@@ -1,0 +1,13 @@
+package coden.child.core
+
+interface CreateFactorActivator: Activator
+interface DeleteFactorActivator: Activator
+interface PurgeFactorActivator: Activator
+interface ChangeFactorActivator: Activator
+interface QueryFactorsActivator: Activator
+
+interface CreateFactorResponder: Responder
+interface DeleteFactorResponder: Responder
+interface PurgeFactorResponder: Responder
+interface ChangeFactorResponder: Responder
+interface QueryFactorsResponder: Responder
