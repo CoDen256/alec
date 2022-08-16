@@ -1,4 +1,4 @@
-package coden.child.interactors.definer
+package coden.child.interactors.definer.factor
 
 import coden.child.core.DeleteFactorActivator
 import coden.child.core.Request

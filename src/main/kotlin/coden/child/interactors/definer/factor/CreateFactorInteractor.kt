@@ -1,4 +1,4 @@
-package coden.child.interactors.definer
+package coden.child.interactors.definer.factor
 
 import coden.child.core.CreateFactorActivator
 import coden.child.core.CreateFactorResponder

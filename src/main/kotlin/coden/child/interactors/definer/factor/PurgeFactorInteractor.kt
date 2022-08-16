@@ -1,4 +1,4 @@
-package coden.child.interactors.definer
+package coden.child.interactors.definer.factor
 
 import coden.child.core.PurgeFactorActivator
 import coden.child.core.Request

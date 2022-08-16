@@ -5,7 +5,7 @@ data class Scale (
     val name: String,
     val unit: String,
     val deleted: Boolean,
-    val division: List<ScaleDivision>
+    val divisions: List<ScaleDivision>
     )
 
 
@@ -18,7 +18,7 @@ interface ScaleGateway{
     fun getScales(): List<Scale>
     fun getScalesCount(): Long
     fun addScale(scale: Scale)
-    fun updateScale(scale: Scale)
+    fun updateScaleSetDeleted(scaleId: String, deleted: Boolean)
     fun deleteScale(scaleId: String)
 }
 
