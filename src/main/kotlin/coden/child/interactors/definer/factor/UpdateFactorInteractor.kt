@@ -1,12 +1,12 @@
 package coden.child.interactors.definer.factor
 
-import coden.child.core.ChangeFactorActivator
+import coden.child.core.UpdateFactorActivator
 import coden.child.core.Request
 import coden.child.core.Response
 import coden.child.entities.Factor
 import coden.child.entities.FactorGateway
 
-class ChangeFactorInteractor(private val gateway: FactorGateway) : ChangeFactorActivator {
+class UpdateFactorInteractor(private val gateway: FactorGateway) : UpdateFactorActivator {
 
     override fun execute(request: Request) {
         val r = request as UpdateFactorRequest

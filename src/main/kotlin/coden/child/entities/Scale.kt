@@ -16,7 +16,7 @@ data class ScaleDivision (
 
 interface ScaleGateway{
     fun getScales(): List<Scale>
-    fun getScalesCount(): Long
+    fun getScalesCount(): Int
     fun addScale(scale: Scale)
     fun updateScaleSetDeleted(scaleId: String, deleted: Boolean)
     fun deleteScale(scaleId: String)
