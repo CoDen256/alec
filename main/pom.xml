@@ -10,9 +10,15 @@
     </parent>
     <groupId>coden</groupId>
     <artifactId>alec-main</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>main</name>
-    <description>main</description>
+    <version>1.0</version>
+    <name>ALEC Main Module</name>
+
+    <repositories>
+        <repository>
+            <id>maven</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     <properties>
         <java.version>11</java.version>
         <kotlin.version>1.6.21</kotlin.version>
@@ -22,6 +28,21 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
@@ -56,6 +77,12 @@
             <groupId>coden</groupId>
             <artifactId>alec-gateway-inmemory</artifactId>
             <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.kotlin-telegram-bot.kotlin-telegram-bot</groupId>
+            <artifactId>telegram</artifactId>
+            <version>6.0.7</version>
         </dependency>
     </dependencies>
 
