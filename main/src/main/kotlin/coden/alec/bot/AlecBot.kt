@@ -1,21 +1,27 @@
 package coden.alec.bot
 
+import coden.alec.bot.controllers.StartController
+import coden.alec.bot.messages.MessageResource
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
-import com.github.kotlintelegrambot.dispatcher.text
-import com.github.kotlintelegrambot.entities.ChatId
+import com.github.kotlintelegrambot.dispatcher.command
 
-class AlecBot (val token: String) {
+class AlecBot (
+    botToken: String,
+    messageResource: MessageResource
+) {
 
-    fun launch(){
-        val bot = bot {
-            token = this@AlecBot.token
-            dispatch {
-                text {
-                    bot.sendMessage(ChatId.fromId(message.chat.id), text = text)
-                }
+    private val bot = bot {
+        token = botToken
+
+        dispatch {
+            command("start") {
+                StartController(bot, messageResource).handle(message)
             }
         }
+    }
+
+    fun launch(){
         bot.startPolling()
     }
 }

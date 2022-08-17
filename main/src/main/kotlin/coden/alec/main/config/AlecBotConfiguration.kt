@@ -7,13 +7,14 @@ import org.springframework.context.annotation.Configuration
 
 
 @Configuration
-@EnableConfigurationProperties(AlecBotProperties::class)
+@EnableConfigurationProperties(AlecBotProperties::class, AlecBotMessages::class)
 class AlecBotConfiguration {
 
 
+
     @Bean
-    fun alecBot(properties: AlecBotProperties): AlecBot{
-        return AlecBot(properties.token).also {
+    fun alecBot(properties: AlecBotProperties, messages: AlecBotMessages): AlecBot{
+        return AlecBot(properties.token, messages).also {
             it.launch()
         }
     }
