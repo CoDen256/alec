@@ -32,6 +32,10 @@ class AlecBot (
             command("start") {
                 StartController(bot, messageResource).handle(message)
             }
+            command("help") {
+                StartController(bot, messageResource).handle(message)
+            }
+
             command("list_scales") {
                 val activator = ListScalesInteractor(
                     gateway, ListScalesPresenter(bot, message)
@@ -45,27 +49,14 @@ class AlecBot (
                 )
                 CreateScaleController(activator, bot).handle(message, args)
             }
-            command("inlineButtons") {
-                val inlineKeyboardMarkup = InlineKeyboardMarkup.create(
-                    listOf(InlineKeyboardButton.CallbackData(text = "Test Inline Button", callbackData = "testButton")),
-                    listOf(InlineKeyboardButton.CallbackData(text = "Show alert", callbackData = "showAlert"))
-                )
-                bot.sendMessage(
-                    chatId = ChatId.fromId(message.chat.id),
-                    text = "Hello, inline buttons!",
-                    replyMarkup = inlineKeyboardMarkup
-                )
-            }
 
-            callbackQuery("testButton") {
-                val inlineKeyboardMarkup = InlineKeyboardMarkup.create(
-                    listOf(InlineKeyboardButton.CallbackData(text = "Test Inline Button 2", callbackData = "testButton")),
-                    listOf(InlineKeyboardButton.CallbackData(text = "Show alert 2", callbackData = "showAlert"))
+            callbackQuery("listScales") {
+                callbackQuery.message?.chat?.id ?: return@callbackQuery
+                val activator = ListScalesInteractor(
+                    gateway, ListScalesInlinePresenter(bot, callbackQuery.message!!)
                 )
-                val chatId = callbackQuery.message?.chat?.id ?: return@callbackQuery
-                bot.editMessageText(ChatId.fromId(chatId), callbackQuery.message?.messageId, text="selected ${callbackQuery.data}",
+                ListScalesController(activator, bot).handle(callbackQuery.message!!)
 
-                    replyMarkup =inlineKeyboardMarkup )
             }
 
         }
