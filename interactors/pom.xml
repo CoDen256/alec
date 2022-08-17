@@ -84,5 +84,15 @@
       <artifactId>kotlin-stdlib-jdk8</artifactId>
       <version>1.7.10</version>
     </dependency>
+    <dependency>
+      <groupId>coden</groupId>
+      <artifactId>alec-core</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>coden</groupId>
+      <artifactId>alec-data</artifactId>
+      <version>1.0</version>
+    </dependency>
   </dependencies>
 </project>

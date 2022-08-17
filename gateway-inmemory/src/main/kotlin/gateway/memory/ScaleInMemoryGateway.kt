@@ -1,7 +1,7 @@
 package gateway.memory
 
-import coden.child.entities.Scale
-import coden.child.entities.ScaleGateway
+import coden.alec.data.Scale
+import coden.alec.data.ScaleGateway
 
 class ScaleInMemoryGateway: ScaleGateway {
 

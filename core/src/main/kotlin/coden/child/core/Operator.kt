@@ -1,2 +1,0 @@
-package coden.child.core
-
