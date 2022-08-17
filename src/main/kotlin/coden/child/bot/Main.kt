@@ -1,35 +1,21 @@
 package coden.child.bot
 
-import coden.child.core.CreateScaleActivator
-import coden.child.core.CreateScaleResponder
-import coden.child.core.Response
-import coden.child.entities.ScaleGateway
-import coden.child.gateway.memory.ScaleInMemoryGateway
-import coden.child.interactors.definer.scale.CreateScaleInteractor
-import coden.child.interactors.definer.scale.CreateScaleRequest
-import coden.child.interactors.definer.scale.CreateScaleResponse
+import com.github.kotlintelegrambot.bot
+import com.github.kotlintelegrambot.dispatch
+import com.github.kotlintelegrambot.dispatcher.text
+import com.github.kotlintelegrambot.entities.ChatId
+
 
 fun main() {
-    val token = ""
-    println("Running")
-
-    val gateway: ScaleGateway = ScaleInMemoryGateway()
-    val responder: CreateScaleResponder = object: CreateScaleResponder {
-        override fun submit(response: Response) {
-            response as CreateScaleResponse
+    val bot = bot {
+        token = "5651703557:AAFyw2eTxvFDxTiq4w1A-moeWxHhLqNnL6k"
+        dispatch {
+            text {
+                bot.sendMessage(ChatId.fromId(message.chat.id), text = text)
+            }
         }
     }
-
-    val createScale: CreateScaleActivator = CreateScaleInteractor(gateway, responder)
-
-
-    createScale.execute(CreateScaleRequest(
-        "scale-0",
-        "hours",
-        mapOf(1L to "minimal", 2L to "maximal")
-    ))
-
-    gateway.getScales();
+    bot.startPolling()
 }
 
 

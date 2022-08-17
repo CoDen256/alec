@@ -90,6 +90,11 @@
             <artifactId>kotlin-stdlib-jdk8</artifactId>
             <version>1.7.10</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.kotlin-telegram-bot.kotlin-telegram-bot</groupId>
+            <artifactId>telegram</artifactId>
+            <version>6.0.7</version>
+        </dependency>
     </dependencies>
 
 </project>
