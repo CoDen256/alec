@@ -1,9 +1,8 @@
 package coden.alec.bot
 
-import coden.alec.bot.controllers.ListScalesController
-import coden.alec.bot.controllers.ListScalesPresenter
-import coden.alec.bot.controllers.StartController
+import coden.alec.bot.controllers.*
 import coden.alec.bot.messages.MessageResource
+import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
@@ -15,6 +14,8 @@ class AlecBot (
     messageResource: MessageResource
 ) {
 
+    private val gateway = ScaleInMemoryGateway()
+
     private val bot = bot {
         token = botToken
 
@@ -24,9 +25,16 @@ class AlecBot (
             }
             command("list_scales") {
                 val activator = ListScalesInteractor(
-                    ScaleInMemoryGateway(), ListScalesPresenter(bot, message)
+                    gateway, ListScalesPresenter(bot, message)
                 )
                 ListScalesController(activator, bot).handle(message)
+            }
+
+            command("create_scale") {
+                val activator = CreateScaleInteractor(
+                    gateway, CreateScalePresenter(bot, message)
+                )
+                CreateScaleController(activator, bot).handle(message, args)
             }
         }
     }
