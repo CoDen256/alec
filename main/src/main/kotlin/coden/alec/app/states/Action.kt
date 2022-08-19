@@ -43,7 +43,7 @@ object CreateInvalidScale: Action {
     }
 }
 
-object CreateScale: Action {
+object DisplayScaleCreated: Action {
     override fun execute(useCaseFactory: UseCaseFactory, view: View, messages: MessageResource): Boolean {
         val createScale = useCaseFactory.createScale()
         val response = createScale.execute(CreateScaleRequest(

@@ -17,7 +17,8 @@ class StateExecutor(
         for (entry in fsm) {
             if (entry.input == current  && entry.command == command){
                 current = entry.output
-                entry.action.execute(useCaseFactory, view, messages)
+                val handled = entry.action.execute(useCaseFactory, view, messages)
+                if (handled) continue
             }
         }
     }

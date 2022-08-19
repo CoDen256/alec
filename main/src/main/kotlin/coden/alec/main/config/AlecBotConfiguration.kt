@@ -94,7 +94,10 @@ class AlecBotConfiguration {
     val fsm = arrayListOf(
         Entry.entry(StartState,             HelpCommand,                    StartState,               DisplayHelpMessage),
         Entry.entry(StartState,             ListScalesCommand,              StartState,               ListScales),
-        Entry.entry(StartState,             CreateScaleCommand,             StartState,               CreateScale),
+
+        Entry.entry(StartState,             CreateScaleCommand,             StartState,               DisplayScaleCreated),
+        Entry.entry(StartState,             CreateScaleCommand,             StartState,               CreateInvalidScale),
+
         Entry.entry(StartState,             CreateScaleNoArgumentCommand,   ScaleWaitForNameState,    CreateScalePromptName),
         Entry.entry(ScaleWaitForNameState,  TextCommand,                    ScaleWaitForNameState,    CreateScalePromptName)
     )
