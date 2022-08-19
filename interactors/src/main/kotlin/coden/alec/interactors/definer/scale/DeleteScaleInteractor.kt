@@ -8,13 +8,12 @@ import coden.alec.data.ScaleGateway
 
 class DeleteScaleInteractor(
     private val gateway: ScaleGateway,
-    private val responder: DeleteScaleResponder
 ) : DeleteScaleActivator {
 
-    override fun execute(request: Request) {
+    override fun execute(request: Request): Response {
         request as DeleteScaleRequest
         gateway.updateScaleSetDeleted(request.id, true)
-        responder.submit(DeleteScaleResponse(Result.success(Unit)))
+        return DeleteScaleResponse(Result.success(Unit))
     }
 
 }

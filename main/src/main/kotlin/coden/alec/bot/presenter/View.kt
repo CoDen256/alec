@@ -1,7 +1,8 @@
-package coden.alec.bot.controllers
+package coden.alec.bot.presenter
 
-interface GlobalPresenter {
+interface View {
     fun displayPrompt(message: String)
     fun displayMessage(message: String)
+    fun displayError(message: String)
     fun replyToMessage(message: String)
 }

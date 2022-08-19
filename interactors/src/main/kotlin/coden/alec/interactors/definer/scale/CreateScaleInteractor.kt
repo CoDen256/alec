@@ -10,10 +10,9 @@ import coden.alec.data.ScaleGateway
 
 class CreateScaleInteractor(
     private val gateway: ScaleGateway,
-    private val responder: CreateScaleResponder
-    ) : CreateScaleActivator {
+) : CreateScaleActivator {
 
-    override fun execute(request: Request) {
+    override fun execute(request: Request): Response {
         request as CreateScaleRequest
         val newScale = Scale(
             name = request.name,
@@ -23,7 +22,7 @@ class CreateScaleInteractor(
             divisions = createDivisions(request.divisions)
         )
         gateway.addScale(newScale)
-        responder.submit(CreateScaleResponse(Result.success(newScale.id)))
+        return CreateScaleResponse(Result.success(newScale.id))
     }
 
     private fun createDivisions(divisions: Map<Long, String>): List<ScaleDivision>{

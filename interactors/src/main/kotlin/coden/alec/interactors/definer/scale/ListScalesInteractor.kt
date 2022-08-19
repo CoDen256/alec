@@ -9,13 +9,12 @@ import coden.alec.data.ScaleGateway
 
 class ListScalesInteractor(
     private val gateway: ScaleGateway,
-    private val responder: ListScalesResponder
 ) : ListScalesActivator {
 
-    override fun execute(request: Request) {
+    override fun execute(request: Request): Response {
         request as ListScalesRequest
         val scales = gateway.getScales()
-        responder.submit(ListScalesResponse(Result.success(scales)))
+        return ListScalesResponse(Result.success(scales))
     }
 }
 
