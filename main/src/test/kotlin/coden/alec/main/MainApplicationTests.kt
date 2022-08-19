@@ -22,6 +22,11 @@ class MainApplicationTests {
         stateExecutor.submit(ListScalesCommand)
         stateExecutor.submit(ListScalesCommand)
         stateExecutor.submit(HelpCommand)
+        stateExecutor.submit(CreateScaleCommand)
+        stateExecutor.submit(CreateScaleCommand)
+        stateExecutor.submit(CreateScaleCommand, "something")
+        stateExecutor.submit(CreateScaleCommand, "hello\nname\n1-interesting")
+        stateExecutor.submit(ListScalesCommand)
 
     }
 

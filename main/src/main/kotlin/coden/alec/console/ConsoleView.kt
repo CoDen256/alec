@@ -12,7 +12,7 @@ class ConsoleView: View {
     }
 
     override fun displayError(message: String) {
-        TODO("Not yet implemented")
+        println("Error: $message")
     }
 
     override fun replyToMessage(message: String) {

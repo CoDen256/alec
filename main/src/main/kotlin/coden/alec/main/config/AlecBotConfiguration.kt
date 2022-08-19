@@ -1,6 +1,7 @@
 package coden.alec.main.config
 
 import coden.alec.app.states.*
+import coden.alec.app.states.Entry.Companion.entry
 import coden.alec.bot.presenter.View
 import coden.alec.console.ConsoleView
 import coden.alec.core.CreateScaleActivator
@@ -92,19 +93,31 @@ class AlecBotConfiguration {
     }
 
     val fsm = arrayListOf(
-        Entry.entry(StartState,             HelpCommand,                    StartState,               DisplayHelpMessage),
-        Entry.entry(StartState,             ListScalesCommand,              StartState,               ListScales),
+        entry(StartState, StartState,
+            eq(HelpCommand),
+            DisplayHelpMessage),
 
-        Entry.entry(StartState,             CreateScaleCommand,             StartState,               DisplayScaleCreated),
-        Entry.entry(StartState,             CreateScaleCommand,             StartState,               CreateInvalidScale),
+        entry(StartState, StartState,
+            eq(ListScalesCommand),
+            GetScalesAndDisplay),
 
-        Entry.entry(StartState,             CreateScaleNoArgumentCommand,   ScaleWaitForNameState,    CreateScalePromptName),
-        Entry.entry(ScaleWaitForNameState,  TextCommand,                    ScaleWaitForNameState,    CreateScalePromptName)
+        entry(StartState, StartState,
+            eq(CreateScaleCommand) * CreateScaleArgsAreValid,
+            CreateScaleAndDisplay
+        ),
+        entry(StartState, StartState,
+            eq(CreateScaleCommand) * not(CreateScaleArgsAreValid),
+            FailOnInvalidScale
+        ),
+
+//        entry(StartState,             CreateScaleNoArgumentCommand,   ScaleWaitForNameState,    CreateScalePromptName),
+//        entry(ScaleWaitForNameState,  TextCommand,                    ScaleWaitForNameState,    CreateScalePromptName)
     )
 
     @Bean
     fun stateExecutor(useCaseFactory: UseCaseFactory, messages: Messages, view: View): StateExecutor {
-        return StateExecutor(StartState,
+        return StateExecutor(
+            StartState,
             fsm,
             view,
             useCaseFactory,

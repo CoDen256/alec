@@ -1,10 +1,8 @@
 package coden.alec.app.states
 
 
-sealed interface State {
-}
+interface State
 
-object StartState : State
-object ScaleWaitForNameState : State
-
+object StartState: State
+object ScaleWaitForNameState: State
 

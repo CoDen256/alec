@@ -13,12 +13,11 @@ class StateExecutor(
 
     private var current = start
 
-    fun submit(command: Command){
+    fun submit(command: Command, args: String = ""){
         for (entry in fsm) {
-            if (entry.input == current  && entry.command == command){
+            if (entry.input == current  && entry.condition.verify(command, args)){
                 current = entry.output
-                val handled = entry.action.execute(useCaseFactory, view, messages)
-                if (handled) continue
+                entry.action.execute(ActionContext(useCaseFactory, view, messages, args))
             }
         }
     }

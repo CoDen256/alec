@@ -7,64 +7,72 @@ import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
 
-fun interface Action {
-    fun execute(useCaseFactory: UseCaseFactory, view: View, messages: MessageResource): Boolean
+interface Action {
+    fun execute(ctx: ActionContext)
 }
+
+data class ActionContext(
+    val useCaseFactory: UseCaseFactory,
+    val view: View,
+    val messages: MessageResource,
+    val args: String
+)
 
 
 object DisplayHelpMessage: Action {
-    override fun execute(useCaseFactory: UseCaseFactory, view: View, messages: MessageResource): Boolean {
-        view.displayMessage(messages.startMessage)
-        return true
+    override fun execute(ctx: ActionContext) {
+        ctx.view.displayMessage(ctx.messages.startMessage)
     }
 }
 
-object ListScales: Action {
-    override fun execute(useCaseFactory: UseCaseFactory, view: View, messages: MessageResource): Boolean {
-        val listScales = useCaseFactory.listScales()
+object GetScalesAndDisplay: Action {
+    override fun execute(ctx: ActionContext) {
+        val listScales = ctx.useCaseFactory.listScales()
         val response = listScales.execute(ListScalesRequest()) as ListScalesResponse
         response.scales.onSuccess {
             if (it.isEmpty()){
-                view.displayMessage(messages.listScalesEmptyMessage)
+                ctx.view.displayMessage(ctx.messages.listScalesEmptyMessage)
             }else {
-                view.displayMessage(messages.listScalesMessage + it)
+                ctx.view.displayMessage(ctx.messages.listScalesMessage + it)
             }
         }.onFailure {
-            view.displayError("${messages.errorMessage} ${it.message}")
+            ctx.view.displayError("${ctx.messages.errorMessage} ${it.message}")
         }
-        return true;
     }
 }
 
-object CreateInvalidScale: Action {
-    override fun execute(useCaseFactory: UseCaseFactory, view: View, messages: MessageResource): Boolean {
-        view.displayError("Invalid format")
-        return true;
+object FailOnInvalidScale: Action {
+    override fun execute(ctx: ActionContext) {
+        ctx.view.displayError("Invalid format")
     }
 }
 
-object DisplayScaleCreated: Action {
-    override fun execute(useCaseFactory: UseCaseFactory, view: View, messages: MessageResource): Boolean {
-        val createScale = useCaseFactory.createScale()
+object CreateScaleAndDisplay: Action {
+    override fun execute(ctx: ActionContext) {
+        val args = ctx.args.split("\n")
+        val name = args[0]
+        val unit = args[1]
+        val divisions = HashMap<Long, String>()
+        for (arg in args.subList(2, args.size)) {
+            val division = arg.split("-")
+            divisions[division[0].toLong()] = division[1]
+        }
+        val createScale = ctx.useCaseFactory.createScale()
         val response = createScale.execute(CreateScaleRequest(
-            name = "",
-            unit = "",
-            mapOf(
-                1L to ""
-            )
+            name = name,
+            unit = unit,
+            divisions
         )) as CreateScaleResponse
         response.scaleId.onSuccess {
-            view.displayMessage("Added id: $it")
+            ctx.view.displayMessage("Added id: $it")
         }.onFailure {
-            view.displayError("${messages.errorMessage} ${it.message}")
+            ctx.view.displayError("${ctx.messages.errorMessage} ${it.message}")
         }
-        return true;
     }
 }
 
 object CreateScalePromptName: Action {
-    override fun execute(useCaseFactory: UseCaseFactory, view: View, messages: MessageResource): Boolean {
-        view.displayPrompt("Input the name of the scale:")
-        return true;
+    override fun execute(ctx: ActionContext) {
+        ctx.view.displayPrompt("Input the name of the scale:")
     }
 }
