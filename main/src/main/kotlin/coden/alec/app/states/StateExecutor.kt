@@ -7,6 +7,7 @@ class StateExecutor(
     start: State,
     private val fsm: List<Entry>,
     private val view: View,
+    private val useCaseFactory: UseCaseFactory,
     private val messages: MessageResource
 ) {
 
@@ -16,7 +17,7 @@ class StateExecutor(
         for (entry in fsm) {
             if (entry.input == current  && entry.command == command){
                 current = entry.output
-                entry.action.execute(view, messages)
+                entry.action.execute(useCaseFactory, view, messages)
             }
         }
     }

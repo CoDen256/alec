@@ -2,3 +2,6 @@ bot.token: '5402767430:AAEXVe8s8IAow9z9Ip69NCU9JnUaEHIgcrw'
 
 messages:
   startMessage: "Hello"
+  listScalesEmptyMessage: "Empty"
+  listScalesMessage: "Scales:"
+  errorMessage: "Error ocurred:"

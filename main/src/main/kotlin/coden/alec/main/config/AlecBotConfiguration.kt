@@ -1,22 +1,15 @@
 package coden.alec.main.config
 
-import coden.alec.app.ListScalesController
-import coden.alec.app.ListScalesPresenter
 import coden.alec.app.states.*
-import coden.alec.bot.AlecBot
-import coden.alec.bot.presenter.TelegramView
 import coden.alec.bot.presenter.View
-import coden.alec.console.AlecConsole
 import coden.alec.console.ConsoleView
-import coden.alec.core.ListScalesResponder
+import coden.alec.core.ListScalesActivator
 import coden.alec.data.ScaleGateway
 import coden.alec.interactors.definer.scale.ListScalesInteractor
 import gateway.memory.ScaleInMemoryGateway
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.scheduling.annotation.Async
 
 
 @Configuration
@@ -24,10 +17,10 @@ import org.springframework.scheduling.annotation.Async
 class AlecBotConfiguration {
 
 
-//    @Bean
-//    fun scalesGateway(): ScaleGateway {
-//        return ScaleInMemoryGateway()
-//    }
+    @Bean
+    fun scalesGateway(): ScaleGateway {
+        return ScaleInMemoryGateway()
+    }
 //
 //
 //    @Bean
@@ -79,18 +72,29 @@ class AlecBotConfiguration {
 
 
     @Bean
+    fun useCaseFactory(scalesGateway: ScaleGateway): UseCaseFactory {
+        return object : UseCaseFactory {
+            override fun listScales(): ListScalesActivator {
+                return ListScalesInteractor(scalesGateway)
+            }
+        }
+    }
+
+    @Bean
     fun view(): View {
         return ConsoleView()
     }
 
     val fsm = arrayListOf(
-        Entry.entry(StartState, StartState, HelpCommand, DisplayStartMessage)
+        Entry.entry(StartState, StartState, HelpCommand, DisplayHelpMessage),
+        Entry.entry(StartState, StartState, ListScalesCommand, ListScales)
     )
     @Bean
-    fun stateExecutor(messages: Messages, view: View): StateExecutor {
+    fun stateExecutor(useCaseFactory: UseCaseFactory, messages: Messages, view: View): StateExecutor {
         return StateExecutor(StartState,
             fsm,
             view,
+            useCaseFactory,
             messages
         )
     }

@@ -18,6 +18,10 @@ class MainApplicationTests {
         stateExecutor.submit(HelpCommand)
         stateExecutor.submit(HelpCommand)
         stateExecutor.submit(HelpCommand)
+        stateExecutor.submit(ListScalesCommand)
+        stateExecutor.submit(ListScalesCommand)
+        stateExecutor.submit(ListScalesCommand)
+        stateExecutor.submit(HelpCommand)
 
     }
 
