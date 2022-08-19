@@ -23,7 +23,7 @@ class StartController (
         val inlineKeyboardMarkup = InlineKeyboardMarkup.create(
             listOf(
                 InlineKeyboardButton.CallbackData(text = "List Scales", callbackData = "listScales"),
-                InlineKeyboardButton.CallbackData(text = "Create Scale", callbackData = "createScales")
+                InlineKeyboardButton.CallbackData(text = "Create Scale", callbackData = "createScale")
             ),
         )
         bot.send(message, messageResource.startMessage, replyMarkup = inlineKeyboardMarkup)

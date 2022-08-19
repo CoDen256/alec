@@ -1,6 +1,7 @@
 package coden.alec.bot
 
 import coden.alec.bot.controllers.*
+import coden.alec.bot.handler.Handler
 import coden.alec.bot.messages.MessageResource
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
@@ -9,6 +10,7 @@ import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.callbackQuery
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.inlineQuery
+import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
@@ -24,7 +26,7 @@ class AlecBot (
 ) {
 
     private val gateway = ScaleInMemoryGateway()
-
+    private var handler: Handler? = null
     private val bot = bot {
         token = botToken
 
@@ -47,7 +49,15 @@ class AlecBot (
                 val activator = CreateScaleInteractor(
                     gateway, CreateScalePresenter(bot, message)
                 )
-                CreateScaleController(activator, bot).handle(message, args)
+                val ctronroller = CreateScaleController(activator, bot)
+                val controllerhandler = CreateScaleHandler(
+                    bot = bot,
+                    controller = ctronroller,
+                )
+                val handled = controllerhandler.handle(message, args)
+                if (!handled) {
+                    handler =  controllerhandler
+                }
             }
 
             callbackQuery("listScales") {
@@ -57,6 +67,22 @@ class AlecBot (
                 )
                 ListScalesController(activator, bot).handle(callbackQuery.message!!)
 
+            }
+
+//            callbackQuery("createScale") {
+//                callbackQuery.message?.chat?.id ?: return@callbackQuery
+//                val activator = CreateScaleInteractor(
+//                    gateway, CreateScaleInlinePresenter(bot, callbackQuery.message!!)
+//                )
+//                CreateScaleController(activator, bot).handle(callbackQuery.message!!, listOf())
+//
+//            }
+
+            text {
+                val handled = handler?.handleArguments(message)
+                if (handled == true){
+                    handler = null
+                }
             }
 
         }
