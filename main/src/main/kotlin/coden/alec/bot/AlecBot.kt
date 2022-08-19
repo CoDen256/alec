@@ -30,64 +30,76 @@ class AlecBot (
     private val bot = bot {
         token = botToken
 
-        dispatch {
-            command("start") {
-                StartController(bot, messageResource).handle(message)
-            }
-            command("help") {
-                StartController(bot, messageResource).handle(message)
-            }
-
-            command("list_scales") {
-                val activator = ListScalesInteractor(
-                    gateway, ListScalesPresenter(bot, message)
-                )
-                ListScalesController(activator, bot).handle(message)
-            }
-
-            command("create_scale") {
-                val activator = CreateScaleInteractor(
-                    gateway, CreateScalePresenter(bot, message)
-                )
-                val ctronroller = CreateScaleController(activator, bot)
-                val controllerhandler = CreateScaleHandler(
-                    bot = bot,
-                    controller = ctronroller,
-                )
-                val handled = controllerhandler.handle(message, args)
-                if (!handled) {
-                    handler =  controllerhandler
-                }
-            }
-
-            callbackQuery("listScales") {
-                callbackQuery.message?.chat?.id ?: return@callbackQuery
-                val activator = ListScalesInteractor(
-                    gateway, ListScalesInlinePresenter(bot, callbackQuery.message!!)
-                )
-                ListScalesController(activator, bot).handle(callbackQuery.message!!)
-
-            }
-
-//            callbackQuery("createScale") {
-//                callbackQuery.message?.chat?.id ?: return@callbackQuery
-//                val activator = CreateScaleInteractor(
-//                    gateway, CreateScaleInlinePresenter(bot, callbackQuery.message!!)
-//                )
-//                CreateScaleController(activator, bot).handle(callbackQuery.message!!, listOf())
+//        dispatch {
+////            command("start") {
+////                StartController(bot, messageResource).handle(message)
+////            }
+////            command("help") {
+////                StartController(bot, messageResource).handle(message)
+////            }
 //
+////            command("list_scales") {
+////                val activator = ListScalesInteractor(
+////                    gateway, ListScalesPresenter(bot, message)
+////                )
+////                ListScalesController(activator, bot).handle(message)
+////            }
+//
+//            command("create_scale") {
+//                val activator = CreateScaleInteractor(
+//                    gateway, CreateScalePresenter(bot, message)
+//                )
+//                val ctronroller = CreateScaleController(activator, bot)
+//                val controllerhandler = CreateScaleHandler(
+//                    bot = bot,
+//                    controller = ctronroller,
+//                )
+//                val handled = controllerhandler.handle(message, args)
+//                if (!handled) {
+//                    handler =  controllerhandler
+//                }
+//            }
+//
+////            callbackQuery("listScales") {
+////                callbackQuery.message?.chat?.id ?: return@callbackQuery
+////                val activator = ListScalesInteractor(
+////                    gateway, ListScalesInlinePresenter(bot, callbackQuery.message!!)
+////                )
+////                ListScalesController(activator, bot).handle(callbackQuery.message!!)
+////
+////            }
+//
+////            callbackQuery("createScale") {
+////                callbackQuery.message?.chat?.id ?: return@callbackQuery
+////                val activator = CreateScaleInteractor(
+////                    gateway, CreateScaleInlinePresenter(bot, callbackQuery.message!!)
+////                )
+////                CreateScaleController(activator, bot).handle(callbackQuery.message!!, listOf())
+////
+////            }
+//
+//            text {
+//                val handled = handler?.handleArguments(message)
+//                if (handled == true){
+//                    handler = null
+//                }
 //            }
 
-            text {
-                val handled = handler?.handleArguments(message)
-                if (handled == true){
-                    handler = null
-                }
-            }
-
-        }
+//        }
     }
     fun launch(){
+
+        globalContext.add(
+            command("create_scale", CreateScaleHandler){
+                text (CreateScaleArgHandler) {
+
+                }
+            }
+            command("start", StartHandler)
+
+            text (TextHandler)
+        )
+
         bot.startPolling()
     }
 }

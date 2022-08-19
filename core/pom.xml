@@ -5,7 +5,7 @@
   <artifactId>alec-core</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
-  <name>ALEC Core module</name>
+  <name>ALEC Core Module</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
