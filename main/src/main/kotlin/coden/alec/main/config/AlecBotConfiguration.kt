@@ -2,6 +2,7 @@ package coden.alec.main.config
 
 import coden.alec.app.ListScalesController
 import coden.alec.app.ListScalesPresenter
+import coden.alec.app.states.*
 import coden.alec.bot.AlecBot
 import coden.alec.bot.presenter.TelegramView
 import coden.alec.bot.presenter.View
@@ -23,57 +24,74 @@ import org.springframework.scheduling.annotation.Async
 class AlecBotConfiguration {
 
 
-    @Bean
-    fun scalesGateway(): ScaleGateway {
-        return ScaleInMemoryGateway()
-    }
+//    @Bean
+//    fun scalesGateway(): ScaleGateway {
+//        return ScaleInMemoryGateway()
+//    }
+//
+//
+//    @Bean
+//    fun telegramView(): TelegramView{
+//        return TelegramView()
+//    }
+//
+//    @Bean
+//    fun consoleResponder(): ListScalesResponder {
+//        return ListScalesPresenter(ConsoleView())
+//    }
+//
+//    @Bean("telResponder")
+//    fun telegramResponder(telegramView: View): ListScalesResponder {
+//        return ListScalesPresenter(telegramView)
+//    }
+//
+//    @Bean("telegram")
+//    fun telegramListScaleController(gateway: ScaleGateway, @Qualifier("telResponder") telegramResponder: ListScalesResponder): ListScalesController {
+//        return ListScalesController(ListScalesInteractor(gateway), telegramResponder)
+//    }
+//
+//
+//    @Bean("console")
+//    fun consoleListScaleController(gateway: ScaleGateway): ListScalesController {
+//        return ListScalesController(ListScalesInteractor(gateway), consoleResponder())
+//    }
+
+//    @Bean
+//    @Async
+//    fun alecBot(@Qualifier("telegram") telegram: ListScalesController,
+//                properties: AlecBotProperties,
+//                messages: Messages,
+//                telegramView: TelegramView
+//
+//    ): AlecBot{
+//        return AlecBot(telegram,telegramView,  properties.token, messages).also {
+//            it.launch()
+//        }
+//    }
+//
+//    @Bean
+//    @Async
+//    fun alecConsole(@Qualifier("console") console: ListScalesController) : AlecConsole{
+//        return AlecConsole(console).also {
+//            it.launch()
+//        }
+//    }
 
 
     @Bean
-    fun telegramView(): TelegramView{
-        return TelegramView()
+    fun view(): View {
+        return ConsoleView()
     }
 
+    val fsm = arrayListOf(
+        Entry.entry(StartState, StartState, HelpCommand, DisplayStartMessage)
+    )
     @Bean
-    fun consoleResponder(): ListScalesResponder {
-        return ListScalesPresenter(ConsoleView())
+    fun stateExecutor(messages: Messages, view: View): StateExecutor {
+        return StateExecutor(StartState,
+            fsm,
+            view,
+            messages
+        )
     }
-
-    @Bean("telResponder")
-    fun telegramResponder(telegramView: View): ListScalesResponder {
-        return ListScalesPresenter(telegramView)
-    }
-
-    @Bean("telegram")
-    fun telegramListScaleController(gateway: ScaleGateway, @Qualifier("telResponder") telegramResponder: ListScalesResponder): ListScalesController {
-        return ListScalesController(ListScalesInteractor(gateway), telegramResponder)
-    }
-
-
-    @Bean("console")
-    fun consoleListScaleController(gateway: ScaleGateway): ListScalesController {
-        return ListScalesController(ListScalesInteractor(gateway), consoleResponder())
-    }
-
-    @Bean
-    @Async
-    fun alecBot(@Qualifier("telegram") telegram: ListScalesController,
-                properties: AlecBotProperties,
-                messages: Messages,
-                telegramView: TelegramView
-
-    ): AlecBot{
-        return AlecBot(telegram,telegramView,  properties.token, messages).also {
-            it.launch()
-        }
-    }
-
-    @Bean
-    @Async
-    fun alecConsole(@Qualifier("console") console: ListScalesController) : AlecConsole{
-        return AlecConsole(console).also {
-            it.launch()
-        }
-    }
-
 }

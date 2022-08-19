@@ -25,6 +25,19 @@ class AlecBot (
                 scaleController.handle()
             }
 
+//            command("create_scale"){
+//                view.update(bot, lastMessage = message)
+//                if (args.isNotEmpty()){
+//                    message.text?.let{
+//                        createScalesController.handle(mapOf(
+//                            "name" to args[0],
+//                            "unit" to args[1],
+//                            "divisions" to args[3]
+//                        ))
+//                    }
+//                }
+//            }
+
         }
     }
     fun launch(){
