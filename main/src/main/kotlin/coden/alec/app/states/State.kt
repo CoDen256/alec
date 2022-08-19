@@ -5,5 +5,6 @@ sealed interface State {
 }
 
 object StartState : State
+object ScaleWaitForNameState : State
 
 

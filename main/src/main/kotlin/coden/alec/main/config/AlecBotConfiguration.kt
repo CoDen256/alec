@@ -3,8 +3,10 @@ package coden.alec.main.config
 import coden.alec.app.states.*
 import coden.alec.bot.presenter.View
 import coden.alec.console.ConsoleView
+import coden.alec.core.CreateScaleActivator
 import coden.alec.core.ListScalesActivator
 import coden.alec.data.ScaleGateway
+import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -77,6 +79,10 @@ class AlecBotConfiguration {
             override fun listScales(): ListScalesActivator {
                 return ListScalesInteractor(scalesGateway)
             }
+
+            override fun createScale(): CreateScaleActivator {
+                return CreateScaleInteractor(scalesGateway)
+            }
         }
     }
 
@@ -86,9 +92,13 @@ class AlecBotConfiguration {
     }
 
     val fsm = arrayListOf(
-        Entry.entry(StartState, StartState, HelpCommand, DisplayHelpMessage),
-        Entry.entry(StartState, StartState, ListScalesCommand, ListScales)
+        Entry.entry(StartState,             HelpCommand,                    StartState,               DisplayHelpMessage),
+        Entry.entry(StartState,             ListScalesCommand,              StartState,               ListScales),
+        Entry.entry(StartState,             CreateScaleCommand,             StartState,               CreateScale),
+        Entry.entry(StartState,             CreateScaleNoArgumentCommand,   ScaleWaitForNameState,    CreateScalePromptName),
+        Entry.entry(ScaleWaitForNameState,  TextCommand,                    ScaleWaitForNameState,    CreateScalePromptName)
     )
+
     @Bean
     fun stateExecutor(useCaseFactory: UseCaseFactory, messages: Messages, view: View): StateExecutor {
         return StateExecutor(StartState,
