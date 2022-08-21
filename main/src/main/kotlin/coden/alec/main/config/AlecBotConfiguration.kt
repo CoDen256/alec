@@ -1,7 +1,14 @@
 package coden.alec.main.config
 
+import coden.alec.app.FiniteStateMachine
+import coden.alec.app.actuator.BaseHelpActuator
+import coden.alec.app.actuator.BaseScaleActuator
+import coden.alec.app.actuator.HelpActuator
+import coden.alec.app.actuator.ScaleActuator
 import coden.alec.app.states.*
 import coden.alec.app.states.Entry.Companion.entry
+import coden.alec.app.states.State.*
+import coden.alec.bot.messages.MessageResource
 import coden.alec.bot.presenter.View
 import coden.alec.console.ConsoleView
 import coden.alec.core.CreateScaleActivator
@@ -92,82 +99,51 @@ class AlecBotConfiguration {
         return ConsoleView()
     }
 
-    val fsm = arrayListOf(
-        entry(
-            Start, Start,
-            eq(Help),
-            DisplayHelp
-        ),
-
-        entry(
-            Start, Start,
-            eq(ListScales),
-            GetScalesAndDisplay
-        ),
-
-        entry(
-            Start, Start,
-            eq(CreateScale) * ScaleIsValid,
-            CreateScaleAndDisplay
-        ),
-        entry(
-            Start, Start,
-            eq(CreateScale) * not(ScaleIsValid),
-            FailOnInvalidScale
-        ),
-
-        entry(
-            Start, WaitScaleName,
-            CreateScaleNoArgs,
-            PromptScaleName
-        ),
-
-
-        entry(
-            WaitScaleName, WaitScaleName,
-            eq(Text) * not(NameIsValid),
-            FailOnScaleName + PromptScaleName
-        ),
-
-        entry(
-            WaitScaleName, WaitScaleUnit,
-            eq(Text) * NameIsValid,
-            PromptScaleUnit
-        ),
-
-
-        entry(
-            WaitScaleUnit, WaitScaleUnit,
-            eq(Text) * not(NameIsValid),
-            FailOnScaleUnit + PromptScaleUnit
-        ),
-        entry(
-            WaitScaleUnit, WaitScaleDivision,
-            eq(Text) * NameIsValid,
-            PromptScaleDivisions
-        ),
-
-        entry(
-            WaitScaleDivision, WaitScaleDivision,
-            eq(Text) * not(DivisionsAreValid),
-            FailOnScaleDivisions + PromptScaleDivisions
-        ),
-        entry(
-            WaitScaleDivision, Start,
-            eq(Text) * DivisionsAreValid,
-            CreateScaleAndDisplay
-        ),
-
-        )
+    @Bean
+    fun scaleActuator(view: View, useCaseFactory: UseCaseFactory, messages: MessageResource): ScaleActuator {
+        return BaseScaleActuator(useCaseFactory, view, messages)
+    }
 
     @Bean
-    fun stateExecutor(useCaseFactory: UseCaseFactory, messages: Messages, view: View): StateExecutor {
-        return StateExecutor(
-            Start,
-            fsm,
-            view,
-            useCaseFactory,
-            messages
+    fun helpActuator(view: View, useCaseFactory: UseCaseFactory, messages: MessageResource): HelpActuator {
+        return BaseHelpActuator(useCaseFactory, view, messages)
+    }
+
+
+    @Bean
+    fun stateExecutor(fsm: FiniteStateMachine): StateExecutor {
+        return StateExecutor(fsm)
+    }
+
+
+    @Bean
+    fun fsm(
+        scale: ScaleActuator,
+        help: HelpActuator
+    ): FiniteStateMachine {
+        return FiniteStateMachine(
+            Start, arrayListOf(
+
+                entry(Start, HelpCommand, Start, help::displayHelp),
+                entry(Start, ListScalesCommand, Start, scale::getAndDisplayScales),
+
+                entry(Start, CreateScaleCommand::class, Start, scale::createAndDisplayScale),
+
+                entry(Start, CreateScaleCommandNoArgs, WaitScaleName, scale::displayScaleNamePrompt),
+                entry(WaitScaleName, TextCommand::class, WaitScaleUnit, {
+                    scale.handleScaleName(it);
+                    scale.displayScaleUnitPrompt(it)
+                }),
+                entry(WaitScaleUnit, TextCommand::class, WaitScaleDivision, {
+                    scale.handleScaleUnit(it)
+                    scale.displayScaleDivisionsPrompt(it)
+                }),
+                entry(WaitScaleDivision, TextCommand::class, WaitScaleDivision, {
+                    scale.handleScaleDivisions(it)
+                    scale.createAndDisplayScale(it)
+                })
+            )
         )
     }
+
 }

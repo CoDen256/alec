@@ -1,25 +1,21 @@
 package coden.alec.app.states
 
-import coden.alec.bot.messages.MessageResource
-import coden.alec.bot.presenter.View
+import coden.alec.app.FiniteStateMachine
 
-class StateExecutor(
-    start: State,
-    private val fsm: List<Entry>,
-    private val view: View,
-    private val useCaseFactory: UseCaseFactory,
-    private val messages: MessageResource
-) {
+class StateExecutor(private val fsm: FiniteStateMachine) {
+    private var current = fsm.start
 
-    private var current = start
-    private val buffer = ArrayList<String>()
-
-    fun submit(command: Command, args: String = ""){
-        view.displayMessage("[Command]: ${command.javaClass.simpleName} $args")
-        for (entry in fsm) {
-            if (entry.input == current  && entry.condition.verify(command, args)){
-                current = entry.output
-                entry.action.execute(ActionContext(useCaseFactory, view, messages, args, buffer))
+    fun submit(submittedCommand: Command){
+        println("[Command]: ${submittedCommand.javaClass.simpleName} ${submittedCommand.arguments}")
+        for ((input, command, condition, output, action, fallback, fallbackAction) in fsm.entries) {
+            if (input == current && command.isInstance(submittedCommand) && condition.verify(submittedCommand)){
+                val success = action(submittedCommand)
+                current = if (success){
+                    output
+                }else{
+                    fallbackAction(submittedCommand)
+                    fallback
+                }
                 break
             }
         }
