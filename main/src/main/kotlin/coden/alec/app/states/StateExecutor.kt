@@ -12,12 +12,15 @@ class StateExecutor(
 ) {
 
     private var current = start
+    private val buffer = ArrayList<String>()
 
     fun submit(command: Command, args: String = ""){
+        view.displayMessage("[Command]: ${command.javaClass.simpleName} $args")
         for (entry in fsm) {
             if (entry.input == current  && entry.condition.verify(command, args)){
                 current = entry.output
-                entry.action.execute(ActionContext(useCaseFactory, view, messages, args))
+                entry.action.execute(ActionContext(useCaseFactory, view, messages, args, buffer))
+                break
             }
         }
     }

@@ -93,31 +93,77 @@ class AlecBotConfiguration {
     }
 
     val fsm = arrayListOf(
-        entry(StartState, StartState,
-            eq(HelpCommand),
-            DisplayHelpMessage),
+        entry(
+            Start, Start,
+            eq(Help),
+            DisplayHelp
+        ),
 
-        entry(StartState, StartState,
-            eq(ListScalesCommand),
-            GetScalesAndDisplay),
+        entry(
+            Start, Start,
+            eq(ListScales),
+            GetScalesAndDisplay
+        ),
 
-        entry(StartState, StartState,
-            eq(CreateScaleCommand) * CreateScaleArgsAreValid,
+        entry(
+            Start, Start,
+            eq(CreateScale) * ScaleIsValid,
             CreateScaleAndDisplay
         ),
-        entry(StartState, StartState,
-            eq(CreateScaleCommand) * not(CreateScaleArgsAreValid),
+        entry(
+            Start, Start,
+            eq(CreateScale) * not(ScaleIsValid),
             FailOnInvalidScale
         ),
 
-//        entry(StartState,             CreateScaleNoArgumentCommand,   ScaleWaitForNameState,    CreateScalePromptName),
-//        entry(ScaleWaitForNameState,  TextCommand,                    ScaleWaitForNameState,    CreateScalePromptName)
-    )
+        entry(
+            Start, WaitScaleName,
+            CreateScaleNoArgs,
+            PromptScaleName
+        ),
+
+
+        entry(
+            WaitScaleName, WaitScaleName,
+            eq(Text) * not(NameIsValid),
+            FailOnScaleName + PromptScaleName
+        ),
+
+        entry(
+            WaitScaleName, WaitScaleUnit,
+            eq(Text) * NameIsValid,
+            PromptScaleUnit
+        ),
+
+
+        entry(
+            WaitScaleUnit, WaitScaleUnit,
+            eq(Text) * not(NameIsValid),
+            FailOnScaleUnit + PromptScaleUnit
+        ),
+        entry(
+            WaitScaleUnit, WaitScaleDivision,
+            eq(Text) * NameIsValid,
+            PromptScaleDivisions
+        ),
+
+        entry(
+            WaitScaleDivision, WaitScaleDivision,
+            eq(Text) * not(DivisionsAreValid),
+            FailOnScaleDivisions + PromptScaleDivisions
+        ),
+        entry(
+            WaitScaleDivision, Start,
+            eq(Text) * DivisionsAreValid,
+            CreateScaleAndDisplay
+        ),
+
+        )
 
     @Bean
     fun stateExecutor(useCaseFactory: UseCaseFactory, messages: Messages, view: View): StateExecutor {
         return StateExecutor(
-            StartState,
+            Start,
             fsm,
             view,
             useCaseFactory,

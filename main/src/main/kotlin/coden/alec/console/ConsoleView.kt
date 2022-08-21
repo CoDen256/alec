@@ -4,7 +4,7 @@ import coden.alec.bot.presenter.View
 
 class ConsoleView: View {
     override fun displayPrompt(message: String) {
-        TODO("Not yet implemented")
+        println("Please add something: $message")
     }
 
     override fun displayMessage(message: String) {

@@ -3,8 +3,8 @@ package coden.alec.app.states
 sealed interface Command {
 }
 
-object HelpCommand : Command
-object ListScalesCommand : Command
-object CreateScaleCommand : Command
-object CreateScaleNoArgumentCommand : Command
-object TextCommand: Command
+object Help : Command
+object ListScales : Command
+object CreateScale : Command
+object CreateScaleNoArgs : Command
+object Text: Command

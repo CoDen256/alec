@@ -9,17 +9,28 @@ import coden.alec.interactors.definer.scale.ListScalesResponse
 
 interface Action {
     fun execute(ctx: ActionContext)
+
+    operator fun plus(other: Action): Action{
+        return object : Action {
+            override fun execute(ctx: ActionContext) {
+                this@Action.execute(ctx)
+                other.execute(ctx)
+            }
+        }
+
+    }
 }
 
 data class ActionContext(
     val useCaseFactory: UseCaseFactory,
     val view: View,
     val messages: MessageResource,
-    val args: String
+    val args: String,
+    val buffer: MutableList<String>
 )
 
 
-object DisplayHelpMessage: Action {
+object DisplayHelp: Action {
     override fun execute(ctx: ActionContext) {
         ctx.view.displayMessage(ctx.messages.startMessage)
     }
@@ -43,13 +54,13 @@ object GetScalesAndDisplay: Action {
 
 object FailOnInvalidScale: Action {
     override fun execute(ctx: ActionContext) {
-        ctx.view.displayError("Invalid format")
+        ctx.view.displayError("Invalid format of the scale")
     }
 }
 
 object CreateScaleAndDisplay: Action {
     override fun execute(ctx: ActionContext) {
-        val args = ctx.args.split("\n")
+        val args = if (ctx.buffer.isEmpty()) ctx.args.split("\n") else ctx.buffer + ctx.args
         val name = args[0]
         val unit = args[1]
         val divisions = HashMap<Long, String>()
@@ -71,8 +82,40 @@ object CreateScaleAndDisplay: Action {
     }
 }
 
-object CreateScalePromptName: Action {
+object FailOnScaleName: Action {
+    override fun execute(ctx: ActionContext) {
+        ctx.view.displayError("Invalid format of the name")
+    }
+}
+
+object PromptScaleName: Action {
     override fun execute(ctx: ActionContext) {
         ctx.view.displayPrompt("Input the name of the scale:")
+    }
+}
+
+object FailOnScaleUnit: Action {
+    override fun execute(ctx: ActionContext) {
+        ctx.view.displayError("Invalid format of the unit")
+    }
+}
+
+object PromptScaleUnit: Action {
+    override fun execute(ctx: ActionContext) {
+        ctx.buffer.add(ctx.args)
+        ctx.view.displayPrompt("Input the name of the unit:")
+    }
+}
+
+object FailOnScaleDivisions: Action {
+    override fun execute(ctx: ActionContext) {
+        ctx.view.displayError("Invalid format of the divisions")
+    }
+}
+
+object PromptScaleDivisions: Action {
+    override fun execute(ctx: ActionContext) {
+        ctx.buffer.add(ctx.args)
+        ctx.view.displayPrompt("Input the divisions:")
     }
 }

@@ -27,11 +27,29 @@ open class CommandEquals(private val command: Command): TransitionCondition{
     }
 }
 
-object CreateScaleArgsAreValid: TransitionCondition {
+object ScaleIsValid: TransitionCondition {
     private val pattern = Pattern.compile("" +
             "[A-Za-z0-9_-]{1,10}" +
             "\n[A-Za-z/-]{1,10}" +
             "(\n\\d+-[A-Za-z0-9_-]+)+")
+
+    override fun verify(command: Command, args: String): Boolean {
+        return args.matches(pattern.toRegex())
+    }
+}
+
+object NameIsValid: TransitionCondition {
+    private val pattern = Pattern.compile("\\w+")
+
+    override fun verify(command: Command, args: String): Boolean {
+        return args.matches(pattern.toRegex())
+    }
+}
+
+object DivisionsAreValid: TransitionCondition {
+
+    private val pattern = Pattern.compile("\\d+-[A-Za-z0-9_-]+" +
+            "(\n\\d+-[A-Za-z0-9_-]+)*")
 
     override fun verify(command: Command, args: String): Boolean {
         return args.matches(pattern.toRegex())
