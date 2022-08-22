@@ -16,18 +16,18 @@ class TelegramView: View {
 
 
     override fun displayPrompt(message: String) {
-        TODO("Not yet implemented")
+        bot.send(lastMessage, message)
     }
 
     override fun displayMessage(message: String) {
-        bot.send(this.lastMessage, message)
+        bot.send(lastMessage, message)
     }
 
     override fun displayError(message: String) {
-        TODO("Not yet implemented")
+        bot.send(lastMessage, message)
     }
 
     override fun replyToMessage(message: String) {
-        TODO("Not yet implemented")
+        bot.send(lastMessage, message)
     }
 }

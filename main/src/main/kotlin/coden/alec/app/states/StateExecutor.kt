@@ -10,6 +10,7 @@ class StateExecutor(private val fsm: FiniteStateMachine) {
         for ((input, command, transition) in fsm.table) {
             if (input == current && command.isInstance(submittedCommand)){
                 current = transition(submittedCommand)
+                println("[Transition]: $input -> $current")
                 break
             }
         }

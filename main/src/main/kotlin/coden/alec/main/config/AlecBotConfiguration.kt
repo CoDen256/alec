@@ -2,13 +2,16 @@ package coden.alec.main.config
 
 import coden.alec.app.FiniteStateMachine
 import coden.alec.app.FiniteStateMachineTable
+import coden.alec.app.ListScalesController
 import coden.alec.app.actuator.BaseHelpActuator
 import coden.alec.app.actuator.BaseScaleActuator
 import coden.alec.app.actuator.HelpActuator
 import coden.alec.app.actuator.ScaleActuator
 import coden.alec.app.states.*
 import coden.alec.app.states.State.*
+import coden.alec.bot.AlecBot
 import coden.alec.bot.messages.MessageResource
+import coden.alec.bot.presenter.TelegramView
 import coden.alec.bot.presenter.View
 import coden.alec.console.ConsoleView
 import coden.alec.core.CreateScaleActivator
@@ -16,12 +19,14 @@ import coden.alec.core.ListScalesActivator
 import coden.alec.data.ScaleGateway
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
-import coden.alec.main.config.fsm.HelpFSM
-import coden.alec.main.config.fsm.ScaleFSM
+import coden.alec.main.config.table.HelpTable
+import coden.alec.main.config.table.ScaleTable
 import gateway.memory.ScaleInMemoryGateway
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.scheduling.annotation.Async
 
 
 @Configuration
@@ -61,18 +66,7 @@ class AlecBotConfiguration {
 //        return ListScalesController(ListScalesInteractor(gateway), consoleResponder())
 //    }
 
-//    @Bean
-//    @Async
-//    fun alecBot(@Qualifier("telegram") telegram: ListScalesController,
-//                properties: AlecBotProperties,
-//                messages: Messages,
-//                telegramView: TelegramView
-//
-//    ): AlecBot{
-//        return AlecBot(telegram,telegramView,  properties.token, messages).also {
-//            it.launch()
-//        }
-//    }
+
 //
 //    @Bean
 //    @Async
@@ -97,8 +91,8 @@ class AlecBotConfiguration {
     }
 
     @Bean
-    fun view(): View {
-        return ConsoleView()
+    fun view(): TelegramView {
+        return TelegramView()
     }
 
     @Bean
@@ -112,16 +106,14 @@ class AlecBotConfiguration {
     }
 
 
-
-
     @Bean
     fun helpFSM(help: HelpActuator): FiniteStateMachineTable {
-        return HelpFSM(help)
+        return HelpTable(help)
     }
 
     @Bean
     fun scaleFSM(scale: ScaleActuator): FiniteStateMachineTable {
-        return ScaleFSM(scale)
+        return ScaleTable(scale)
     }
 
     @Bean
@@ -134,6 +126,16 @@ class AlecBotConfiguration {
     @Bean
     fun stateExecutor(fsm: FiniteStateMachine): StateExecutor {
         return StateExecutor(fsm)
+    }
+
+    @Bean
+    @Async
+    fun alecBot(properties: AlecBotProperties, telegramView: TelegramView
+        , stateExecutor: StateExecutor
+    ): AlecBot {
+        return AlecBot(telegramView,  properties.token, stateExecutor).also {
+            it.launch()
+        }
     }
 
 }

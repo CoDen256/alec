@@ -91,12 +91,10 @@ class BaseScaleActuator(
     }
 
     override fun isValidScale(command: Command): Boolean {
-        return command.arguments.fold(
-            {
-                it.matches(scalePattern.toRegex())
-            },
-        ) {
-            return true
+        return if (name != null && unit != null){
+            true
+        }else {
+            command.arguments.getOrNull()?.matches(scalePattern.toRegex()) ?: false
         }
 
     }
@@ -158,7 +156,7 @@ class BaseScaleActuator(
 
     override fun handleScaleUnit(command: Command) {
         command.arguments.onSuccess {
-            name = it
+            unit = it
         }.onFailure {
             view.displayError("Invalid name format")
         }
@@ -178,7 +176,7 @@ class BaseScaleActuator(
 
     override fun handleScaleDivisions(command: Command) {
         command.arguments.onSuccess {
-            name = it
+            divisions = it
         }.onFailure {
             view.displayError("Invalid name format")
         }

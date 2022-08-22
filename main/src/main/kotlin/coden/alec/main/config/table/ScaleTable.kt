@@ -1,11 +1,11 @@
-package coden.alec.main.config.fsm
+package coden.alec.main.config.table
 
 import coden.alec.app.FiniteStateMachineTable
 import coden.alec.app.actuator.ScaleActuator
 import coden.alec.app.states.*
 import coden.alec.app.states.Entry.Companion.entry
 
-class ScaleFSM(scale: ScaleActuator) : FiniteStateMachineTable(
+class ScaleTable(scale: ScaleActuator) : FiniteStateMachineTable(
     entry(State.Start, ListScalesCommand) { scale.getAndDisplayScales(it); State.Start },
 
     entry(State.Start, CreateScaleCommand::class) {
@@ -39,7 +39,7 @@ class ScaleFSM(scale: ScaleActuator) : FiniteStateMachineTable(
     },
     entry(State.WaitScaleUnit, TextCommand::class) {
         when {
-            !scale.isValidScaleUnit(it) -> {
+            scale.isValidScaleUnit(it) -> {
                 scale.handleScaleUnit(it)
                 scale.displayScaleDivisionsPrompt(it)
                 State.WaitScaleDivision
