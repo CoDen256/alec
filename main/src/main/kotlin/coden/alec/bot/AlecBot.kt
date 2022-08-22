@@ -1,18 +1,31 @@
 package coden.alec.bot
 
+import coden.alec.app.FiniteStateMachine
+import coden.alec.app.FiniteStateMachineTable
 import coden.alec.app.states.*
-import coden.alec.bot.handler.Handler
+import coden.alec.app.states.Entry.Companion.entry
+import coden.alec.bot.presenter.TelegramInlineView
 import coden.alec.bot.presenter.TelegramView
+import coden.alec.bot.utils.send
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
+import com.github.kotlintelegrambot.dispatcher.callbackQuery
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
+import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
+import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
+import java.util.UUID
 
 class AlecBot (
     private val view: TelegramView,
+    private val inline: TelegramInlineView,
     botToken: String,
-    private val stateExecutor: StateExecutor
+    private val stateExecutor: StateExecutor,
+    private val messageFSM: FiniteStateMachine
 ) {
+
+
+    private val stateExecutors: MutableMap<Long, StateExecutor> = HashMap()
 
     private val bot = bot {
         token = botToken
@@ -21,6 +34,11 @@ class AlecBot (
 
             command("help") {
                 view.update(bot, lastMessage = message)
+                val inlineKeyboardMarkup = InlineKeyboardMarkup.create(
+                    listOf(InlineKeyboardButton.CallbackData(text = "Test Inline Button", callbackData = "listScaleInline")),
+                )
+                val id = bot.send(message, "something", replyMarkup = inlineKeyboardMarkup).get().messageId
+                stateExecutors[id] = StateExecutor(messageFSM)
                 stateExecutor.submit(HelpCommand)
             }
 
@@ -49,6 +67,14 @@ class AlecBot (
                 stateExecutor.submit(TextCommand(text))
             }
 
+            callbackQuery("listScaleInline") {
+                val message = callbackQuery.message ?: return@callbackQuery
+                val executor = stateExecutors[message.messageId]
+                executor?.let {
+                    inline.updateCallback(bot, botMessage = message)
+                    it.submit(ListScalesInlineCommand)
+                }
+            }
         }
     }
     fun launch(){

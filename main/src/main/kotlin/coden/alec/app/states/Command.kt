@@ -14,6 +14,11 @@ abstract class BaseCommand(arguments: String? = null): Command{
 object HelpCommand : BaseCommand()
 object ListScalesCommand : BaseCommand()
 object CreateScaleCommandNoArgs: BaseCommand()
+
+object HelpInlineCommand : BaseCommand()
+object ListScalesInlineCommand : BaseCommand()
+object CreateScaleInlineCommand: BaseCommand()
+
 class CreateScaleCommand(arguments: String) : BaseCommand(arguments)
 class TextCommand(text: String): BaseCommand(text)
 

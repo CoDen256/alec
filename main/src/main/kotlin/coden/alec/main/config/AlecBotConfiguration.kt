@@ -11,6 +11,7 @@ import coden.alec.app.states.*
 import coden.alec.app.states.State.*
 import coden.alec.bot.AlecBot
 import coden.alec.bot.messages.MessageResource
+import coden.alec.bot.presenter.TelegramInlineView
 import coden.alec.bot.presenter.TelegramView
 import coden.alec.bot.presenter.View
 import coden.alec.console.ConsoleView
@@ -116,7 +117,7 @@ class AlecBotConfiguration {
         return ScaleTable(scale)
     }
 
-    @Bean
+    @Bean("fsm")
     fun fsm(tables:List<FiniteStateMachineTable>): FiniteStateMachine {
         return FiniteStateMachine(
             Start, FiniteStateMachineTable(tables.reduce { t1, t2 -> t1 + t2 })
@@ -124,16 +125,35 @@ class AlecBotConfiguration {
     }
 
     @Bean
-    fun stateExecutor(fsm: FiniteStateMachine): StateExecutor {
+    fun stateExecutor(@Qualifier("fsm") fsm: FiniteStateMachine): StateExecutor {
         return StateExecutor(fsm)
     }
 
     @Bean
+    fun scale(view: TelegramInlineView, useCaseFactory: UseCaseFactory, messages: MessageResource): BaseScaleActuator {
+        return BaseScaleActuator(useCaseFactory, view, messages)
+    }
+
+    @Bean("messageFSM")
+    fun messageFSM(scale: BaseScaleActuator): FiniteStateMachine {
+        return FiniteStateMachine(Start,
+            FiniteStateMachineTable(
+                Entry.entry(Start, ListScalesInlineCommand) {scale.getAndDisplayScales(it); Start}
+            )
+        )
+    }
+
+    @Bean
+    fun inlineTelegram(): TelegramInlineView{
+        return TelegramInlineView()
+    }
+
+    @Bean
     @Async
-    fun alecBot(properties: AlecBotProperties, telegramView: TelegramView
-        , stateExecutor: StateExecutor
+    fun alecBot(properties: AlecBotProperties, telegramView: TelegramView, inline: TelegramInlineView,
+        stateExecutor: StateExecutor,  @Qualifier("messageFSM") messageFSM: FiniteStateMachine
     ): AlecBot {
-        return AlecBot(telegramView,  properties.token, stateExecutor).also {
+        return AlecBot(telegramView, inline, properties.token, stateExecutor, messageFSM).also {
             it.launch()
         }
     }
