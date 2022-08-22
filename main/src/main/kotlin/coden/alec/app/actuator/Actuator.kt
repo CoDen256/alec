@@ -29,12 +29,12 @@ interface ScaleActuator {
     fun rejectScaleName(command: Command)
 
     fun displayScaleUnitPrompt(command: Command)
-    fun isValidScaleUnit(command: Command) : Boolean
+    fun isValidScaleUnit(command: Command): Boolean
     fun handleScaleUnit(command: Command)
     fun rejectScaleUnit(command: Command)
 
     fun displayScaleDivisionsPrompt(command: Command)
-    fun isValidScaleDivisions(command: Command) : Boolean
+    fun isValidScaleDivisions(command: Command): Boolean
     fun handleScaleDivisions(command: Command)
     fun rejectScaleDivisions(command: Command)
 
@@ -45,7 +45,7 @@ class BaseHelpActuator(
     private val useCaseFactory: UseCaseFactory,
     private val view: View,
     private val messages: MessageResource,
-): HelpActuator {
+) : HelpActuator {
     override fun displayHelp(command: Command) {
         view.displayMessage(messages.startMessage)
     }
@@ -58,15 +58,19 @@ class BaseScaleActuator(
     private val messages: MessageResource,
 ) : ScaleActuator {
 
-    private val scalePattern = Pattern.compile("" +
-            "[A-Za-z0-9_-]{1,10}" +
-            "\n[A-Za-z/-]{1,10}" +
-            "(\n\\d+-[A-Za-z0-9_-]+)+")
+    private val scalePattern = Pattern.compile(
+        "" +
+                "[A-Za-z0-9_-]{1,10}" +
+                "\n[A-Za-z/-]{1,10}" +
+                "(\n\\d+-[A-Za-z0-9_-]+)+"
+    )
 
     private val namePattern = Pattern.compile("\\w+")
 
-    private val divisionPattern = Pattern.compile("\\d+-[A-Za-z0-9_-]+" +
-            "(\n\\d+-[A-Za-z0-9_-]+)*")
+    private val divisionPattern = Pattern.compile(
+        "\\d+-[A-Za-z0-9_-]+" +
+                "(\n\\d+-[A-Za-z0-9_-]+)*"
+    )
 
     private var name: String? = null
     private var unit: String? = null
@@ -76,9 +80,9 @@ class BaseScaleActuator(
         val listScales = useCaseFactory.listScales()
         val response = listScales.execute(ListScalesRequest()) as ListScalesResponse
         response.scales.onSuccess {
-            if (it.isEmpty()){
+            if (it.isEmpty()) {
                 view.displayMessage(messages.listScalesEmptyMessage)
-            }else {
+            } else {
                 view.displayMessage(messages.listScalesMessage + it)
             }
         }.onFailure {
@@ -87,7 +91,14 @@ class BaseScaleActuator(
     }
 
     override fun isValidScale(command: Command): Boolean {
-        TODO("Not yet implemented")
+        return command.arguments.fold(
+            {
+                it.matches(scalePattern.toRegex())
+            },
+        ) {
+            return true
+        }
+
     }
 
     override fun createAndDisplayScale(command: Command) {
@@ -113,23 +124,16 @@ class BaseScaleActuator(
     }
 
     override fun rejectScale(command: Command) {
-        TODO("Not yet implemented")
+        view.displayError("Scale is invalid")
     }
 
-    private fun collectArgs(command: Command): Triple<String, String, String> {
-        if (name != null && unit != null && divisions != null) {
-            return Triple(name!!, unit!!, divisions!!)
-        }
-        val split = command.arguments.getOrThrow().split("\n", limit = 2)
-        return Triple(split[0], split[1], split[2])
-    }
 
     override fun displayScaleNamePrompt(command: Command) {
         view.displayPrompt("Input the name of the scale:")
     }
 
     override fun isValidScaleName(command: Command): Boolean {
-        TODO("Not yet implemented")
+        return command.arguments.getOrNull()?.matches(namePattern.toRegex()) ?: false
     }
 
     override fun handleScaleName(command: Command) {
@@ -141,15 +145,15 @@ class BaseScaleActuator(
     }
 
     override fun rejectScaleName(command: Command) {
-        TODO("Not yet implemented")
+        view.displayError("Invalid scale name")
     }
 
     override fun displayScaleUnitPrompt(command: Command) {
-        view.displayError("Invalid format of the unit")
+        view.displayError("Input the unit")
     }
 
     override fun isValidScaleUnit(command: Command): Boolean {
-        TODO("Not yet implemented")
+        return command.arguments.getOrNull()?.matches(namePattern.toRegex()) ?: false
     }
 
     override fun handleScaleUnit(command: Command) {
@@ -161,7 +165,7 @@ class BaseScaleActuator(
     }
 
     override fun rejectScaleUnit(command: Command) {
-        TODO("Not yet implemented")
+        view.displayError("Invalid format of the unit")
     }
 
     override fun displayScaleDivisionsPrompt(command: Command) {
@@ -169,7 +173,7 @@ class BaseScaleActuator(
     }
 
     override fun isValidScaleDivisions(command: Command): Boolean {
-        TODO("Not yet implemented")
+        return command.arguments.getOrNull()?.matches(divisionPattern.toRegex()) ?: false
     }
 
     override fun handleScaleDivisions(command: Command) {
@@ -181,12 +185,20 @@ class BaseScaleActuator(
     }
 
     override fun rejectScaleDivisions(command: Command) {
-        TODO("Not yet implemented")
+        view.displayError("Invalid division format")
     }
 
     override fun resetScale(command: Command) {
         name = null
         unit = null
         divisions = null
+    }
+
+    private fun collectArgs(command: Command): Triple<String, String, String> {
+        if (name != null && unit != null && divisions != null) {
+            return Triple(name!!, unit!!, divisions!!)
+        }
+        val split = command.arguments.getOrThrow().split("\n", limit = 3)
+        return Triple(split[0], split[1], split[2])
     }
 }

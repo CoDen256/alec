@@ -128,7 +128,10 @@ class AlecBotConfiguration {
 
                 entry(Start, ListScalesCommand) {scale.getAndDisplayScales(it); Start},
 
-                entry(Start, CreateScaleCommand::class) {scale.createAndDisplayScale(it); Start},
+                entry(Start, CreateScaleCommand::class) { when {
+                    scale.isValidScale(it) -> { scale.createAndDisplayScale(it); Start }
+                    else ->  { scale.rejectScale(it); Start }
+                } },
 
                 entry(Start, CreateScaleCommandNoArgs) {scale.displayScaleNamePrompt(it); WaitScaleName},
 
