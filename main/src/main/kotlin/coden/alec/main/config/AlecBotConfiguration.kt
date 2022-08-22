@@ -131,15 +131,20 @@ class AlecBotConfiguration {
 
                 entry(Start, CreateScaleCommandNoArgs, WaitScaleName, scale::displayScaleNamePrompt),
                 entry(WaitScaleName, TextCommand::class, WaitScaleUnit, {
-                    scale.handleScaleName(it) &&
+                    scale.handleScaleName(it)
                     scale.displayScaleUnitPrompt(it)
-                }),
+                }, scale::isValidScaleName),
+                entry(WaitScaleName, TextCommand::class, WaitScaleName, {
+                    scale.displayScaleNamePrompt(it)
+                }, not(scale::isValidScaleName)),
+
+
                 entry(WaitScaleUnit, TextCommand::class, WaitScaleDivision, {
-                    scale.handleScaleUnit(it) &&
+                    scale.handleScaleUnit(it)
                     scale.displayScaleDivisionsPrompt(it)
                 }),
                 entry(WaitScaleDivision, TextCommand::class, WaitScaleDivision, {
-                    scale.handleScaleDivisions(it) &&
+                    scale.handleScaleDivisions(it)
                     scale.createAndDisplayScale(it)
                 })
             )

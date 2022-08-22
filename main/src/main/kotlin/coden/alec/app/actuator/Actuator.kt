@@ -12,24 +12,27 @@ import java.util.regex.Pattern
 
 
 interface HelpActuator {
-    fun displayHelp(command: Command): Boolean
+    fun displayHelp(command: Command)
 }
 
 
 interface ScaleActuator {
-    fun getAndDisplayScales(command: Command) : Boolean
-    fun createAndDisplayScale(command: Command): Boolean
+    fun getAndDisplayScales(command: Command)
+    fun createAndDisplayScale(command: Command)
 
-    fun displayScaleNamePrompt(command: Command): Boolean
-    fun handleScaleName(command: Command): Boolean
+    fun displayScaleNamePrompt(command: Command)
+    fun isValidScaleName(command: Command): Boolean
+    fun handleScaleName(command: Command)
 
-    fun displayScaleUnitPrompt(command: Command): Boolean
-    fun handleScaleUnit(command: Command): Boolean
+    fun displayScaleUnitPrompt(command: Command)
+    fun isValidUnitName(command: Command) : Boolean
+    fun handleScaleUnit(command: Command)
 
-    fun displayScaleDivisionsPrompt(command: Command): Boolean
-    fun handleScaleDivisions(command: Command): Boolean
+    fun displayScaleDivisionsPrompt(command: Command)
+    fun isValidScaleDivisions(command: Command) : Boolean
+    fun handleScaleDivisions(command: Command)
 
-    fun resetScale(): Boolean
+    fun resetScale()
 }
 
 class BaseHelpActuator(
@@ -37,9 +40,8 @@ class BaseHelpActuator(
     private val view: View,
     private val messages: MessageResource,
 ): HelpActuator {
-    override fun displayHelp(command: Command): Boolean {
+    override fun displayHelp(command: Command) {
         view.displayMessage(messages.startMessage)
-        return true
     }
 }
 
@@ -64,7 +66,7 @@ class BaseScaleActuator(
     private var unit: String? = null
     private var divisions: String? = null
 
-    override fun getAndDisplayScales(command: Command): Boolean {
+    override fun getAndDisplayScales(command: Command) {
         val listScales = useCaseFactory.listScales()
         val response = listScales.execute(ListScalesRequest()) as ListScalesResponse
         response.scales.onSuccess {
@@ -76,10 +78,9 @@ class BaseScaleActuator(
         }.onFailure {
             view.displayError("${messages.errorMessage} ${it.message}")
         }
-        return true
     }
 
-    override fun createAndDisplayScale(command: Command): Boolean {
+    override fun createAndDisplayScale(command: Command) {
         val (name, unit, divisionString) = collectArgs(command)
         val divisions = HashMap<Long, String>()
         for (arg in divisionString.split("\n")) {
@@ -99,7 +100,6 @@ class BaseScaleActuator(
         }.onFailure {
             view.displayError("${messages.errorMessage} ${it.message}")
         }
-        return true
     }
 
     private fun collectArgs(command: Command): Triple<String, String, String> {
@@ -110,12 +110,15 @@ class BaseScaleActuator(
         return Triple(split[0], split[1], split[2])
     }
 
-    override fun displayScaleNamePrompt(command: Command): Boolean {
+    override fun displayScaleNamePrompt(command: Command) {
         view.displayPrompt("Input the name of the scale:")
-        return true
     }
 
-    override fun handleScaleName(command: Command): Boolean {
+    override fun isValidScaleName(command: Command): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun handleScaleName(command: Command) {
         return command.arguments.onSuccess {
             name = it
         }.onFailure {
@@ -123,12 +126,15 @@ class BaseScaleActuator(
         }.isSuccess
     }
 
-    override fun displayScaleUnitPrompt(command: Command): Boolean {
+    override fun displayScaleUnitPrompt(command: Command) {
         view.displayError("Invalid format of the unit")
-        return true
     }
 
-    override fun handleScaleUnit(command: Command): Boolean {
+    override fun isValidUnitName(command: Command): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun handleScaleUnit(command: Command) {
         return command.arguments.onSuccess {
             name = it
         }.onFailure {
@@ -136,23 +142,25 @@ class BaseScaleActuator(
         }.isSuccess
     }
 
-    override fun displayScaleDivisionsPrompt(command: Command): Boolean {
+    override fun displayScaleDivisionsPrompt(command: Command) {
         view.displayPrompt("Input the divisions:")
-        return true
     }
 
-    override fun handleScaleDivisions(command: Command): Boolean {
-        return command.arguments.onSuccess {
+    override fun isValidScaleDivisions(command: Command): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun handleScaleDivisions(command: Command) {
+        command.arguments.onSuccess {
             name = it
         }.onFailure {
             view.displayError("Invalid name format")
         }.isSuccess
     }
 
-    override fun resetScale(): Boolean {
+    override fun resetScale() {
         name = null
         unit = null
         divisions = null
-        return true
     }
 }
