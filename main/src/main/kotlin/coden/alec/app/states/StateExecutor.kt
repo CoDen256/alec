@@ -7,15 +7,10 @@ class StateExecutor(private val fsm: FiniteStateMachine) {
 
     fun submit(submittedCommand: Command){
         println("[Command]: ${submittedCommand.javaClass.simpleName} ${submittedCommand.arguments}")
-        for ((input, command, condition, output, action, fallback, fallbackAction) in fsm.entries) {
-            if (input == current && command.isInstance(submittedCommand) && condition.verify(submittedCommand)){
+        for ((input, command, transition, action) in fsm.entries) {
+            if (input == current && command.isInstance(submittedCommand)){
+                transition()
                 val success = action(submittedCommand)
-                current = if (success){
-                    output
-                }else{
-                    fallbackAction(submittedCommand)
-                    fallback
-                }
                 break
             }
         }

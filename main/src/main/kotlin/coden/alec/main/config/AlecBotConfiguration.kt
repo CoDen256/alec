@@ -177,4 +177,10 @@ class AlecBotConfiguration {
         action: (Command) -> Unit,
         condition: (Command) -> Boolean = { true },
     ): Entry = entry(input, command, output, action, condition)
+
+    private fun e(
+        input: State,
+        command: KClass<out Command>,
+        action: (Command) -> State,
+    ): Entry = entry(input, command, output, action, condition)
 }
