@@ -7,7 +7,7 @@ class StateExecutor(private val fsm: FiniteStateMachine) {
 
     fun submit(submittedCommand: Command){
         println("[Command]: ${submittedCommand.javaClass.simpleName} ${submittedCommand.arguments}")
-        for ((input, command, transition) in fsm.entries) {
+        for ((input, command, transition) in fsm.table) {
             if (input == current && command.isInstance(submittedCommand)){
                 current = transition(submittedCommand)
                 break

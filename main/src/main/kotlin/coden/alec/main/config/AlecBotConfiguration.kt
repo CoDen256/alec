@@ -1,12 +1,12 @@
 package coden.alec.main.config
 
 import coden.alec.app.FiniteStateMachine
+import coden.alec.app.FiniteStateMachineTable
 import coden.alec.app.actuator.BaseHelpActuator
 import coden.alec.app.actuator.BaseScaleActuator
 import coden.alec.app.actuator.HelpActuator
 import coden.alec.app.actuator.ScaleActuator
 import coden.alec.app.states.*
-import coden.alec.app.states.Entry.Companion.entry
 import coden.alec.app.states.State.*
 import coden.alec.bot.messages.MessageResource
 import coden.alec.bot.presenter.View
@@ -16,6 +16,8 @@ import coden.alec.core.ListScalesActivator
 import coden.alec.data.ScaleGateway
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
+import coden.alec.main.config.fsm.HelpFSM
+import coden.alec.main.config.fsm.ScaleFSM
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -110,74 +112,28 @@ class AlecBotConfiguration {
     }
 
 
+
+
+    @Bean
+    fun helpFSM(help: HelpActuator): FiniteStateMachineTable {
+        return HelpFSM(help)
+    }
+
+    @Bean
+    fun scaleFSM(scale: ScaleActuator): FiniteStateMachineTable {
+        return ScaleFSM(scale)
+    }
+
+    @Bean
+    fun fsm(tables:List<FiniteStateMachineTable>): FiniteStateMachine {
+        return FiniteStateMachine(
+            Start, FiniteStateMachineTable(tables.reduce { t1, t2 -> t1 + t2 })
+        )
+    }
+
     @Bean
     fun stateExecutor(fsm: FiniteStateMachine): StateExecutor {
         return StateExecutor(fsm)
-    }
-
-
-    @Bean
-    fun fsm(
-        scale: ScaleActuator,
-        help: HelpActuator
-    ): FiniteStateMachine {
-        return FiniteStateMachine(
-            Start, arrayListOf(
-
-                entry(Start, HelpCommand) { help.displayHelp(it); Start },
-
-                entry(Start, ListScalesCommand) {scale.getAndDisplayScales(it); Start},
-
-                entry(Start, CreateScaleCommand::class) { when {
-                    scale.isValidScale(it) -> { scale.createAndDisplayScale(it); Start }
-                    else ->  { scale.rejectScale(it); Start }
-                } },
-
-                entry(Start, CreateScaleCommandNoArgs) {scale.displayScaleNamePrompt(it); WaitScaleName},
-
-                entry(WaitScaleName, TextCommand::class) { when {
-                    scale.isValidScaleName(it) -> {
-                        scale.handleScaleName(it)
-                        scale.displayScaleUnitPrompt(it)
-                        WaitScaleUnit
-                    }
-                    else -> {
-                        scale.rejectScaleName(it)
-                        scale.displayScaleNamePrompt(it)
-                        WaitScaleName
-                    }
-                } },
-                entry(WaitScaleUnit, TextCommand::class) { when {
-                    !scale.isValidScaleUnit(it) -> {
-                        scale.handleScaleUnit(it)
-                        scale.displayScaleDivisionsPrompt(it)
-                        WaitScaleDivision
-                    }
-                    else -> {
-                        scale.rejectScaleUnit(it)
-                        scale.displayScaleUnitPrompt(it)
-                        WaitScaleUnit
-                    }
-                } },
-
-                entry(WaitScaleDivision, TextCommand::class) { when {
-                    !scale.isValidScaleDivisions(it) -> {
-                        scale.rejectScaleDivisions(it)
-                        scale.displayScaleDivisionsPrompt(it)
-                        WaitScaleDivision
-                    }
-                    !scale.isValidScale(it) -> {
-                        scale.rejectScale(it)
-                        Start
-                    }
-                    else -> {
-                        scale.handleScaleDivisions(it)
-                        scale.createAndDisplayScale(it)
-                        Start
-                    }
-                } },
-            )
-        )
     }
 
 }
