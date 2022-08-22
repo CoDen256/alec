@@ -20,6 +20,7 @@ import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import kotlin.reflect.KClass
 
 
 @Configuration
@@ -124,31 +125,56 @@ class AlecBotConfiguration {
         return FiniteStateMachine(
             Start, arrayListOf(
 
-                entry(Start, HelpCommand, Start, help::displayHelp),
-                entry(Start, ListScalesCommand, Start, scale::getAndDisplayScales),
+                e(Start, HelpCommand, Start, help::displayHelp),
+                e(Start, ListScalesCommand, Start, scale::getAndDisplayScales),
 
-                entry(Start, CreateScaleCommand::class, Start, scale::createAndDisplayScale),
+                e(Start, CreateScaleCommand::class, Start, scale::createAndDisplayScale),
 
-                entry(Start, CreateScaleCommandNoArgs, WaitScaleName, scale::displayScaleNamePrompt),
-                entry(WaitScaleName, TextCommand::class, WaitScaleUnit, {
+                e(Start, CreateScaleCommandNoArgs, WaitScaleName, scale::displayScaleNamePrompt),
+                e(WaitScaleName, TextCommand::class, WaitScaleUnit, {
                     scale.handleScaleName(it)
                     scale.displayScaleUnitPrompt(it)
                 }, scale::isValidScaleName),
-                entry(WaitScaleName, TextCommand::class, WaitScaleName, {
+                e(WaitScaleName, TextCommand::class, WaitScaleName, {
+                    scale.rejectScaleName(it)
                     scale.displayScaleNamePrompt(it)
                 }, not(scale::isValidScaleName)),
 
 
-                entry(WaitScaleUnit, TextCommand::class, WaitScaleDivision, {
+                e(WaitScaleUnit, TextCommand::class, WaitScaleDivision, {
                     scale.handleScaleUnit(it)
                     scale.displayScaleDivisionsPrompt(it)
-                }),
-                entry(WaitScaleDivision, TextCommand::class, WaitScaleDivision, {
+                }, scale::isValidUnitName),
+                e(WaitScaleUnit, TextCommand::class, WaitScaleUnit, {
+                    scale.handleScaleUnit(it)
+                    scale.displayScaleDivisionsPrompt(it)
+                }, not(scale::isValidUnitName)),
+
+                e(WaitScaleDivision, TextCommand::class, WaitScaleDivision, {
                     scale.handleScaleDivisions(it)
                     scale.createAndDisplayScale(it)
-                })
+                }, scale::isValidScaleDivisions),
+                e(WaitScaleDivision, TextCommand::class, WaitScaleDivision, {
+                    scale.handleScaleDivisions(it)
+                }, not(scale::isValidScaleDivisions))
             )
         )
     }
 
+
+    private fun e(
+        input: State,
+        command: Command,
+        output: State,
+        action: (Command) -> Unit,
+        condition: (Command) -> Boolean = { true }
+    ): Entry = entry(input, command, output, action, condition)
+
+    private fun e(
+        input: State,
+        command: KClass<out Command>,
+        output: State,
+        action: (Command) -> Unit,
+        condition: (Command) -> Boolean = { true },
+    ): Entry = entry(input, command, output, action, condition)
 }

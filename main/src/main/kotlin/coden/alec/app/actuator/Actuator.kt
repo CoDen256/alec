@@ -18,19 +18,25 @@ interface HelpActuator {
 
 interface ScaleActuator {
     fun getAndDisplayScales(command: Command)
+
+    fun isValidScale(command: Command)
     fun createAndDisplayScale(command: Command)
+    fun rejectScale(command: Command)
 
     fun displayScaleNamePrompt(command: Command)
     fun isValidScaleName(command: Command): Boolean
     fun handleScaleName(command: Command)
+    fun rejectScaleName(command: Command)
 
     fun displayScaleUnitPrompt(command: Command)
     fun isValidUnitName(command: Command) : Boolean
     fun handleScaleUnit(command: Command)
+    fun rejectScaleUnit(command: Command)
 
     fun displayScaleDivisionsPrompt(command: Command)
     fun isValidScaleDivisions(command: Command) : Boolean
     fun handleScaleDivisions(command: Command)
+    fun rejectScaleDivisions(command: Command)
 
     fun resetScale()
 }
@@ -80,6 +86,10 @@ class BaseScaleActuator(
         }
     }
 
+    override fun isValidScale(command: Command) {
+        TODO("Not yet implemented")
+    }
+
     override fun createAndDisplayScale(command: Command) {
         val (name, unit, divisionString) = collectArgs(command)
         val divisions = HashMap<Long, String>()
@@ -102,6 +112,10 @@ class BaseScaleActuator(
         }
     }
 
+    override fun rejectScale(command: Command) {
+        TODO("Not yet implemented")
+    }
+
     private fun collectArgs(command: Command): Triple<String, String, String> {
         if (name != null && unit != null && divisions != null) {
             return Triple(name!!, unit!!, divisions!!)
@@ -119,11 +133,15 @@ class BaseScaleActuator(
     }
 
     override fun handleScaleName(command: Command) {
-        return command.arguments.onSuccess {
+        command.arguments.onSuccess {
             name = it
         }.onFailure {
             view.displayError("Invalid name format")
-        }.isSuccess
+        }
+    }
+
+    override fun rejectScaleName(command: Command) {
+        TODO("Not yet implemented")
     }
 
     override fun displayScaleUnitPrompt(command: Command) {
@@ -135,11 +153,15 @@ class BaseScaleActuator(
     }
 
     override fun handleScaleUnit(command: Command) {
-        return command.arguments.onSuccess {
+        command.arguments.onSuccess {
             name = it
         }.onFailure {
             view.displayError("Invalid name format")
-        }.isSuccess
+        }
+    }
+
+    override fun rejectScaleUnit(command: Command) {
+        TODO("Not yet implemented")
     }
 
     override fun displayScaleDivisionsPrompt(command: Command) {
@@ -155,7 +177,11 @@ class BaseScaleActuator(
             name = it
         }.onFailure {
             view.displayError("Invalid name format")
-        }.isSuccess
+        }
+    }
+
+    override fun rejectScaleDivisions(command: Command) {
+        TODO("Not yet implemented")
     }
 
     override fun resetScale() {
