@@ -20,7 +20,6 @@ import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import kotlin.reflect.KClass
 
 
 @Configuration
@@ -125,62 +124,57 @@ class AlecBotConfiguration {
         return FiniteStateMachine(
             Start, arrayListOf(
 
-                e(Start, HelpCommand, Start, help::displayHelp),
-                e(Start, ListScalesCommand, Start, scale::getAndDisplayScales),
+                entry(Start, HelpCommand) { help.displayHelp(it); Start },
 
-                e(Start, CreateScaleCommand::class, Start, scale::createAndDisplayScale),
+                entry(Start, ListScalesCommand) {scale.getAndDisplayScales(it); Start},
 
-                e(Start, CreateScaleCommandNoArgs, WaitScaleName, scale::displayScaleNamePrompt),
-                e(WaitScaleName, TextCommand::class, WaitScaleUnit, {
-                    scale.handleScaleName(it)
-                    scale.displayScaleUnitPrompt(it)
-                }, scale::isValidScaleName),
-                e(WaitScaleName, TextCommand::class, WaitScaleName, {
-                    scale.rejectScaleName(it)
-                    scale.displayScaleNamePrompt(it)
-                }, not(scale::isValidScaleName)),
+                entry(Start, CreateScaleCommand::class) {scale.createAndDisplayScale(it); Start},
 
+                entry(Start, CreateScaleCommandNoArgs) {scale.displayScaleNamePrompt(it); WaitScaleName},
 
-                e(WaitScaleUnit, TextCommand::class, WaitScaleDivision, {
-                    scale.handleScaleUnit(it)
-                    scale.displayScaleDivisionsPrompt(it)
-                }, scale::isValidUnitName),
-                e(WaitScaleUnit, TextCommand::class, WaitScaleUnit, {
-                    scale.handleScaleUnit(it)
-                    scale.displayScaleDivisionsPrompt(it)
-                }, not(scale::isValidUnitName)),
+                entry(WaitScaleName, TextCommand::class) { when {
+                    scale.isValidScaleName(it) -> {
+                        scale.handleScaleName(it)
+                        scale.displayScaleUnitPrompt(it)
+                        WaitScaleUnit
+                    }
+                    else -> {
+                        scale.rejectScaleName(it)
+                        scale.displayScaleNamePrompt(it)
+                        WaitScaleName
+                    }
+                } },
+                entry(WaitScaleUnit, TextCommand::class) { when {
+                    !scale.isValidScaleUnit(it) -> {
+                        scale.handleScaleUnit(it)
+                        scale.displayScaleDivisionsPrompt(it)
+                        WaitScaleDivision
+                    }
+                    else -> {
+                        scale.rejectScaleUnit(it)
+                        scale.displayScaleUnitPrompt(it)
+                        WaitScaleUnit
+                    }
+                } },
 
-                e(WaitScaleDivision, TextCommand::class, WaitScaleDivision, {
-                    scale.handleScaleDivisions(it)
-                    scale.createAndDisplayScale(it)
-                }, scale::isValidScaleDivisions),
-                e(WaitScaleDivision, TextCommand::class, WaitScaleDivision, {
-                    scale.handleScaleDivisions(it)
-                }, not(scale::isValidScaleDivisions))
+                entry(WaitScaleDivision, TextCommand::class) { when {
+                    !scale.isValidScaleDivisions(it) -> {
+                        scale.rejectScaleDivisions(it)
+                        scale.displayScaleDivisionsPrompt(it)
+                        WaitScaleDivision
+                    }
+                    !scale.isValidScale(it) -> {
+                        scale.rejectScale(it)
+                        Start
+                    }
+                    else -> {
+                        scale.handleScaleDivisions(it)
+                        scale.createAndDisplayScale(it)
+                        Start
+                    }
+                } },
             )
         )
     }
 
-
-    private fun e(
-        input: State,
-        command: Command,
-        output: State,
-        action: (Command) -> Unit,
-        condition: (Command) -> Boolean = { true }
-    ): Entry = entry(input, command, output, action, condition)
-
-    private fun e(
-        input: State,
-        command: KClass<out Command>,
-        output: State,
-        action: (Command) -> Unit,
-        condition: (Command) -> Boolean = { true },
-    ): Entry = entry(input, command, output, action, condition)
-
-    private fun e(
-        input: State,
-        command: KClass<out Command>,
-        action: (Command) -> State,
-    ): Entry = entry(input, command, output, action, condition)
 }

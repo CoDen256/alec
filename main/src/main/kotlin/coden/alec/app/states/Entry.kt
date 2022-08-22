@@ -12,18 +12,30 @@ data class Entry(
             input: State,
             command: KClass<out Command>,
             transition: (Command) -> State,
-            action: (Command) -> Unit,
         ): Entry {
-            return Entry(input, command, transition, action)
+            return Entry(input, command, transition)
         }
 
         fun entry(
             input: State,
             command: Command,
             transition: (Command) -> State,
-            action: (Command) -> Unit,
         ): Entry {
-            return Entry(input, command::class, transition, action)
+            return Entry(input, command::class, transition)
         }
+
+         fun entry(
+            input: State,
+            command: Command,
+            output: State,
+            action: (Command) -> Unit,
+        ): Entry = entry(input, command) { action(it); output }
+
+        fun entry(
+            input: State,
+            command: KClass<out Command>,
+            output: State,
+            action: (Command) -> Unit,
+        ): Entry = entry(input, command) { action(it); output }
     }
 }

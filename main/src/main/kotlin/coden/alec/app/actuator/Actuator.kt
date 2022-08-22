@@ -19,7 +19,7 @@ interface HelpActuator {
 interface ScaleActuator {
     fun getAndDisplayScales(command: Command)
 
-    fun isValidScale(command: Command)
+    fun isValidScale(command: Command): Boolean
     fun createAndDisplayScale(command: Command)
     fun rejectScale(command: Command)
 
@@ -29,7 +29,7 @@ interface ScaleActuator {
     fun rejectScaleName(command: Command)
 
     fun displayScaleUnitPrompt(command: Command)
-    fun isValidUnitName(command: Command) : Boolean
+    fun isValidScaleUnit(command: Command) : Boolean
     fun handleScaleUnit(command: Command)
     fun rejectScaleUnit(command: Command)
 
@@ -38,7 +38,7 @@ interface ScaleActuator {
     fun handleScaleDivisions(command: Command)
     fun rejectScaleDivisions(command: Command)
 
-    fun resetScale()
+    fun resetScale(command: Command)
 }
 
 class BaseHelpActuator(
@@ -86,7 +86,7 @@ class BaseScaleActuator(
         }
     }
 
-    override fun isValidScale(command: Command) {
+    override fun isValidScale(command: Command): Boolean {
         TODO("Not yet implemented")
     }
 
@@ -148,7 +148,7 @@ class BaseScaleActuator(
         view.displayError("Invalid format of the unit")
     }
 
-    override fun isValidUnitName(command: Command): Boolean {
+    override fun isValidScaleUnit(command: Command): Boolean {
         TODO("Not yet implemented")
     }
 
@@ -184,7 +184,7 @@ class BaseScaleActuator(
         TODO("Not yet implemented")
     }
 
-    override fun resetScale() {
+    override fun resetScale(command: Command) {
         name = null
         unit = null
         divisions = null
