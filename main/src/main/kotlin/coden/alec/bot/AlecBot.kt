@@ -1,11 +1,8 @@
 package coden.alec.bot
 
-import coden.alec.app.FiniteStateMachine
-import coden.fsm.StateExecutor
-import coden.alec.app.commands.*
 import coden.alec.app.fsm.*
-import coden.alec.app.states.*
 import coden.alec.bot.utils.send
+import coden.fsm.StateExecutor
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.callbackQuery
@@ -19,7 +16,6 @@ class AlecBot (
     private val inline: TelegramInlineView,
     botToken: String,
     private val stateExecutor: StateExecutor,
-    private val messageFSM: FiniteStateMachine
 ) {
 
 
@@ -36,7 +32,7 @@ class AlecBot (
                     listOf(InlineKeyboardButton.CallbackData(text = "Test Inline Button", callbackData = "listScaleInline")),
                 )
                 val id = bot.send(message, "something", replyMarkup = inlineKeyboardMarkup).get().messageId
-                stateExecutors[id] = StateExecutor(messageFSM)
+//                stateExecutors[id] = StateExecutor(messageFSM)
                 stateExecutor.submit(HelpCommand)
             }
 
@@ -70,7 +66,6 @@ class AlecBot (
                 val executor = stateExecutors[message.messageId]
                 executor?.let {
                     inline.updateCallback(bot, botMessage = message)
-                    it.submit(ListScalesInlineCommand)
                 }
             }
         }
