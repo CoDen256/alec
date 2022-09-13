@@ -1,12 +1,10 @@
-package coden.alec.app.states
+package coden.fsm
 
-import coden.alec.app.FiniteStateMachine
-
-class StateExecutor(private val fsm: FiniteStateMachine) {
+class StateExecutor(private val fsm: FSM) {
     private var current = fsm.start
 
     fun submit(submittedCommand: Command){
-        println("[Command]: ${submittedCommand.javaClass.simpleName} ${submittedCommand.arguments}")
+        println("[Command]: $submittedCommand")
         for ((input, command, transition) in fsm.table) {
             if (input == current && command.isInstance(submittedCommand)){
                 current = transition(submittedCommand)

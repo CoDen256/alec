@@ -1,12 +1,13 @@
 package coden.alec.main.config.table
 
-import coden.alec.app.FiniteStateMachineTable
-import coden.alec.app.actuator.HelpActuator
-import coden.alec.app.states.Entry.Companion.entry
-import coden.alec.app.states.HelpCommand
-import coden.alec.app.states.State.*
+import coden.alec.app.actuators.HelpActuator
+import coden.alec.app.fsm.HelpCommand
+import coden.alec.app.fsm.Start
+import coden.fsm.Entry.Companion.entry
+import coden.fsm.FSMTable
 
-class HelpTable(help: HelpActuator) : FiniteStateMachineTable(
+
+class HelpTable(help: HelpActuator) : FSMTable(
     entry(Start, HelpCommand) { help.displayHelp(it); Start },
 
     )

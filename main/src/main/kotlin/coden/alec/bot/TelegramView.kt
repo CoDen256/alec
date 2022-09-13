@@ -1,5 +1,6 @@
-package coden.alec.bot.presenter
+package coden.alec.bot
 
+import coden.alec.app.views.View
 import coden.alec.bot.utils.edit
 import coden.alec.bot.utils.send
 import com.github.kotlintelegrambot.Bot

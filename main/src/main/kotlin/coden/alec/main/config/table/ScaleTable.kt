@@ -1,75 +1,75 @@
 package coden.alec.main.config.table
 
-import coden.alec.app.FiniteStateMachineTable
-import coden.alec.app.actuator.ScaleActuator
-import coden.alec.app.states.*
-import coden.alec.app.states.Entry.Companion.entry
+import coden.alec.app.actuators.ScaleActuator
+import coden.alec.app.fsm.*
+import coden.fsm.Entry.Companion.entry
+import coden.fsm.FSMTable
 
-class ScaleTable(scale: ScaleActuator) : FiniteStateMachineTable(
-    entry(State.Start, ListScalesCommand) { scale.getAndDisplayScales(it); State.Start },
+class ScaleTable(scale: ScaleActuator) : FSMTable(
+    entry(Start, ListScalesCommand) { scale.getAndDisplayScales(it); Start },
 
-    entry(State.Start, CreateScaleCommand::class) {
+    entry(Start, CreateScaleCommand::class) {
         when {
             scale.isValidScale(it) -> {
-                scale.createAndDisplayScale(it); State.Start
+                scale.createAndDisplayScale(it); Start
             }
 
             else -> {
-                scale.rejectScale(it); State.Start
+                scale.rejectScale(it); Start
             }
         }
     },
 
-    entry(State.Start, CreateScaleCommandNoArgs) { scale.displayScaleNamePrompt(it); State.WaitScaleName },
+    entry(Start, CreateScaleCommandNoArgs) { scale.displayScaleNamePrompt(it); WaitScaleName },
 
-    entry(State.WaitScaleName, TextCommand::class) {
+    entry(WaitScaleName, TextCommand::class) {
         when {
             scale.isValidScaleName(it) -> {
                 scale.handleScaleName(it)
                 scale.displayScaleUnitPrompt(it)
-                State.WaitScaleUnit
+                WaitScaleUnit
             }
 
             else -> {
                 scale.rejectScaleName(it)
                 scale.displayScaleNamePrompt(it)
-                State.WaitScaleName
+                WaitScaleName
             }
         }
     },
-    entry(State.WaitScaleUnit, TextCommand::class) {
+    entry(WaitScaleUnit, TextCommand::class) {
         when {
             scale.isValidScaleUnit(it) -> {
                 scale.handleScaleUnit(it)
                 scale.displayScaleDivisionsPrompt(it)
-                State.WaitScaleDivision
+                WaitScaleDivision
             }
 
             else -> {
                 scale.rejectScaleUnit(it)
                 scale.displayScaleUnitPrompt(it)
-                State.WaitScaleUnit
+                WaitScaleUnit
             }
         }
     },
 
-    entry(State.WaitScaleDivision, TextCommand::class) {
+    entry(WaitScaleDivision, TextCommand::class) {
         when {
             !scale.isValidScaleDivisions(it) -> {
                 scale.rejectScaleDivisions(it)
                 scale.displayScaleDivisionsPrompt(it)
-                State.WaitScaleDivision
+                WaitScaleDivision
             }
 
             !scale.isValidScale(it) -> {
                 scale.rejectScale(it)
-                State.Start
+                Start
             }
 
             else -> {
                 scale.handleScaleDivisions(it)
                 scale.createAndDisplayScale(it)
-                State.Start
+                Start
             }
         }
     },

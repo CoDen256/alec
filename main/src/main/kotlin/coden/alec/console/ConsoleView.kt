@@ -1,6 +1,6 @@
 package coden.alec.console
 
-import coden.alec.bot.presenter.View
+import coden.alec.app.views.View
 
 class ConsoleView: View {
     override fun displayPrompt(message: String) {

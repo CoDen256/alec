@@ -1,4 +1,4 @@
-package coden.alec.bot.presenter
+package coden.alec.app.views
 
 interface View {
     fun displayPrompt(message: String)

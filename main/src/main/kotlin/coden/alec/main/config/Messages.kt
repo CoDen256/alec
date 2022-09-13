@@ -1,6 +1,6 @@
 package coden.alec.main.config
 
-import coden.alec.bot.messages.MessageResource
+import coden.alec.app.messages.MessageResource
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties("messages")

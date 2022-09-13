@@ -1,11 +1,10 @@
 package coden.alec.bot
 
 import coden.alec.app.FiniteStateMachine
-import coden.alec.app.FiniteStateMachineTable
+import coden.fsm.StateExecutor
+import coden.alec.app.commands.*
+import coden.alec.app.fsm.*
 import coden.alec.app.states.*
-import coden.alec.app.states.Entry.Companion.entry
-import coden.alec.bot.presenter.TelegramInlineView
-import coden.alec.bot.presenter.TelegramView
 import coden.alec.bot.utils.send
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
@@ -14,7 +13,6 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
-import java.util.UUID
 
 class AlecBot (
     private val view: TelegramView,

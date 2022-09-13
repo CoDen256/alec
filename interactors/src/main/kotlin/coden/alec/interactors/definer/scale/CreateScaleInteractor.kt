@@ -1,7 +1,6 @@
 package coden.alec.interactors.definer.scale
 
 import coden.alec.core.CreateScaleActivator
-import coden.alec.core.CreateScaleResponder
 import coden.alec.core.Request
 import coden.alec.core.Response
 import coden.alec.data.Scale

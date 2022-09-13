@@ -1,13 +1,13 @@
-package coden.alec.app.actuator
+package coden.alec.app.actuators
 
-import coden.alec.app.states.Command
-import coden.alec.app.states.UseCaseFactory
-import coden.alec.bot.messages.MessageResource
-import coden.alec.bot.presenter.View
+import coden.alec.core.UseCaseFactory
+import coden.alec.app.messages.MessageResource
+import coden.alec.app.views.View
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
+import coden.fsm.Command
 import java.util.regex.Pattern
 
 

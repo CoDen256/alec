@@ -1,4 +1,4 @@
-package coden.alec.bot.messages
+package coden.alec.app.messages
 
 open class MessageResource {
     lateinit var startMessage: String
