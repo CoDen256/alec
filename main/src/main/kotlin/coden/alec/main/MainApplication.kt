@@ -50,8 +50,8 @@ fun main(args: Array<String>) {
     val consoleView = ConsoleView()
 
 
-//        val view = telegramView
-    val view = consoleView
+        val view = telegramView
+//    val view = consoleView
 
 
     val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages)
