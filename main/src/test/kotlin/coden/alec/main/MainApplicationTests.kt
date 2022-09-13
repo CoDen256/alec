@@ -15,6 +15,8 @@ class MainApplicationTests {
     @Test
     fun contextLoads() {
 
+
+
         stateExecutor.submit(HelpCommand)
         stateExecutor.submit(HelpCommand)
         stateExecutor.submit(HelpCommand)

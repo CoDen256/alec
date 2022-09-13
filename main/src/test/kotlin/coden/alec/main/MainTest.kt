@@ -4,6 +4,8 @@ import coden.alec.app.actuators.BaseHelpActuator
 import coden.alec.app.actuators.BaseScaleActuator
 import coden.alec.app.fsm.*
 import coden.alec.app.messages.MessageResource
+import coden.alec.bot.AlecTelegramBot
+import coden.alec.bot.TelegramContext
 import coden.alec.bot.TelegramView
 import coden.alec.console.ConsoleView
 import coden.alec.core.CreateScaleActivator
@@ -40,8 +42,13 @@ class MainTest {
                 return CreateScaleInteractor(scalesGateway)
             }
         }
-//        val view = TelegramView()
-        val view = ConsoleView()
+        val ctx = TelegramContext()
+        val telegramView = TelegramView(ctx)
+        val consoleView = ConsoleView()
+
+
+//        val view = telegramView
+        val view = consoleView
 
 
         val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages)
@@ -49,25 +56,28 @@ class MainTest {
 
         val stateExecutor = StateExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
 
-        stateExecutor.submit(HelpCommand)
-        stateExecutor.submit(HelpCommand)
-        stateExecutor.submit(HelpCommand)
-        stateExecutor.submit(ListScalesCommand)
-        stateExecutor.submit(ListScalesCommand)
-        stateExecutor.submit(ListScalesCommand)
-        stateExecutor.submit(HelpCommand)
-        stateExecutor.submit(CreateScaleCommand("something"))
-        stateExecutor.submit(CreateScaleCommand("hello\nname\n1-interesting"))
-        stateExecutor.submit(ListScalesCommand)
+        val bot = AlecTelegramBot(botProperties.token, ctx, stateExecutor)
+        bot.launch()
 
-        stateExecutor.submit(CreateScaleCommandNoArgs)
-        stateExecutor.submit(TextCommand( " asd asd"))
-        stateExecutor.submit(TextCommand( "scale"))
-        stateExecutor.submit(TextCommand( " asd asd"))
-        stateExecutor.submit(TextCommand( "unit"))
-        stateExecutor.submit(TextCommand( "hello"))
-        stateExecutor.submit(TextCommand( "1-interesting\n2-somewhatinteresting"))
-
-        stateExecutor.submit(ListScalesCommand)
+//        stateExecutor.submit(HelpCommand)
+//        stateExecutor.submit(HelpCommand)
+//        stateExecutor.submit(HelpCommand)
+//        stateExecutor.submit(ListScalesCommand)
+//        stateExecutor.submit(ListScalesCommand)
+//        stateExecutor.submit(ListScalesCommand)
+//        stateExecutor.submit(HelpCommand)
+//        stateExecutor.submit(CreateScaleCommand("something"))
+//        stateExecutor.submit(CreateScaleCommand("hello\nname\n1-interesting"))
+//        stateExecutor.submit(ListScalesCommand)
+//
+//        stateExecutor.submit(CreateScaleCommandNoArgs)
+//        stateExecutor.submit(TextCommand( " asd asd"))
+//        stateExecutor.submit(TextCommand( "scale"))
+//        stateExecutor.submit(TextCommand( " asd asd"))
+//        stateExecutor.submit(TextCommand( "unit"))
+//        stateExecutor.submit(TextCommand( "hello"))
+//        stateExecutor.submit(TextCommand( "1-interesting\n2-somewhatinteresting"))
+//
+//        stateExecutor.submit(ListScalesCommand)
     }
 }
