@@ -11,6 +11,10 @@ class ConsoleView: View {
         println(message)
     }
 
+    override fun displayMainMenu(message: String) {
+        TODO("Not yet implemented")
+    }
+
     override fun displayError(message: String) {
         println("Error: $message")
     }

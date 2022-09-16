@@ -7,6 +7,7 @@ import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
+import coden.alec.main.Menu
 import coden.fsm.Command
 import java.util.regex.Pattern
 
@@ -47,7 +48,7 @@ class BaseHelpActuator(
     private val messages: MessageResource,
 ) : HelpActuator {
     override fun displayHelp(command: Command) {
-        view.displayMessage(messages.startMessage)
+        view.displayMainMenu(messages.startMessage)
     }
 }
 

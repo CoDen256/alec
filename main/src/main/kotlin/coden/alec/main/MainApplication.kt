@@ -20,7 +20,6 @@ import coden.fsm.FSM
 import coden.fsm.StateExecutor
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
 
 @SpringBootApplication
 class MainApplication
@@ -45,8 +44,9 @@ fun main(args: Array<String>) {
             return CreateScaleInteractor(scalesGateway)
         }
     }
+    val menu = Menu(description="Choose anything")
     val ctx = TelegramContext()
-    val telegramView = TelegramView(ctx)
+    val telegramView = TelegramView(ctx, menu)
     val consoleView = ConsoleView()
 
 
@@ -54,10 +54,28 @@ fun main(args: Array<String>) {
 //    val view = consoleView
 
 
+
+//        MenuItem(
+//            name="Scales",
+//                    action = null,
+//            desciprion="What you want to do with scales"
+//            children = listOf(
+//                    MenuItem(
+//                        name="List Scale"
+//                        action = ListScalesCommand
+//                    )
+//            )
+
+//        )
+//                MenuItem()
+//                MenuItem()
+
+
     val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages)
     val helpActuator = BaseHelpActuator(useCaseFactory, view, messages)
 
     val stateExecutor = StateExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
+
 
     val bot = AlecTelegramBot(botProperties.token, ctx, stateExecutor)
     bot.launch()
