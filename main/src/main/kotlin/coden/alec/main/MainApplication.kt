@@ -47,8 +47,11 @@ fun main(args: Array<String>) {
     val menu = Menu(description="Choose anything",
         listOf(MenuItem("1"), MenuItem("2"),
             MenuItem("3"), MenuItem("4"),
-            MenuItem("5"),  MenuItem("6"),
-            MenuItem("7")
+            MenuItem("5"),
+            MenuItem("6"),
+            MenuItem("7"),
+            MenuItem("8"),
+            MenuItem("9"),
         )
         )
     val ctx = TelegramContext()

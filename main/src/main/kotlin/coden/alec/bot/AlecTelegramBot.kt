@@ -14,7 +14,6 @@ import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
-import java.lang.Math.min
 import kotlin.collections.HashMap
 
 class AlecTelegramBot (
@@ -86,23 +85,13 @@ class AlecTelegramBot (
 class MenuController (
     private val menu: Menu,
     private val executor: StateExecutor,
-    private val itemsPerRow: Int = 2
+    private val itemsPerRow: Int = 4
 ){
 
     fun create(): Pair<String, ReplyMarkup> {
-        val markup = ArrayList<List<InlineKeyboardButton>>()
-        generateSequence(0) { n -> n + 2 }
-            .take((menu.items.size+1)/2)
-            .forEach {tupleIndex ->
-                val row =  ArrayList<InlineKeyboardButton>()
-                (tupleIndex until (tupleIndex+itemsPerRow).coerceAtMost(menu.items.size)).map {
-                    row.add(menuItemToButton(menu.items[it]))
-                }
-                markup.add(row)
-            }
-
-        return menu.description to InlineKeyboardMarkup.create(markup)
+        return menu.description to menuToMarkup(menu.items)
     }
+
 
     fun submit(data: String): Pair<String, ReplyMarkup>{
         return "inlined" to
@@ -110,6 +99,22 @@ class MenuController (
                     listOf(InlineKeyboardButton.CallbackData(text = "Test Inline Button 2", callbackData = "testButton")),
                     listOf(InlineKeyboardButton.CallbackData(text = "Show alert 2", callbackData = "showAlert"))
                 )
+    }
+
+
+    private fun menuToMarkup(items: List<MenuItem>): InlineKeyboardMarkup {
+        val result = ArrayList<List<InlineKeyboardButton>>()
+        generateSequence(0) { n -> n + itemsPerRow }
+            .take((items.size + (itemsPerRow-1)) / itemsPerRow)
+            .forEach { tupleIndex ->
+                val row = ArrayList<InlineKeyboardButton>()
+                (tupleIndex until (tupleIndex + itemsPerRow).coerceAtMost(items.size)).map {
+                    row.add(menuItemToButton(items[it]))
+                }
+                result.add(row)
+            }
+
+        return InlineKeyboardMarkup.create(result)
     }
 
     private fun menuItemToButton(item: MenuItem): InlineKeyboardButton{
