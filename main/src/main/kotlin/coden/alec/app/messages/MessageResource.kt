@@ -5,4 +5,5 @@ open class MessageResource {
     lateinit var listScalesMessage: String
     lateinit var listScalesEmptyMessage: String
     lateinit var errorMessage: String
+    lateinit var backButtonMessage: String
 }

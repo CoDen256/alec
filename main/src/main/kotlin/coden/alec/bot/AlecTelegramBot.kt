@@ -1,9 +1,9 @@
 package coden.alec.bot
 
 import coden.alec.app.fsm.*
+import coden.alec.app.messages.MessageResource
 import coden.alec.bot.utils.send
 import coden.alec.main.Menu
-import coden.alec.main.MenuItem
 import coden.fsm.StateExecutor
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
@@ -14,6 +14,7 @@ import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
+import java.util.UUID
 import kotlin.collections.HashMap
 
 class AlecTelegramBot (
@@ -85,24 +86,30 @@ class AlecTelegramBot (
 class MenuController (
     private val menu: Menu,
     private val executor: StateExecutor,
+    private val messages: MessageResource,
     private val itemsPerRow: Int = 4
 ){
 
+    private val backCommand = UUID.randomUUID().toString()
+    private var current: Menu = menu
+
     fun create(): Pair<String, ReplyMarkup> {
-        return menu.description to menuToMarkup(menu.items)
+        return menu.description to menuToMarkup(menu.innerItems)
     }
 
 
     fun submit(data: String): Pair<String, ReplyMarkup>{
-        return "inlined" to
-        InlineKeyboardMarkup.create(
-                    listOf(InlineKeyboardButton.CallbackData(text = "Test Inline Button 2", callbackData = "testButton")),
-                    listOf(InlineKeyboardButton.CallbackData(text = "Show alert 2", callbackData = "showAlert"))
-                )
+        val target = if (data == backCommand) current.parent
+                     else current.innerItems.find { it.name == data }
+
+        target?.also {
+            current = it
+        }
+        return (current.description to menuToMarkup(current.innerItems))
     }
 
 
-    private fun menuToMarkup(items: List<MenuItem>): InlineKeyboardMarkup {
+    private fun menuToMarkup(items: List<Menu>): InlineKeyboardMarkup {
         val result = ArrayList<List<InlineKeyboardButton>>()
         generateSequence(0) { n -> n + itemsPerRow }
             .take((items.size + (itemsPerRow-1)) / itemsPerRow)
@@ -113,11 +120,13 @@ class MenuController (
                 }
                 result.add(row)
             }
-
+        current.parent?.let {
+            result.add(listOf(InlineKeyboardButton.CallbackData(messages.backButtonMessage, callbackData = backCommand)))
+        }
         return InlineKeyboardMarkup.create(result)
     }
 
-    private fun menuItemToButton(item: MenuItem): InlineKeyboardButton{
+    private fun menuItemToButton(item: Menu): InlineKeyboardButton{
         return InlineKeyboardButton.CallbackData(item.name, callbackData = item.name)
     }
 }
