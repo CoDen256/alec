@@ -16,11 +16,8 @@ class AlecTelegramBot (
     log: LogLevel,
     private val ctx: TelegramContext,
     private val stateExecutor: StateExecutor,
-    private val factory: MenuControllerFactory
+    private val manager: MenuNavigatorManager
 ) {
-
-
-    private val menus = HashMap<Long, MenuController>()
 
     private val bot = bot {
         token = botToken
@@ -37,10 +34,7 @@ class AlecTelegramBot (
                 ctx.update(bot, lastMessage = message)
                 stateExecutor.submit(HelpCommand)
 
-                val controller = factory.controller()
-                val (text, replyMarkup) = controller.createMain()
-                val id = bot.send(message, text, replyMarkup = replyMarkup).get().messageId
-                menus[id] = controller
+                manager.createNewMenu(bot, message)
             }
 
             command("list_scales") {
@@ -64,11 +58,8 @@ class AlecTelegramBot (
             }
 
             callbackQuery{
-                callbackQuery.message?.let {message ->
-                    menus[message.messageId]?.let {
-                        val (text, markup) = it.submit(callbackQuery.data)
-                        bot.edit(message, text=text, replyMarkup = markup)
-                    }
+                callbackQuery.message?.let {
+                    manager.handleCommand(bot, it, callbackQuery.data)
                 }
             }
         }

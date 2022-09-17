@@ -8,18 +8,18 @@ import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import kotlin.collections.ArrayList
 
-class MenuControllerFactory(
+class MenuNavigatorFactory(
     private val mainMenuTemplate: Menu,
     private val executor: StateExecutor,
     private val messages: MessageResource,
     private val itemsPerRow: Int = 4
 ) {
-    fun controller(): MenuController{
-        return MenuController(mainMenuTemplate, executor, messages, itemsPerRow)
+    fun mainMenuNavigator(): MenuNavigator{
+        return MenuNavigator(mainMenuTemplate, executor, messages, itemsPerRow)
     }
 }
 
-class MenuController (
+class MenuNavigator (
     private val mainMenuTemplate: Menu,
     private val executor: StateExecutor,
     private val messages: MessageResource,
@@ -35,7 +35,7 @@ class MenuController (
     }
 
 
-    fun submit(data: String): Pair<String, ReplyMarkup>{
+    fun navigate(data: String): Pair<String, ReplyMarkup>{
         current = moveToNext(data) ?: current
         return (current.description to menuToMarkup(current.items, parentStack.lastOrNull()))
     }
