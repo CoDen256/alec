@@ -1,13 +1,12 @@
 package coden.alec.app.actuators
 
-import coden.alec.core.UseCaseFactory
 import coden.alec.app.messages.MessageResource
 import coden.alec.app.views.View
+import coden.alec.core.UseCaseFactory
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
-import coden.alec.main.Menu
 import coden.fsm.Command
 import java.util.regex.Pattern
 

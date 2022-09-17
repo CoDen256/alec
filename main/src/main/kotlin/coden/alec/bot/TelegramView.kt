@@ -3,8 +3,6 @@ package coden.alec.bot
 import coden.alec.app.views.View
 import coden.alec.bot.utils.send
 import coden.alec.main.Menu
-import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
-import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 
 class TelegramView(
     private val ctx: TelegramContext,

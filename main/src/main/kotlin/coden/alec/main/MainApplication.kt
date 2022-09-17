@@ -2,6 +2,9 @@ package coden.alec.main
 
 import coden.alec.app.actuators.BaseHelpActuator
 import coden.alec.app.actuators.BaseScaleActuator
+import coden.alec.app.fsm.CreateScaleCommandNoArgs
+import coden.alec.app.fsm.HelpCommand
+import coden.alec.app.fsm.ListScalesCommand
 import coden.alec.app.fsm.Start
 import coden.alec.app.messages.MessageResource
 import coden.alec.bot.AlecTelegramBot
@@ -14,6 +17,9 @@ import coden.alec.core.ListScalesActivator
 import coden.alec.core.UseCaseFactory
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
+import coden.alec.main.Menu.Companion.action
+import coden.alec.main.Menu.Companion.menu
+import coden.alec.main.Menu.Companion.set
 import coden.alec.main.config.AlecBotProperties
 import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
@@ -33,7 +39,7 @@ fun main(args: Array<String>) {
     messages.startMessage = "start"
     messages.listScalesMessage = "list scales"
     messages.listScalesEmptyMessage = "empty"
-    messages.backButtonMessage = "back"
+    messages.backButtonMessage = "<-- Back"
     val botProperties = AlecBotProperties()
     botProperties.token = "5402767430:AAEXVe8s8IAow9z9Ip69NCU9JnUaEHIgcrw"
 
@@ -47,17 +53,23 @@ fun main(args: Array<String>) {
             return CreateScaleInteractor(scalesGateway)
         }
     }
-    val menu = Menu("Main Menu", description="Choose anything from  the main menu",
-        listOf(Menu("Common", items = listOf(Menu("Start"), Menu("Specific", items = listOf(Menu("Help"))))),
-            Menu("Scales", items=listOf(Menu("List Scales"), Menu("Create Scale"))),
-            Menu("3"),
-            Menu("4"),
-            Menu("5"),
-            Menu("6"),
-            Menu("7"),
-            Menu("8"),
-            Menu("9"),
-        )
+
+    val menu = menu("Main Menu", "Choose anything from  the main menu",
+        set("Common", "Common commands",
+            action("Start", action = HelpCommand),
+            action("Help", action = HelpCommand)),
+
+        set("Scales", "Scale management",
+            action("View all Scales", action = ListScalesCommand),
+            action("Create Scale", action = CreateScaleCommandNoArgs)),
+
+        set("Factors", "Factor management",
+            action("Start", action = HelpCommand),
+            action("Help", action = HelpCommand)),
+
+        set("Raters", "Rater management",
+            action("Start", action = HelpCommand),
+            action("Help", action = HelpCommand)),
         )
 
 

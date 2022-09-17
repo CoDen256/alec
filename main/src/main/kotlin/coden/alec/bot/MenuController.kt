@@ -9,18 +9,18 @@ import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import kotlin.collections.ArrayList
 
 class MenuControllerFactory(
-    private val menu: Menu,
+    private val mainMenuTemplate: Menu,
     private val executor: StateExecutor,
     private val messages: MessageResource,
     private val itemsPerRow: Int = 4
 ) {
     fun controller(): MenuController{
-        return MenuController(menu, executor, messages, itemsPerRow)
+        return MenuController(mainMenuTemplate, executor, messages, itemsPerRow)
     }
 }
 
 class MenuController (
-    private val menu: Menu,
+    private val mainMenuTemplate: Menu,
     private val executor: StateExecutor,
     private val messages: MessageResource,
     private val itemsPerRow: Int = 4
@@ -28,21 +28,39 @@ class MenuController (
 
     private val backCommand = "MenuController.BACK"
     private val parentStack = ArrayList<Menu>()
-    private var current: Menu = menu
+    private var current: Menu = mainMenuTemplate
 
-    fun create(): Pair<String, ReplyMarkup> {
-        return menu.description to menuToMarkup(menu.items, parentStack.lastOrNull())
+    fun createMain(): Pair<String, ReplyMarkup> {
+        return mainMenuTemplate.description to menuToMarkup(mainMenuTemplate.items, parentStack.lastOrNull())
     }
 
 
     fun submit(data: String): Pair<String, ReplyMarkup>{
-        val target = if (data == backCommand) {parentStack.removeLastOrNull() }
-        else current.items.find { it.name == data }?.also { parentStack.add(current) }
-
-        target?.also {
-            current = it
-        }
+        current = moveToNext(data) ?: current
         return (current.description to menuToMarkup(current.items, parentStack.lastOrNull()))
+    }
+
+    private fun moveToNext(data: String): Menu? {
+        return if (data == backCommand) {
+            moveBack()
+        } else {
+            moveToSubMenu(data)
+        }
+    }
+
+    private fun moveBack(): Menu? {
+        return parentStack.removeLastOrNull()
+    }
+
+    private fun moveToSubMenu(data: String): Menu? {
+        return current.items.find { it.name == data }?.let {
+            it.action?.let { action -> executor.submit(action) }
+            if (it.items.isEmpty()) {
+                return@let null
+            }
+            parentStack.add(current)
+            return@let it
+        }
     }
 
 

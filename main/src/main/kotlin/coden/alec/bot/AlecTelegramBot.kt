@@ -38,7 +38,7 @@ class AlecTelegramBot (
                 stateExecutor.submit(HelpCommand)
 
                 val controller = factory.controller()
-                val (text, replyMarkup) = controller.create()
+                val (text, replyMarkup) = controller.createMain()
                 val id = bot.send(message, text, replyMarkup = replyMarkup).get().messageId
                 menus[id] = controller
             }
