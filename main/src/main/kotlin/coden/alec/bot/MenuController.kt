@@ -26,8 +26,8 @@ class MenuController (
     private val itemsPerRow: Int = 4
 ){
 
-    private val parentStack = ArrayList<Menu>()
     private val backCommand = "MenuController.BACK"
+    private val parentStack = ArrayList<Menu>()
     private var current: Menu = menu
 
     fun create(): Pair<String, ReplyMarkup> {

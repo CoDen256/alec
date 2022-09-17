@@ -9,9 +9,11 @@ import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.callbackQuery
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
+import com.github.kotlintelegrambot.logging.LogLevel
 
 class AlecTelegramBot (
     botToken: String,
+    log: LogLevel,
     private val ctx: TelegramContext,
     private val stateExecutor: StateExecutor,
     private val factory: MenuControllerFactory
@@ -22,6 +24,7 @@ class AlecTelegramBot (
 
     private val bot = bot {
         token = botToken
+        logLevel = log
 
         dispatch {
 

@@ -19,6 +19,7 @@ import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
 import coden.fsm.FSM
 import coden.fsm.StateExecutor
+import com.github.kotlintelegrambot.logging.LogLevel
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
@@ -32,6 +33,7 @@ fun main(args: Array<String>) {
     messages.startMessage = "start"
     messages.listScalesMessage = "list scales"
     messages.listScalesEmptyMessage = "empty"
+    messages.backButtonMessage = "back"
     val botProperties = AlecBotProperties()
     botProperties.token = "5402767430:AAEXVe8s8IAow9z9Ip69NCU9JnUaEHIgcrw"
 
@@ -45,9 +47,11 @@ fun main(args: Array<String>) {
             return CreateScaleInteractor(scalesGateway)
         }
     }
-    val menu = Menu("Main Menu", description="Choose anything",
-        listOf(Menu("1"), Menu("2"),
-            Menu("3"), Menu("4"),
+    val menu = Menu("Main Menu", description="Choose anything from  the main menu",
+        listOf(Menu("Common", items = listOf(Menu("Start"), Menu("Specific", items = listOf(Menu("Help"))))),
+            Menu("Scales", items=listOf(Menu("List Scales"), Menu("Create Scale"))),
+            Menu("3"),
+            Menu("4"),
             Menu("5"),
             Menu("6"),
             Menu("7"),
@@ -92,6 +96,6 @@ fun main(args: Array<String>) {
         menu, stateExecutor, messages, 2
     )
 
-    val bot = AlecTelegramBot(botProperties.token, ctx, stateExecutor, menuControllerFactory)
+    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, ctx, stateExecutor, menuControllerFactory)
     bot.launch()
 }
