@@ -3,6 +3,7 @@ package coden.alec.bot
 import coden.alec.app.fsm.*
 import coden.alec.bot.utils.send
 import coden.alec.main.Menu
+import coden.alec.main.MenuItem
 import coden.fsm.StateExecutor
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
@@ -13,6 +14,7 @@ import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
+import java.lang.Math.min
 import kotlin.collections.HashMap
 
 class AlecTelegramBot (
@@ -39,9 +41,9 @@ class AlecTelegramBot (
                 ctx.update(bot, lastMessage = message)
                 stateExecutor.submit(HelpCommand)
 
-                val controller = MenuController()
-                val inlineKeyboardMarkup = controller.create()
-                val id = bot.send(message, "something", replyMarkup = inlineKeyboardMarkup).get().messageId
+                val controller = MenuController(menu, stateExecutor)
+                val (text, replyMarkup) = controller.create()
+                val id = bot.send(message, text, replyMarkup = replyMarkup).get().messageId
                 menus[id] = controller
             }
 
@@ -81,13 +83,25 @@ class AlecTelegramBot (
     }
 }
 
-class MenuController{
+class MenuController (
+    private val menu: Menu,
+    private val executor: StateExecutor,
+    private val itemsPerRow: Int = 2
+){
 
-    fun create(): ReplyMarkup
-    {
-        return InlineKeyboardMarkup.create(
-            listOf(InlineKeyboardButton.CallbackData(text = "Test Inline Button", callbackData = "listScaleInline")),
-        )
+    fun create(): Pair<String, ReplyMarkup> {
+        val markup = ArrayList<List<InlineKeyboardButton>>()
+        generateSequence(0) { n -> n + 2 }
+            .take((menu.items.size+1)/2)
+            .forEach {tupleIndex ->
+                val row =  ArrayList<InlineKeyboardButton>()
+                (tupleIndex until (tupleIndex+itemsPerRow).coerceAtMost(menu.items.size)).map {
+                    row.add(menuItemToButton(menu.items[it]))
+                }
+                markup.add(row)
+            }
+
+        return menu.description to InlineKeyboardMarkup.create(markup)
     }
 
     fun submit(data: String): Pair<String, ReplyMarkup>{
@@ -96,5 +110,9 @@ class MenuController{
                     listOf(InlineKeyboardButton.CallbackData(text = "Test Inline Button 2", callbackData = "testButton")),
                     listOf(InlineKeyboardButton.CallbackData(text = "Show alert 2", callbackData = "showAlert"))
                 )
+    }
+
+    private fun menuItemToButton(item: MenuItem): InlineKeyboardButton{
+        return InlineKeyboardButton.CallbackData(item.name, callbackData = item.name)
     }
 }

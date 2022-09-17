@@ -44,7 +44,13 @@ fun main(args: Array<String>) {
             return CreateScaleInteractor(scalesGateway)
         }
     }
-    val menu = Menu(description="Choose anything")
+    val menu = Menu(description="Choose anything",
+        listOf(MenuItem("1"), MenuItem("2"),
+            MenuItem("3"), MenuItem("4"),
+            MenuItem("5"),  MenuItem("6"),
+            MenuItem("7")
+        )
+        )
     val ctx = TelegramContext()
     val telegramView = TelegramView(ctx, menu)
     val consoleView = ConsoleView()
@@ -77,6 +83,6 @@ fun main(args: Array<String>) {
     val stateExecutor = StateExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
 
 
-    val bot = AlecTelegramBot(botProperties.token, ctx, stateExecutor)
+    val bot = AlecTelegramBot(botProperties.token, ctx, stateExecutor, menu)
     bot.launch()
 }
