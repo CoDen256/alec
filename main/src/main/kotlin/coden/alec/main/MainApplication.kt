@@ -5,6 +5,7 @@ import coden.alec.app.actuators.BaseScaleActuator
 import coden.alec.app.fsm.Start
 import coden.alec.app.messages.MessageResource
 import coden.alec.bot.AlecTelegramBot
+import coden.alec.bot.MenuControllerFactory
 import coden.alec.bot.TelegramContext
 import coden.alec.bot.TelegramView
 import coden.alec.console.ConsoleView
@@ -44,16 +45,18 @@ fun main(args: Array<String>) {
             return CreateScaleInteractor(scalesGateway)
         }
     }
-    val menu = Menu(description="Choose anything",
-        listOf(MenuItem("1"), MenuItem("2"),
-            MenuItem("3"), MenuItem("4"),
-            MenuItem("5"),
-            MenuItem("6"),
-            MenuItem("7"),
-            MenuItem("8"),
-            MenuItem("9"),
+    val menu = Menu("Main Menu", description="Choose anything",
+        listOf(Menu("1"), Menu("2"),
+            Menu("3"), Menu("4"),
+            Menu("5"),
+            Menu("6"),
+            Menu("7"),
+            Menu("8"),
+            Menu("9"),
         )
         )
+
+
     val ctx = TelegramContext()
     val telegramView = TelegramView(ctx, menu)
     val consoleView = ConsoleView()
@@ -85,7 +88,10 @@ fun main(args: Array<String>) {
 
     val stateExecutor = StateExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
 
+    val menuControllerFactory = MenuControllerFactory(
+        menu, stateExecutor, messages, 2
+    )
 
-    val bot = AlecTelegramBot(botProperties.token, ctx, stateExecutor, menu)
+    val bot = AlecTelegramBot(botProperties.token, ctx, stateExecutor, menuControllerFactory)
     bot.launch()
 }

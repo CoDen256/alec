@@ -1,27 +1,20 @@
 package coden.alec.bot
 
 import coden.alec.app.fsm.*
-import coden.alec.app.messages.MessageResource
+import coden.alec.bot.utils.edit
 import coden.alec.bot.utils.send
-import coden.alec.main.Menu
 import coden.fsm.StateExecutor
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.callbackQuery
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
-import com.github.kotlintelegrambot.entities.ChatId
-import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
-import com.github.kotlintelegrambot.entities.ReplyMarkup
-import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
-import java.util.UUID
-import kotlin.collections.HashMap
 
 class AlecTelegramBot (
     botToken: String,
     private val ctx: TelegramContext,
     private val stateExecutor: StateExecutor,
-    private val menu: Menu
+    private val factory: MenuControllerFactory
 ) {
 
 
@@ -41,7 +34,7 @@ class AlecTelegramBot (
                 ctx.update(bot, lastMessage = message)
                 stateExecutor.submit(HelpCommand)
 
-                val controller = MenuController(menu, stateExecutor)
+                val controller = factory.controller()
                 val (text, replyMarkup) = controller.create()
                 val id = bot.send(message, text, replyMarkup = replyMarkup).get().messageId
                 menus[id] = controller
@@ -68,11 +61,10 @@ class AlecTelegramBot (
             }
 
             callbackQuery{
-                val chatId = callbackQuery.message?.chat?.id ?: return@callbackQuery
-                callbackQuery.message?.messageId?.let {messageId ->
-                    menus[messageId]?.let {
+                callbackQuery.message?.let {message ->
+                    menus[message.messageId]?.let {
                         val (text, markup) = it.submit(callbackQuery.data)
-                        bot.editMessageText(ChatId.fromId(chatId), callbackQuery.message?.messageId, text=text, replyMarkup = markup )
+                        bot.edit(message, text=text, replyMarkup = markup)
                     }
                 }
             }
@@ -80,53 +72,5 @@ class AlecTelegramBot (
     }
     fun launch(){
         bot.startPolling()
-    }
-}
-
-class MenuController (
-    private val menu: Menu,
-    private val executor: StateExecutor,
-    private val messages: MessageResource,
-    private val itemsPerRow: Int = 4
-){
-
-    private val backCommand = UUID.randomUUID().toString()
-    private var current: Menu = menu
-
-    fun create(): Pair<String, ReplyMarkup> {
-        return menu.description to menuToMarkup(menu.innerItems)
-    }
-
-
-    fun submit(data: String): Pair<String, ReplyMarkup>{
-        val target = if (data == backCommand) current.parent
-                     else current.innerItems.find { it.name == data }
-
-        target?.also {
-            current = it
-        }
-        return (current.description to menuToMarkup(current.innerItems))
-    }
-
-
-    private fun menuToMarkup(items: List<Menu>): InlineKeyboardMarkup {
-        val result = ArrayList<List<InlineKeyboardButton>>()
-        generateSequence(0) { n -> n + itemsPerRow }
-            .take((items.size + (itemsPerRow-1)) / itemsPerRow)
-            .forEach { tupleIndex ->
-                val row = ArrayList<InlineKeyboardButton>()
-                (tupleIndex until (tupleIndex + itemsPerRow).coerceAtMost(items.size)).map {
-                    row.add(menuItemToButton(items[it]))
-                }
-                result.add(row)
-            }
-        current.parent?.let {
-            result.add(listOf(InlineKeyboardButton.CallbackData(messages.backButtonMessage, callbackData = backCommand)))
-        }
-        return InlineKeyboardMarkup.create(result)
-    }
-
-    private fun menuItemToButton(item: Menu): InlineKeyboardButton{
-        return InlineKeyboardButton.CallbackData(item.name, callbackData = item.name)
     }
 }
