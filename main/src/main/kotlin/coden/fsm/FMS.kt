@@ -31,16 +31,16 @@ open class FSMTable(private val entries: List<Entry>): ArrayList<Entry>(entries)
 }
 
 data class Entry(
-    val inputCondition: (State) -> Boolean,
+    val inputMatcher: (State) -> Boolean,
     val command: KClass<out Command>,
     val transition: (State, Command) -> State,
 ) {
     companion object {
         fun entry(
-            inputCondition: (State) -> Boolean,
+            inputMatcher: (State) -> Boolean,
             command: KClass<out Command>,
             transition: (State, Command) -> State,
-        ): Entry = Entry(inputCondition, command, transition)
+        ): Entry = Entry(inputMatcher, command, transition)
 
         fun entry(
             input: State,
