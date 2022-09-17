@@ -6,10 +6,10 @@ class StateExecutor(private val fsm: FSM) {
     fun submit(submittedCommand: Command){
         println("[State]: ${current.javaClass.simpleName}")
         println("[Command]: $submittedCommand")
-        for ((inputCondition, command, transition) in fsm.table) {
-            if (inputCondition(current) && command.isInstance(submittedCommand)){
+        for ((inputMatcher, command, transition) in fsm.table) {
+            if (inputMatcher(current) && command.isInstance(submittedCommand)){
                 current = transition(current, submittedCommand)
-                println("[Transition]: ${inputCondition.javaClass.simpleName} -> ${current.javaClass.simpleName}")
+                println("[Transition]: ${inputMatcher.javaClass.simpleName} -> ${current.javaClass.simpleName}")
                 break
             }
         }

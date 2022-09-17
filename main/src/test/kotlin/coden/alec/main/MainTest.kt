@@ -16,6 +16,7 @@ import coden.alec.interactors.definer.scale.ListScalesInteractor
 import coden.alec.main.config.AlecBotProperties
 import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
+import coden.alec.main.config.table.SuperStateTable
 import coden.fsm.FSM
 import coden.fsm.StateExecutor
 import gateway.memory.ScaleInMemoryGateway
@@ -51,7 +52,7 @@ class MainTest {
         val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages)
         val helpActuator = BaseHelpActuator(useCaseFactory, view, messages)
 
-        val stateExecutor = StateExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
+        val stateExecutor = StateExecutor(FSM(Start, SuperStateTable() + HelpTable(helpActuator) + ScaleTable(scaleActuator)))
 
 
         stateExecutor.submit(HelpCommand)
@@ -63,14 +64,18 @@ class MainTest {
         stateExecutor.submit(HelpCommand)
         stateExecutor.submit(CreateScaleCommand("something"))
         stateExecutor.submit(CreateScaleCommand("hello\nname\n1-interesting"))
-        stateExecutor.submit(ListScalesCommand)
+        stateExecutor.submit(InlineCommand(""))
+        stateExecutor.submit(InlineCommand(""))
 
         stateExecutor.submit(CreateScaleCommandNoArgs)
         stateExecutor.submit(TextCommand( " asd asd"))
         stateExecutor.submit(TextCommand( "scale"))
         stateExecutor.submit(TextCommand( " asd asd"))
+        stateExecutor.submit(InlineCommand("asd"))
         stateExecutor.submit(TextCommand( "unit"))
+        stateExecutor.submit(InlineCommand("asd"))
         stateExecutor.submit(TextCommand( "hello"))
+        stateExecutor.submit(InlineCommand("asd"))
         stateExecutor.submit(TextCommand( "1-interesting\n2-somewhatinteresting"))
 
         stateExecutor.submit(ListScalesCommand)
