@@ -8,6 +8,7 @@ import coden.alec.app.fsm.ListScalesCommand
 import coden.alec.app.fsm.Start
 import coden.alec.app.messages.MessageResource
 import coden.alec.bot.*
+import coden.alec.console.ConsoleApp
 import coden.alec.console.ConsoleView
 import coden.alec.core.CreateScaleActivator
 import coden.alec.core.ListScalesActivator
@@ -75,8 +76,8 @@ fun main(args: Array<String>) {
     val consoleView = ConsoleView()
 
 
-        val view = telegramView
-//    val view = consoleView
+//        val view = telegramView
+    val view = consoleView
 
 
 
@@ -107,6 +108,9 @@ fun main(args: Array<String>) {
 
     val manager = MenuNavigatorManager(menuNagivatorFactory)
 
-    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, ctx, stateExecutor, manager)
-    bot.launch()
+//    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, ctx, stateExecutor, manager)
+//    bot.launch()
+
+    val app = ConsoleApp(consoleView, stateExecutor, menu)
+    app.start()
 }
