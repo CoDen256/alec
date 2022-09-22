@@ -23,7 +23,6 @@ import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
 import coden.fsm.FSM
 import coden.fsm.StateExecutor
-import com.github.kotlintelegrambot.logging.LogLevel
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
@@ -37,7 +36,7 @@ fun main(args: Array<String>) {
     messages.startMessage = "start"
     messages.listScalesMessage = "list scales"
     messages.listScalesEmptyMessage = "empty"
-    messages.backButtonMessage = "<-- Back"
+    messages.menuBackMessage = "<-- Back"
     val botProperties = AlecBotProperties()
     botProperties.token = "5402767430:AAEXVe8s8IAow9z9Ip69NCU9JnUaEHIgcrw"
 
@@ -81,21 +80,6 @@ fun main(args: Array<String>) {
 
 
 
-//        MenuItem(
-//            name="Scales",
-//                    action = null,
-//            desciprion="What you want to do with scales"
-//            children = listOf(
-//                    MenuItem(
-//                        name="List Scale"
-//                        action = ListScalesCommand
-//                    )
-//            )
-
-//        )
-//                MenuItem()
-//                MenuItem()
-
 
     val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages)
     val helpActuator = BaseHelpActuator(useCaseFactory, view, messages)
@@ -103,7 +87,7 @@ fun main(args: Array<String>) {
     val stateExecutor = StateExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
 
     val menuNagivatorFactory = MenuNavigatorFactory(
-        menu, stateExecutor, messages, 2
+        menu, stateExecutor, messages,
     )
 
     val manager = MenuNavigatorManager(menuNagivatorFactory)
@@ -111,6 +95,6 @@ fun main(args: Array<String>) {
 //    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, ctx, stateExecutor, manager)
 //    bot.launch()
 
-    val app = ConsoleApp(consoleView, stateExecutor, menu)
+    val app = ConsoleApp(consoleView, stateExecutor, menuNagivatorFactory)
     app.start()
 }

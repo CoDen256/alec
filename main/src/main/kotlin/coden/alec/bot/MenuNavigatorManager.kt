@@ -8,10 +8,10 @@ import com.github.kotlintelegrambot.entities.Message
 class MenuNavigatorManager
     (private val factory: MenuNavigatorFactory)
 {
-    private val menus = HashMap<Long, MenuNavigator>()
+    private val menus = HashMap<Long, TelegramMenuViewer>()
 
     fun createNewMenu(bot: Bot, message: Message){
-        val controller = factory.mainMenuNavigator()
+        val controller = TelegramMenuViewer(factory.mainMenuNavigator())
         val (text, replyMarkup) = controller.createMain()
         val id = bot.send(message, text, replyMarkup = replyMarkup).get().messageId
         menus[id] = controller

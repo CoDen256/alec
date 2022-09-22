@@ -8,36 +8,92 @@ import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 import kotlin.collections.ArrayList
 
+
+
 class MenuNavigatorFactory(
     private val mainMenuTemplate: Menu,
     private val executor: StateExecutor,
     private val messages: MessageResource,
-    private val itemsPerRow: Int = 4
 ) {
     fun mainMenuNavigator(): MenuNavigator{
-        return MenuNavigator(mainMenuTemplate, executor, messages, itemsPerRow)
+        return MenuNavigator(mainMenuTemplate, executor, messages)
     }
 }
+
+class TelegramMenuViewer(
+    private val navigator: MenuNavigator,
+    private val itemsPerRow: Int = 4
+) {
+    fun createMain(): Pair<String, ReplyMarkup>{
+        return menuViewToTelegramMarkup(navigator.createMain())
+    }
+
+    fun navigate(destination: String): Pair<String, ReplyMarkup> {
+        return menuViewToTelegramMarkup(navigator.navigate(destination))
+    }
+
+    private fun menuViewToTelegramMarkup(menuView: MenuView): Pair<String, ReplyMarkup> {
+        return menuView.description to menuToMarkup(menuView.itemRows, menuView.backView)
+    }
+
+    private fun menuToMarkup(items: List<MenuItemView>, backView: MenuItemView?): InlineKeyboardMarkup {
+        val result = ArrayList<List<InlineKeyboardButton>>()
+        generateSequence(0) { n -> n + itemsPerRow }
+            .take((items.size + (itemsPerRow - 1)) / itemsPerRow)
+            .forEach { tupleIndex ->
+                val row = ArrayList<InlineKeyboardButton>()
+                (tupleIndex until (tupleIndex + itemsPerRow).coerceAtMost(items.size)).map {
+                    row.add(menuItemToButton(items[it]))
+                }
+                result.add(row)
+            }
+        backView?.let {
+            result.add(listOf(menuItemToButton(it)))
+        }
+        return InlineKeyboardMarkup.create(result)
+    }
+
+    private fun menuItemToButton(item: MenuItemView): InlineKeyboardButton {
+        return InlineKeyboardButton.CallbackData(item.name, callbackData = item.id)
+    }
+}
+
+class MenuView(
+    val description: String,
+    val itemRows: List<MenuItemView>,
+    val backView: MenuItemView?
+)
+
+class MenuItemView(
+    val name: String,
+    val id: String
+)
 
 class MenuNavigator (
     private val mainMenuTemplate: Menu,
     private val executor: StateExecutor,
-    private val messages: MessageResource,
-    private val itemsPerRow: Int = 4
+    messages: MessageResource,
 ){
 
-    private val backCommand = "MenuController.BACK"
+    private val backCommand = "MenuNavigator.BACK"
+    private val backView = MenuItemView(messages.menuBackMessage, id = backCommand)
     private val parentStack = ArrayList<Menu>()
     private var current: Menu = mainMenuTemplate
 
-    fun createMain(): Pair<String, ReplyMarkup> {
-        return mainMenuTemplate.description to menuToMarkup(mainMenuTemplate.items, parentStack.lastOrNull())
+    fun createMain(): MenuView {
+        return MenuView(
+            mainMenuTemplate.description,
+            menuItemsToView(mainMenuTemplate.items),
+            parentStack.lastOrNull()?.let { backView })
     }
 
 
-    fun navigate(data: String): Pair<String, ReplyMarkup>{
+    fun navigate(data: String): MenuView {
         current = moveToNext(data) ?: current
-        return (current.description to menuToMarkup(current.items, parentStack.lastOrNull()))
+        return MenuView(
+            current.description,
+            menuItemsToView(current.items),
+            parentStack.lastOrNull()?.let { backView })
     }
 
     private fun moveToNext(data: String): Menu? {
@@ -64,24 +120,11 @@ class MenuNavigator (
     }
 
 
-    private fun menuToMarkup(items: List<Menu>, parent: Menu?): InlineKeyboardMarkup {
-        val result = ArrayList<List<InlineKeyboardButton>>()
-        generateSequence(0) { n -> n + itemsPerRow }
-            .take((items.size + (itemsPerRow - 1)) / itemsPerRow)
-            .forEach { tupleIndex ->
-                val row = ArrayList<InlineKeyboardButton>()
-                (tupleIndex until (tupleIndex + itemsPerRow).coerceAtMost(items.size)).map {
-                    row.add(menuItemToButton(items[it]))
-                }
-                result.add(row)
-            }
-        parent?.let {
-            result.add(listOf(InlineKeyboardButton.CallbackData(messages.backButtonMessage, callbackData = backCommand)))
-        }
-        return InlineKeyboardMarkup.create(result)
+    private fun menuItemsToView(items: List<Menu>): List<MenuItemView> {
+        return items.map { menuItemToView(it) }
     }
 
-    private fun menuItemToButton(item: Menu): InlineKeyboardButton {
-        return InlineKeyboardButton.CallbackData(item.name, callbackData = item.name)
+    private fun menuItemToView(item: Menu): MenuItemView {
+        return MenuItemView(item.name, id = item.name)
     }
 }
