@@ -11,6 +11,7 @@ class MenuNavigator(private val menuLayout: MenuLayout) {
 
     fun createMainMenu(): MenuView {
         val newContext = createContext(menuLayout.description, menuLayout.items)
+        contextStack.clear()
         contextStack.add(newContext)
         return newContext.menu
     }

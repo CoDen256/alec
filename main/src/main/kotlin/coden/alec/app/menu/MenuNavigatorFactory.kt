@@ -1,4 +1,4 @@
-package coden.alec.bot.menu
+package coden.alec.app.menu
 
 import coden.menu.MenuLayout
 import coden.menu.MenuNavigator
