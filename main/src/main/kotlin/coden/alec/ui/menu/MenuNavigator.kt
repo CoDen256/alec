@@ -27,7 +27,7 @@ class MenuNavigator(
     //
 //
     fun navigate(data: String): NavigationResult {
-        return (layouts[data]?.let {
+        return layouts[data]?.let {
             val targetAction = it.action
 
             if (it.children.isEmpty()){
@@ -44,11 +44,13 @@ class MenuNavigator(
             return NavigationResult(
                 newMenu,
                 targetAction,
-            )
+            ).also {
+                previous = it.menu
+            }
         } ?: NavigationResult(MenuView(
             menuLayout.description, itemLayoutsToViews(menuLayout.items), null),
             null
-        )).also {
+        ).also {
             previous = it.menu
         }
 

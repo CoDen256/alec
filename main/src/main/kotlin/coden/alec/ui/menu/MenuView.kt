@@ -10,7 +10,7 @@ class NavigationResult(
 
 class MenuView(
     val description: String,
-    val itemRows: List<ItemView>,
+    val items: List<ItemView>,
     val backItemView: ItemView?
 )
 
