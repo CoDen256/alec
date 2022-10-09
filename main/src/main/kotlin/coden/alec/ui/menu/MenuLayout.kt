@@ -1,27 +1,22 @@
 package coden.alec.ui.menu
 
-import coden.fsm.Command
-
 class MenuLayout private constructor(
-    val name: String,
     val description: String,
-    val items: List<MenuLayout>,
-    val action: Command?
+    val backItem: ItemLayout,
+    val items: List<ItemLayout>,
 ) {
     companion object {
-        fun layout(name: String, description: String = name, vararg items: MenuLayout): MenuLayout =
-            MenuLayout(name, description, items.toList(), null)
-
-        fun action(name: String, action: Command): MenuLayout =
-            MenuLayout(name, name, emptyList(), action)
-    }
-}
-
-class BackItemLayout private constructor(
-    val description: String
-) {
-    companion object {
-        fun back(description: String): BackItemLayout
-            = BackItemLayout(description)
+        fun menuLayout(name: String, backLayout: ItemLayout, vararg items: ItemLayout): MenuLayout {
+            if (backLayout.action != null){
+                throw InvalidBackItemException("Back Item should not contain action")
+            }
+            if (backLayout.description != null){
+                throw InvalidBackItemException("Back Item should not contain description")
+            }
+            if (backLayout.children.isNotEmpty()){
+                throw InvalidBackItemException("Back Item should not contain children")
+            }
+            return MenuLayout(name, backLayout, items.toList())
+        }
     }
 }

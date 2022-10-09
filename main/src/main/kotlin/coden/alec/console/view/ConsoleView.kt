@@ -12,7 +12,7 @@ class ConsoleView: View {
     }
 
     override fun displayMainMenu(message: String) {
-        println("menu")
+        println(message)
     }
 
     override fun displayError(message: String) {
