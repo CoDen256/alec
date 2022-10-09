@@ -1,10 +1,10 @@
 package coden.alec.console
 
 import coden.alec.app.fsm.HelpCommand
-import coden.alec.bot.MenuItemView
-import coden.alec.bot.MenuNavigator
-import coden.alec.bot.MenuNavigatorFactory
-import coden.alec.bot.MenuView
+import coden.alec.ui.menu.MenuItemView
+import coden.alec.ui.menu.MenuNavigator
+import coden.alec.ui.menu.MenuNavigatorFactory
+import coden.alec.ui.menu.MenuView
 import coden.alec.console.view.ConsoleView
 import coden.fsm.StateExecutor
 
@@ -39,7 +39,7 @@ class ConsoleMenuViewer(
     }
 
     private fun menuViewToTelegramMarkup(menuView: MenuView): String {
-        return menuView.description +"\n"+ menuToStringMenu(menuView.itemRows, menuView.backView)
+        return menuView.description +"\n"+ menuToStringMenu(menuView.itemRows, menuView.backItem)
     }
 
     private fun menuToStringMenu(items: List<MenuItemView>, backView: MenuItemView?): String {

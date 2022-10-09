@@ -1,11 +1,12 @@
-package coden.alec.bot
+package coden.alec.bot.menu
 
+import coden.alec.ui.menu.MenuNavigatorFactory
 import coden.alec.bot.utils.edit
 import coden.alec.bot.utils.send
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.entities.Message
 
-class MenuNavigatorManager
+class TelegramMenuNavigatorManager
     (private val factory: MenuNavigatorFactory)
 {
     private val menus = HashMap<Long, TelegramMenuViewer>()

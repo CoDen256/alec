@@ -1,8 +1,7 @@
 package coden.alec.bot
 
 import coden.alec.app.fsm.*
-import coden.alec.bot.utils.edit
-import coden.alec.bot.utils.send
+import coden.alec.bot.menu.TelegramMenuNavigatorManager
 import coden.fsm.StateExecutor
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
@@ -16,7 +15,7 @@ class AlecTelegramBot (
     log: LogLevel,
     private val ctx: TelegramContext,
     private val stateExecutor: StateExecutor,
-    private val manager: MenuNavigatorManager
+    private val manager: TelegramMenuNavigatorManager
 ) {
 
     private val bot = bot {

@@ -6,20 +6,22 @@ import coden.alec.app.fsm.CreateScaleCommandNoArgs
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.ListScalesCommand
 import coden.alec.app.fsm.Start
+import coden.alec.ui.menu.MenuNavigatorFactory
 import coden.alec.app.messages.MessageResource
 import coden.alec.bot.*
+import coden.alec.bot.menu.TelegramMenuNavigatorManager
 import coden.alec.bot.view.TelegramView
 import coden.alec.console.ConsoleApp
 import coden.alec.console.view.ConsoleView
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
-import coden.alec.main.Menu.Companion.action
-import coden.alec.main.Menu.Companion.menu
-import coden.alec.main.Menu.Companion.set
+import coden.alec.ui.menu.MenuLayout.Companion.action
+import coden.alec.ui.menu.MenuLayout.Companion.layout
 import coden.alec.main.config.AlecBotProperties
 import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
+import coden.alec.ui.menu.MenuLayout
 import coden.fsm.FSM
 import coden.fsm.StateExecutor
 import gateway.memory.ScaleInMemoryGateway
@@ -62,23 +64,29 @@ fun main(args: Array<String>) {
         }
     }
 
-    val menu = menu("Main Menu", "Choose anything from  the main menu",
-        set("Common", "Common commands",
+    val menu = layout(
+        "Main Menu", "Choose anything from  the main menu",
+        layout(
+            "Common", "Common commands",
             action("Start", action = HelpCommand),
-            action("Help", action = HelpCommand)),
-
-        set("Scales", "Scale management",
+            action("Help", action = HelpCommand)
+        ),
+        layout(
+            "Scales", "Scale management",
             action("View all Scales", action = ListScalesCommand),
-            action("Create Scale", action = CreateScaleCommandNoArgs)),
-
-        set("Factors", "Factor management",
+            action("Create Scale", action = CreateScaleCommandNoArgs)
+        ),
+        layout(
+            "Factors", "Factor management",
             action("Start", action = HelpCommand),
-            action("Help", action = HelpCommand)),
-
-        set("Raters", "Rater management",
+            action("Help", action = HelpCommand)
+        ),
+        layout(
+            "Raters", "Rater management",
             action("Start", action = HelpCommand),
-            action("Help", action = HelpCommand)),
+            action("Help", action = HelpCommand)
         )
+    )
 
 
     val ctx = TelegramContext()
@@ -90,8 +98,6 @@ fun main(args: Array<String>) {
     val view = consoleView
 
 
-
-
     val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages)
     val helpActuator = BaseHelpActuator(useCaseFactory, view, messages)
 
@@ -101,7 +107,7 @@ fun main(args: Array<String>) {
         menu, stateExecutor, messages,
     )
 
-    val manager = MenuNavigatorManager(menuNagivatorFactory)
+    val manager = TelegramMenuNavigatorManager(menuNagivatorFactory)
 
 //    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, ctx, stateExecutor, manager)
 //    bot.launch()

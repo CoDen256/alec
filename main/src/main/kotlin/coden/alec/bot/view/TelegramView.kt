@@ -3,11 +3,11 @@ package coden.alec.bot.view
 import coden.alec.app.views.View
 import coden.alec.bot.TelegramContext
 import coden.alec.bot.utils.send
-import coden.alec.main.Menu
+import coden.alec.ui.menu.MenuLayout
 
 class TelegramView(
     private val ctx: TelegramContext,
-    private val menu: Menu
+    private val menu: MenuLayout
 ): View {
 
     override fun displayPrompt(message: String) {
