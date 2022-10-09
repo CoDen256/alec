@@ -58,7 +58,9 @@ class AlecTelegramBot (
 
             callbackQuery{
                 callbackQuery.message?.let {
-                    manager.handleCommand(bot, it, callbackQuery.data)
+                    manager.handleCommand(bot, it, callbackQuery.data)?.let {cmd ->
+                        stateExecutor.submit(cmd)
+                    }
                 }
             }
         }

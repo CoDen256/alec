@@ -21,6 +21,7 @@ import coden.alec.ui.menu.MenuLayout.Companion.layout
 import coden.alec.main.config.AlecBotProperties
 import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
+import coden.alec.ui.menu.BackItemLayout
 import coden.alec.ui.menu.MenuLayout
 import coden.fsm.FSM
 import coden.fsm.StateExecutor
@@ -104,7 +105,7 @@ fun main(args: Array<String>) {
     val stateExecutor = StateExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
 
     val menuNagivatorFactory = MenuNavigatorFactory(
-        menu, stateExecutor, messages,
+        menu, BackItemLayout.back(messages.menuBackMessage)
     )
 
     val manager = TelegramMenuNavigatorManager(menuNagivatorFactory)

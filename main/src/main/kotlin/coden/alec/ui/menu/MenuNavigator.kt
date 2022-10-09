@@ -1,19 +1,15 @@
 package coden.alec.ui.menu
 
-import coden.alec.app.messages.MessageResource
-import coden.fsm.StateExecutor
-
-
+import coden.fsm.Command
 
 
 class MenuNavigator (
     private val menuLayout: MenuLayout,
-    private val executor: StateExecutor,
-    backLayout: BackLayout
+    backItemLayout: BackItemLayout
 ){
 
     private val backCommand = "MenuNavigator.BACK"
-    private val backView = MenuItemView(backLayout.description, id = backCommand)
+    private val backView = MenuItemView(backItemLayout.description, id = backCommand)
     private val parentStack = ArrayList<MenuLayout>()
     private var current: MenuLayout = menuLayout
 
@@ -21,19 +17,27 @@ class MenuNavigator (
         return MenuView(
             menuLayout.description,
             menuItemsToView(menuLayout.items),
-            parentStack.lastOrNull()?.let { backView })
+            parentStack.lastOrNull()?.let { backView },
+        )
     }
 
 
     fun navigate(data: String): MenuView {
-        current = moveToNext(data) ?: current
+        val next = moveToNext(data)
+        var action: Command? = null
+        next?.let {
+            current = next.first ?: current
+            action = next.second
+        }
         return MenuView(
             current.description,
             menuItemsToView(current.items),
-            parentStack.lastOrNull()?.let { backView })
+            parentStack.lastOrNull()?.let { backView },
+            action
+        )
     }
 
-    private fun moveToNext(data: String): MenuLayout? {
+    private fun moveToNext(data: String): Pair<MenuLayout?, Command?>? {
         return if (data == backCommand) {
             moveBack()
         } else {
@@ -41,18 +45,19 @@ class MenuNavigator (
         }
     }
 
-    private fun moveBack(): MenuLayout? {
-        return parentStack.removeLastOrNull()
+    private fun moveBack(): Pair<MenuLayout?, Command?>? {
+        return parentStack.removeLastOrNull()?.let {
+            return it to null
+        }
     }
 
-    private fun moveToSubMenu(data: String): MenuLayout? {
+    private fun moveToSubMenu(data: String): Pair<MenuLayout?, Command?>? {
         return current.items.find { it.name == data }?.let {
-            it.action?.let { action -> executor.submit(action) }
             if (it.items.isEmpty()) {
-                return@let null
+                return@let Pair(null, it.action)
             }
             parentStack.add(current)
-            return@let it
+            return@let Pair(it, it.action)
         }
     }
 
@@ -67,11 +72,10 @@ class MenuNavigator (
 }
 
 class MenuNavigatorFactory(
-    private val mainMenuTemplate: MenuLayout,
-    private val executor: StateExecutor,
-    private val messages: MessageResource,
+    private val menuLayout: MenuLayout,
+    private val backItemLayout: BackItemLayout
 ) {
     fun mainMenuNavigator(): MenuNavigator {
-        return MenuNavigator(mainMenuTemplate, executor)
+        return MenuNavigator(menuLayout, backItemLayout)
     }
 }

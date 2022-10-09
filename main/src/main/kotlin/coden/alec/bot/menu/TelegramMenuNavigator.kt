@@ -3,12 +3,13 @@ package coden.alec.bot.menu
 import coden.alec.ui.menu.MenuItemView
 import coden.alec.ui.menu.MenuNavigator
 import coden.alec.ui.menu.MenuView
+import coden.fsm.Command
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 
 
-class TelegramMenuViewer(
+class TelegramMenuNavigator(
     private val navigator: MenuNavigator,
     private val itemsPerRow: Int = 4
 ) {
@@ -16,8 +17,10 @@ class TelegramMenuViewer(
         return menuViewToTelegramMarkup(navigator.createMain())
     }
 
-    fun navigate(destination: String): Pair<String, ReplyMarkup> {
-        return menuViewToTelegramMarkup(navigator.navigate(destination))
+    fun navigate(destination: String): Triple<String, ReplyMarkup, Command?> {
+        val menuView = navigator.navigate(destination)
+        val markup = menuViewToTelegramMarkup(menuView)
+        return Triple(markup.first, markup.second, menuView.action)
     }
 
     private fun menuViewToTelegramMarkup(menuView: MenuView): Pair<String, ReplyMarkup> {

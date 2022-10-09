@@ -3,25 +3,28 @@ package coden.alec.bot.menu
 import coden.alec.ui.menu.MenuNavigatorFactory
 import coden.alec.bot.utils.edit
 import coden.alec.bot.utils.send
+import coden.fsm.Command
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.entities.Message
 
 class TelegramMenuNavigatorManager
-    (private val factory: MenuNavigatorFactory)
+    (private val factory: MenuNavigatorFactory
+    )
 {
-    private val menus = HashMap<Long, TelegramMenuViewer>()
+    private val menus = HashMap<Long, TelegramMenuNavigator>()
 
     fun createNewMenu(bot: Bot, message: Message){
-        val controller = TelegramMenuViewer(factory.mainMenuNavigator())
+        val controller = TelegramMenuNavigator(factory.mainMenuNavigator())
         val (text, replyMarkup) = controller.createMain()
         val id = bot.send(message, text, replyMarkup = replyMarkup).get().messageId
         menus[id] = controller
     }
 
-    fun handleCommand(bot: Bot, message: Message, data: String){
-        menus[message.messageId]?.let {
-            val (text, markup) = it.navigate(data)
+    fun handleCommand(bot: Bot, message: Message, data: String): Command?{
+        return menus[message.messageId]?.let {
+            val (text, markup, action) = it.navigate(data)
             bot.edit(message, text=text, replyMarkup = markup)
+            return action
         }
     }
 

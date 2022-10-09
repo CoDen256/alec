@@ -17,11 +17,11 @@ class MenuLayout private constructor(
     }
 }
 
-class BackLayout private constructor(
+class BackItemLayout private constructor(
     val description: String
 ) {
     companion object {
-        fun back(description: String): BackLayout
-            = BackLayout(description)
+        fun back(description: String): BackItemLayout
+            = BackItemLayout(description)
     }
 }
