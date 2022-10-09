@@ -4,13 +4,8 @@ import coden.alec.app.actuators.BaseHelpActuator
 import coden.alec.app.actuators.BaseScaleActuator
 import coden.alec.app.fsm.*
 import coden.alec.app.messages.MessageResource
-import coden.alec.bot.AlecTelegramBot
-import coden.alec.bot.TelegramContext
-import coden.alec.bot.TelegramView
-import coden.alec.console.ConsoleView
-import coden.alec.core.CreateScaleActivator
-import coden.alec.core.ListScalesActivator
-import coden.alec.core.UseCaseFactory
+import coden.alec.console.view.ConsoleView
+import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
 import coden.alec.main.config.AlecBotProperties
@@ -40,6 +35,18 @@ class MainTest {
 
             override fun createScale(): CreateScaleActivator {
                 return CreateScaleInteractor(scalesGateway)
+            }
+
+            override fun deleteScale(): DeleteScaleActivator {
+                TODO("Not yet implemented")
+            }
+
+            override fun purgeScale(): PurgeScaleActivator {
+                TODO("Not yet implemented")
+            }
+
+            override fun updateScale(): UpdateScaleActivator {
+                TODO("Not yet implemented")
             }
         }
         val consoleView = ConsoleView()

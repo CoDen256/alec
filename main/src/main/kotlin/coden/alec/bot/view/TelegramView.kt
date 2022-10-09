@@ -1,6 +1,7 @@
-package coden.alec.bot
+package coden.alec.bot.view
 
 import coden.alec.app.views.View
+import coden.alec.bot.TelegramContext
 import coden.alec.bot.utils.send
 import coden.alec.main.Menu
 

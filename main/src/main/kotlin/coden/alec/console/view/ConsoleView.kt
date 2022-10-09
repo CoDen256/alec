@@ -1,4 +1,4 @@
-package coden.alec.console
+package coden.alec.console.view
 
 import coden.alec.app.views.View
 

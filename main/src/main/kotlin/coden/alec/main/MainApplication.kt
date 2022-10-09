@@ -8,11 +8,10 @@ import coden.alec.app.fsm.ListScalesCommand
 import coden.alec.app.fsm.Start
 import coden.alec.app.messages.MessageResource
 import coden.alec.bot.*
+import coden.alec.bot.view.TelegramView
 import coden.alec.console.ConsoleApp
-import coden.alec.console.ConsoleView
-import coden.alec.core.CreateScaleActivator
-import coden.alec.core.ListScalesActivator
-import coden.alec.core.UseCaseFactory
+import coden.alec.console.view.ConsoleView
+import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
 import coden.alec.main.Menu.Companion.action
@@ -48,6 +47,18 @@ fun main(args: Array<String>) {
 
         override fun createScale(): CreateScaleActivator {
             return CreateScaleInteractor(scalesGateway)
+        }
+
+        override fun deleteScale(): DeleteScaleActivator {
+            TODO("Not yet implemented")
+        }
+
+        override fun purgeScale(): PurgeScaleActivator {
+            TODO("Not yet implemented")
+        }
+
+        override fun updateScale(): UpdateScaleActivator {
+            TODO("Not yet implemented")
         }
     }
 

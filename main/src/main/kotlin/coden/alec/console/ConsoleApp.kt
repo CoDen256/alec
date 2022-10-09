@@ -5,6 +5,7 @@ import coden.alec.bot.MenuItemView
 import coden.alec.bot.MenuNavigator
 import coden.alec.bot.MenuNavigatorFactory
 import coden.alec.bot.MenuView
+import coden.alec.console.view.ConsoleView
 import coden.fsm.StateExecutor
 
 class ConsoleApp(
