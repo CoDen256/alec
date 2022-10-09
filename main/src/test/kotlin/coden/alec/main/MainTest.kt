@@ -12,6 +12,7 @@ import coden.alec.main.config.AlecBotProperties
 import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
 import coden.fsm.FSM
+import coden.fsm.LoggingStateExecutor
 import coden.fsm.StateExecutor
 import gateway.memory.ScaleInMemoryGateway
 import org.junit.jupiter.api.Test
@@ -58,7 +59,7 @@ class MainTest {
         val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages)
         val helpActuator = BaseHelpActuator(useCaseFactory, view, messages)
 
-        val stateExecutor = StateExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
+        val stateExecutor = LoggingStateExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
 
 
         stateExecutor.submit(HelpCommand)

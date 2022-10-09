@@ -1,19 +1,22 @@
 package coden.fsm
 
-class StateExecutor(private val fsm: FSM) {
-    private var current = fsm.start
 
-    fun submit(submittedCommand: Command){
-        println("[State]: ${current.javaClass.simpleName}")
-        println("[Command]: $submittedCommand")
+open class StateExecutor(private val fsm: FSM) {
+
+    var current = fsm.start
+        private set
+
+    open fun submit(submittedCommand: Command){
         for ((input, command, transition) in fsm.table) {
             if (input == current && command.isInstance(submittedCommand)){
-                current = transition(submittedCommand)
-                println("[Transition]: ${input.javaClass.simpleName} -> ${current.javaClass.simpleName}")
+                doTransit(transition, submittedCommand)
                 break
             }
         }
-        println()
+    }
+
+    internal open fun doTransit(transition: (Command) -> State, submittedCommand: Command) {
+        current = transition(submittedCommand)
     }
 
 }
