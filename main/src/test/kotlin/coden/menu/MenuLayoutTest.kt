@@ -1,8 +1,10 @@
-package coden.alec.ui.menu
+package coden.menu
 
-import coden.alec.ui.menu.ItemLayout.Companion.itemLayout
-import coden.alec.ui.menu.MenuLayout.Companion.menuLayout
+import coden.menu.ItemLayout.Companion.itemLayout
+import coden.menu.MenuLayout.Companion.menuLayout
 import coden.fsm.BaseCommand
+import coden.menu.InvalidBackItemException
+import coden.menu.InvalidMenuLayoutException
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

@@ -3,7 +3,7 @@ package coden.alec.bot.view
 import coden.alec.app.views.View
 import coden.alec.bot.TelegramContext
 import coden.alec.bot.utils.send
-import coden.alec.ui.menu.MenuLayout
+import coden.menu.MenuLayout
 
 class TelegramView(
     private val ctx: TelegramContext,

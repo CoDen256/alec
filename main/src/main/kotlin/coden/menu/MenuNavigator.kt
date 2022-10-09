@@ -1,4 +1,4 @@
-package coden.alec.ui.menu
+package coden.menu
 
 import coden.fsm.Command
 import java.util.*

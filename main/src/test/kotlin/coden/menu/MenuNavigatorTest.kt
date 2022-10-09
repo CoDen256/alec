@@ -1,6 +1,9 @@
-package coden.alec.ui.menu
+package coden.menu
 
-import coden.alec.ui.menu.MenuLayout.Companion.menuLayout
+import coden.menu.ItemLayout
+import coden.menu.MenuLayout.Companion.menuLayout
+import coden.menu.MenuNavigator
+import coden.menu.NavigationResult
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
