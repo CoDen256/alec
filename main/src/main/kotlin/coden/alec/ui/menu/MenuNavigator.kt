@@ -1,38 +1,57 @@
 package coden.alec.ui.menu
 
-import coden.fsm.Command
 import java.util.UUID
 
 
-class MenuNavigator (
+class MenuNavigator(
     private val menuLayout: MenuLayout,
-){
+) {
 
     private val backCommand = "MenuNavigator.BACK"
     private val backView = ItemView(menuLayout.backItem.name, id = backCommand)
     private val parentStack = ArrayList<MenuLayout>()
-    private var current: MenuLayout = menuLayout
-    private val actions = HashMap<String, Command?>()
+    private lateinit var previous: MenuView
+    private val layouts = HashMap<String, ItemLayout>()
 
     fun createMainMenu(): MenuView {
         // parentStack.lastOrNull()?.let { backView }
         return MenuView(
             menuLayout.description,
-            itemLayoutToView(menuLayout.items),
-        )
+            itemLayoutsToViews(menuLayout.items),
+            null
+        ).also {
+            previous = it
+        }
     }
-//
+
+    //
 //
     fun navigate(data: String): NavigationResult {
-    val targetAction = actions[data]
-    return NavigationResult(
-            MenuView(
-                menuLayout.description,
-                itemLayoutToView(menuLayout.items)
-            ),
-            targetAction,
+        return (layouts[data]?.let {
+            val targetAction = it.action
+
+            if (it.children.isEmpty()){
+                return NavigationResult(
+                    previous,
+                    targetAction,
+                )
+            }
+            val newMenu = MenuView(
+                it.description ?: it.name,
+                itemLayoutsToViews(it.children),
+                backView
+            )
+            return NavigationResult(
+                newMenu,
+                targetAction,
+            )
+        } ?: NavigationResult(MenuView(
+            menuLayout.description, itemLayoutsToViews(menuLayout.items), null),
             null
-        )
+        )).also {
+            previous = it.menu
+        }
+
 
 
 //        val next = moveToNext(data)
@@ -76,13 +95,13 @@ class MenuNavigator (
 //
 
 
-    private fun itemLayoutToView(items: List<ItemLayout>): List<ItemView> {
+    private fun itemLayoutsToViews(items: List<ItemLayout>): List<ItemView> {
         return items.map { menuItemToView(it) }
     }
 
     private fun menuItemToView(item: ItemLayout): ItemView {
         return ItemView(item.name, id = UUID.randomUUID().toString()).also {
-            actions[it.id] = item.action
+            layouts[it.id] = item
         }
     }
 }

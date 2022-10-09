@@ -23,13 +23,13 @@ internal class MenuLayoutTest {
     internal fun createItem() {
         val layout = itemLayout(name = "Common",
             description = "Common Commands",
-            action = EmptyCommand(),
+            action = TestCommand(),
             children = listOf(itemLayout(name = "Help"), itemLayout("Start"))
         )
         assertNotNull(layout)
         assertEquals("Common", layout.name)
         assertEquals( "Common Commands", layout.description)
-        assertInstanceOf(EmptyCommand::class.java, layout.action)
+        assertInstanceOf(TestCommand::class.java, layout.action)
         assertThat(layout.children).isNotEmpty()
         assertEquals("Help", layout.children[0].name)
         assertEquals("Start", layout.children[1].name)
@@ -40,12 +40,12 @@ internal class MenuLayoutTest {
         val menu = menuLayout(
             "Main Menu", itemLayout("Back"),
             itemLayout("Common", "Common Commands",
-                itemLayout("Start", action = EmptyCommand()),
-                itemLayout("Help", action = EmptyCommand())
+                itemLayout("Start", action = TestCommand()),
+                itemLayout("Help", action = TestCommand())
             ),
-            itemLayout("Scales", "Scale Commands", action = EmptyCommand()),
-            itemLayout("Rater", "Rater Commands", action = EmptyCommand()),
-            itemLayout("Factors", "Factor Commands", action = EmptyCommand()),
+            itemLayout("Scales", "Scale Commands", action = TestCommand()),
+            itemLayout("Rater", "Rater Commands", action = TestCommand()),
+            itemLayout("Factors", "Factor Commands", action = TestCommand()),
         )
 
         assertThat(menu.items).isNotEmpty()
@@ -56,7 +56,7 @@ internal class MenuLayoutTest {
     @Test
     internal fun invalidBackItem() {
         assertThrows(InvalidBackItemException::class.java) {
-            menuLayout("Main Menu", itemLayout("Back", action = EmptyCommand()), itemLayout("Inner child"))
+            menuLayout("Main Menu", itemLayout("Back", action = TestCommand()), itemLayout("Inner child"))
         }
         assertThrows(InvalidBackItemException::class.java) {
             menuLayout("Main Menu", itemLayout("Back", "Description"), itemLayout("Inner child"))
@@ -75,4 +75,4 @@ internal class MenuLayoutTest {
     }
 }
 
-class EmptyCommand(args: String?=null): BaseCommand(args)
+class TestCommand(args: String?=null): BaseCommand(args)
