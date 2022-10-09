@@ -1,20 +1,20 @@
-package coden.alec.console
+package coden.alec.console.menu
 
 import coden.alec.app.fsm.CreateScaleCommandNoArgs
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.ListScalesCommand
-import coden.alec.app.menu.MenuNavigatorFactory
-import coden.alec.console.menu.ConsoleMenuReindexingNavigator
 import coden.menu.ItemLayout
 import coden.menu.MenuLayout
 import coden.menu.MenuNavigator
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-internal class ConsoleAppTest{
+internal class ConsoleMenuReindexingNavigatorTest{
     @Test
-    internal fun name() {
+    internal fun navigate() {
         val menu = MenuLayout.menuLayout(
-            "Choose anything from  the main menu", ItemLayout.itemLayout("Back"), ItemLayout.itemLayout(
+            "Choose anything from the main menu", ItemLayout.itemLayout("Back"),
+            ItemLayout.itemLayout(
                 "Common", "Common commands",
                 ItemLayout.itemLayout("Start", action = HelpCommand),
                 ItemLayout.itemLayout("Help", action = HelpCommand)
@@ -38,6 +38,16 @@ internal class ConsoleAppTest{
 
         val controller = ConsoleMenuReindexingNavigator(MenuNavigator(menu))
 
-//        val app = ConsoleApp(MenuNavigatorFactory(menu), )
+        assertEquals("Choose anything from the main menu", controller.createMain().description )
+        assertEquals("Common commands", controller.navigate("1").getOrThrow().menu.description )
+        assertEquals("Choose anything from the main menu", controller.navigate("3").getOrThrow().menu.description )
+        assertEquals("Factor management", controller.navigate("3").getOrThrow().menu.description )
+        assertEquals("Factor management", controller.navigate("1").getOrThrow().menu.description )
+        assertEquals("Factor management", controller.navigate("2").getOrThrow().menu.description )
+        assertEquals("Choose anything from the main menu", controller.navigate("3").getOrThrow().menu.description )
+        assertEquals("Scale management", controller.navigate("2").getOrThrow().menu.description )
+        assertEquals(ListScalesCommand, controller.navigate("1").getOrThrow().action)
+
+        assertFalse(controller.navigate("123123").isSuccess)
     }
 }
