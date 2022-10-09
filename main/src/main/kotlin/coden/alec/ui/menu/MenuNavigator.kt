@@ -9,8 +9,7 @@ class MenuNavigator(
 
     private val backCommand = "MenuNavigator.BACK"
     private val backView = ItemView(menuLayout.backItem.name, id = backCommand)
-    private val parentStack = ArrayList<MenuLayout>()
-    private lateinit var previous: MenuView
+    private val parentStack = ArrayList<MenuView>()
     private val layouts = HashMap<String, ItemLayout>()
 
     fun createMainMenu(): MenuView {
@@ -20,38 +19,54 @@ class MenuNavigator(
             itemLayoutsToViews(menuLayout.items),
             null
         ).also {
-            previous = it
+            parentStack.add(it)
         }
     }
 
     //
 //
     fun navigate(data: String): NavigationResult {
-        return layouts[data]?.let {
-            val targetAction = it.action
-
-            if (it.children.isEmpty()){
+        if (data == backCommand){
+            if (parentStack.size == 1){
                 return NavigationResult(
-                    previous,
+                    parentStack.lastOrNull()!!,
+                    null
+                )
+            }else{
+                parentStack.removeLast()
+                return NavigationResult(
+                    parentStack.lastOrNull()!!,
+                    null
+                )
+            }
+        }
+
+        return parentStack.lastOrNull()?.items?.find { it.id == data }?.let {
+            val layout = layouts[data]!!
+            val targetAction = layout.action
+
+            if (layout.children.isEmpty()){
+                return NavigationResult(
+                    parentStack.lastOrNull()!!,
                     targetAction,
                 )
             }
             val newMenu = MenuView(
-                it.description ?: it.name,
-                itemLayoutsToViews(it.children),
+                layout.description ?: it.name,
+                itemLayoutsToViews(layout.children),
                 backView
             )
             return NavigationResult(
                 newMenu,
                 targetAction,
             ).also {
-                previous = it.menu
+                parentStack.add(it.menu)
             }
         } ?: NavigationResult(MenuView(
             menuLayout.description, itemLayoutsToViews(menuLayout.items), null),
             null
         ).also {
-            previous = it.menu
+            parentStack.add(it.menu)
         }
 
 

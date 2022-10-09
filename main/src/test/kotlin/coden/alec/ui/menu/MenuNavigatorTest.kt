@@ -4,11 +4,14 @@ import coden.alec.ui.menu.MenuLayout.Companion.menuLayout
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.lang.IllegalStateException
+import java.util.UUID
 
-internal class MenuNavigatorTest{
+internal class MenuNavigatorTest {
     @Test
     internal fun createMainMenu() {
-        val menu = menuLayout("Main Menu",
+        val menu = menuLayout(
+            "Main Menu",
             ItemLayout.itemLayout("Back"),
             ItemLayout.itemLayout("View Scales", action = TestCommand())
         )
@@ -24,9 +27,10 @@ internal class MenuNavigatorTest{
     @Test
     internal fun navigateToAction() {
         //setup
-        val menu = menuLayout("Main Menu",
+        val menu = menuLayout(
+            "Main Menu",
             ItemLayout.itemLayout("Back"),
-            ItemLayout.itemLayout("View Scales", action = TestCommand())
+            ItemLayout.itemLayout("View Scales", action = TestCommand("t"))
         )
 
         val navigator = MenuNavigator(menu)
@@ -34,17 +38,7 @@ internal class MenuNavigatorTest{
         (0..3).forEach { _ ->
             // exercise
             val navigationResult = navigator.navigate(mainMenu.items[0].id)
-
-            // Verify
-            // Action to perform
-            assertNotNull(navigationResult.action)
-            assertInstanceOf(TestCommand::class.java, navigationResult.action)
-
-            // Menu to display
-            assertEquals("Main Menu", navigationResult.menu.description)
-            assertEquals("View Scales", navigationResult.menu.items[0].name)
-            assertNull(navigationResult.menu.backItemView)
-            assertThat(mainMenu.items[0].id).isNotEmpty()
+            verifyNavResult(navigationResult, "Main Menu", "View Scales", false,"t")
         }
 
     }
@@ -52,7 +46,8 @@ internal class MenuNavigatorTest{
     @Test
     internal fun navigateToTwoActions() {
         //setup
-        val menu = menuLayout("Main Menu",
+        val menu = menuLayout(
+            "Main Menu",
             ItemLayout.itemLayout("Back"),
             ItemLayout.itemLayout("View Scales", action = TestCommand("v")),
             ItemLayout.itemLayout("List Scales", action = TestCommand("l"))
@@ -61,90 +56,46 @@ internal class MenuNavigatorTest{
         val navigator = MenuNavigator(menu)
         val mainMenu = navigator.createMainMenu()
         // exercise
-        navigator.navigate(mainMenu.items[0].id).also {
-            // Verify
-            // Action to perform
-            assertNotNull(it.action)
-            assertInstanceOf(TestCommand::class.java, it.action)
-            assertEquals("v", it.action!!.arguments.getOrNull())
-
-            // Menu to display
-            assertEquals("Main Menu", it.menu.description)
-            assertEquals("View Scales", it.menu.items[0].name)
-            assertEquals("List Scales", it.menu.items[1].name)
-            assertThat(it.menu.items[0].id).isNotEmpty()
-            assertNull(it.menu.backItemView)
-        }
-
+        val viewScalesResult = navigator.navigate(mainMenu.items[0].id)
+        verifyNavResult(viewScalesResult, "Main Menu", "View Scales", false, "v")
 
         // exercise again to list scales
-        navigator.navigate(mainMenu.items[1].id).also {
-            // Verify
-            // Action to perform
-            assertNotNull(it.action)
-            assertInstanceOf(TestCommand::class.java, it.action)
-            assertEquals("l", it.action!!.arguments.getOrNull())
-
-            // Menu to display
-            assertEquals("Main Menu", it.menu.description)
-            assertEquals("View Scales", it.menu.items[0].name)
-            assertEquals("List Scales", it.menu.items[1].name)
-            assertThat(it.menu.items[1].id).isNotEmpty()
-            assertNull(it.menu.backItemView)
-
-        }
+        val listScalesResult = navigator.navigate(mainMenu.items[1].id)
+        verifyNavResult(listScalesResult, "Main Menu", "View Scales", false, "l")
     }
 
     @Test
     internal fun navigateOneLevelDownAndBack() {
         //setup
-        val menuLayout = menuLayout("Main Menu",
+        val menuLayout = menuLayout(
+            "Main Menu",
             ItemLayout.itemLayout("Back"),
-            ItemLayout.itemLayout("Scales Commands",
-                children = listOf(ItemLayout.itemLayout("View Scales", action = TestCommand("v")
-                ))),
+            ItemLayout.itemLayout(
+                "Scales Commands",
+                children = listOf(
+                    ItemLayout.itemLayout(
+                        "View Scales", action = TestCommand("v")
+                    )
+                )
+            ),
         )
 
         val navigator = MenuNavigator(menuLayout)
         val mainMenu = navigator.createMainMenu()
         // exercise
-        val result = navigator.navigate(mainMenu.items[0].id).also {
-            // Verify
-            // Action to perform
-            assertNull(it.action)
+        val scalesItems = mainMenu.items[0]
+        val scalesResult = navigator.navigate(scalesItems.id)
+        verifyNavResult(scalesResult,"Scales Commands", "View Scales" )
 
-            // Menu to display
-            assertEquals("Scales Commands", it.menu.description)
-            assertEquals("View Scales", it.menu.items[0].name)
-            assertThat(it.menu.items[0].id).isNotEmpty()
-            assertNotNull(it.menu.backItemView)
-        }
+        val viewScalesItem = scalesResult.menu.items[0]
+        val viewScalesResult = navigator.navigate(viewScalesItem.id)
+        verifyNavResult(viewScalesResult, "Scales Commands","View Scales", actionName = "v" )
 
-        val actionResult = navigator.navigate(result.menu.items[0].id).also {
-            // Verify
-            // Action to perform
-            assertNotNull(it.action)
-            assertInstanceOf(TestCommand::class.java, it.action)
-            assertEquals("v", it.action!!.arguments.getOrNull())
-
-            // Menu to display
-            assertEquals("Scales Commands", it.menu.description)
-            assertEquals("View Scales", it.menu.items[0].name)
-            assertThat(it.menu.items[0].id).isNotEmpty()
-            assertNotNull(it.menu.backItemView)
-        }
-
-        navigator.navigate(actionResult.menu.backItemView!!.id).also {
-            // Verify
-            // Action to perform
-            assertNull(it.action)
-
-            // Menu to display
-            assertEquals("Main Menu", it.menu.description)
-            assertEquals("Scales Commands", it.menu.items[0].name)
-            assertThat(it.menu.items[0].id).isNotEmpty()
-            assertNull(it.menu.backItemView)
-        }
+        val backResult = navigator.navigate(viewScalesResult.menu.backItemView!!.id)
+        verifyNavResult(backResult,
+            "Main Menu",
+            "Scales Commands",
+            false)
     }
 
     @Test
@@ -158,49 +109,95 @@ internal class MenuNavigatorTest{
 
 
          */
-        val menuLayout = menuLayout("Main Menu",
+        val menuLayout = menuLayout(
+            "Main Menu",
             ItemLayout.itemLayout("Back"),
-            ItemLayout.itemLayout("Scales Commands", description="Select one of the Scales Commands",
-                children = listOf(ItemLayout.itemLayout("View Scales", action = TestCommand("v"),
-                    children = listOf(ItemLayout.itemLayout("View Scales detailed", action = TestCommand("d")
-                        ))
-                ))),
+            ItemLayout.itemLayout(
+                "Scales Commands", description = "Select one of the Scales Commands",
+                children = listOf(
+                    ItemLayout.itemLayout(
+                        "View Scales", action = TestCommand("v"),
+                        children = listOf(
+                            ItemLayout.itemLayout(
+                                "View Scales detailed", action = TestCommand("d")
+                            )
+                        )
+                    )
+                )
+            ),
         )
 
         val navigator = MenuNavigator(menuLayout)
         val mainMenu = navigator.createMainMenu()
         // exercise
         val scalesItem = mainMenu.items[0]
-        val scalesResultMenu = navigator.navigate(scalesItem.id).also {
-            // Verify
-            // Action to perform
-            assertNull(it.action)
-
-            // Menu to display
-            val scalesResultMenu = it.menu
-            val viewScalesItem = scalesResultMenu.items[0]
-            assertEquals("Select one of the Scales Commands", scalesResultMenu.description)
-            assertEquals("View Scales", viewScalesItem.name)
-            assertThat(viewScalesItem.id).isNotEmpty()
-            assertNotNull(scalesResultMenu.backItemView)
-        }
+        val scalesResultMenu = navigator.navigate(scalesItem.id)
+        verifyNavResult(scalesResultMenu, "Select one of the Scales Commands", "View Scales")
 
         val viewScalesItem = scalesResultMenu.menu.items[0]
-        val viewScalesMenu = navigator.navigate(viewScalesItem.id).also {
-            // Verify
-            // Action to perform
-            assertNotNull(it.action)
-            assertInstanceOf(TestCommand::class.java, it.action)
-            assertEquals("v", it.action!!.arguments.getOrNull())
+        val viewScalesResultMenu = navigator.navigate(viewScalesItem.id)
+        verifyNavResult(viewScalesResultMenu, "View Scales", "View Scales detailed", actionName = "v")
 
-            // Menu to display
-            val viewScalesMenu = it.menu
-            val detailedScalesItem = viewScalesMenu.items[0]
-            assertEquals("View Scales", viewScalesMenu.description)
-            assertEquals("View Scales detailed", detailedScalesItem.name)
-            assertThat(detailedScalesItem.id).isNotEmpty()
-            assertNotNull(viewScalesMenu.backItemView)
-        }
+        val detailedScalesItem = viewScalesResultMenu.menu.items[0]
+        val sameViewScalesResultMenu = navigator.navigate(detailedScalesItem.id)
+        verifyNavResult(sameViewScalesResultMenu, "View Scales", "View Scales detailed", actionName = "d")
+
+        val backItem = viewScalesResultMenu.menu.backItemView!!
+        val backToScalesResultMenu = navigator.navigate(backItem.id)
+        verifyNavResult(backToScalesResultMenu, "Select one of the Scales Commands", "View Scales")
+
+        val viewScalesItem2 = backToScalesResultMenu.menu.items[0]
+        val viewScalesResultMenu2 = navigator.navigate(viewScalesItem2.id)
+        verifyNavResult(viewScalesResultMenu2, "View Scales", "View Scales detailed", actionName = "v")
+
+        val backItem2 = viewScalesResultMenu2.menu.backItemView!!
+        val backToScalesResultMenu2 = navigator.navigate(backItem2.id)
+        verifyNavResult(backToScalesResultMenu2, "Select one of the Scales Commands", "View Scales")
+
+        val backToTopItem = backToScalesResultMenu2.menu.backItemView!!
+        val backToTopItemMainMenuResult = navigator.navigate(backToTopItem.id)
+        verifyNavResult(backToTopItemMainMenuResult, "Main Menu", "Scales Commands", false)
+
+
+        val sameResult = navigator.navigate(backToTopItem.id)
+        verifyNavResult(sameResult, "Main Menu", "Scales Commands", false)
+
+        val sameResult2 = navigator.navigate(UUID.randomUUID().toString())
+        verifyNavResult(sameResult2, "Main Menu", "Scales Commands", false)
+
+        val sameResult3 = navigator.navigate(viewScalesItem2.id)
+        verifyNavResult(sameResult3, "Main Menu", "Scales Commands", false)
 
     }
+
+    private fun verifyNavResult(
+        result: NavigationResult,
+        menuDescription: String,
+        firstItemName: String,
+        backItemPresent: Boolean = true,
+        actionName: String? = null,
+    ) {
+        actionName?.let {
+            assertNotNull(result.action)
+            assertInstanceOf(TestCommand::class.java, result.action)
+            assertEquals(actionName, result.action!!.arguments.getOrNull())
+        } ?: assertNull(result.action)
+
+
+
+        // Menu to display
+        val scalesResultMenu = result.menu
+        val viewScalesItem = scalesResultMenu.items[0]
+        assertEquals(menuDescription, scalesResultMenu.description)
+        assertEquals(firstItemName, viewScalesItem.name)
+        assertThat(viewScalesItem.id).isNotEmpty()
+
+        if (backItemPresent) {
+            assertNotNull(scalesResultMenu.backItemView)
+        }else {
+            assertNull(scalesResultMenu.backItemView)
+        }
+    }
+
+
 }
