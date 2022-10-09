@@ -1,16 +1,10 @@
 package coden.alec.ui.menu
 
-import java.lang.IllegalArgumentException
+import coden.fsm.Command
 import java.util.*
 
-class MenuContext(
-    val menu: MenuView,
-    val childrenLayouts : Map<String, ItemLayout>
-)
 
-class MenuNavigator(
-    private val menuLayout: MenuLayout,
-) {
+class MenuNavigator(private val menuLayout: MenuLayout) {
 
     private val backItem = ItemView(menuLayout.backItem.name, id = UUID.randomUUID().toString())
     private val contextStack = ArrayList<MenuContext>()
@@ -21,26 +15,28 @@ class MenuNavigator(
         return newContext.menu
     }
 
-    fun navigate(data: String): NavigationResult {
-        if (data == backItem.id) {
-            return moveBack()
-        }
-        val action = contextStack.last().childrenLayouts[data]?.let {
-            addSubMenuIfExists(it)
-            it.action
+    fun navigate(destination: String): NavigationResult {
+        var action: Command? = null
+        if (isDestinationUp(destination)){
+            moveUp()
+        } else {
+            val currentLayout = contextStack.last().childrenLayouts[destination]
+            action = currentLayout?.action
+            moveDown(currentLayout)
         }
 
         return NavigationResult(contextStack.last().menu, action)
     }
 
-    private fun addSubMenuIfExists(it: ItemLayout) {
-        if (it.children.isNotEmpty())
-            contextStack.add(createContext(it.description ?: it.name, it.children, backItem))
+    private fun isDestinationUp(data: String) = data == backItem.id
+
+    private fun moveUp(){
+        if (contextStack.size > 1) contextStack.removeLast()
     }
 
-    private fun moveBack(): NavigationResult {
-        if (contextStack.size > 1) contextStack.removeLast()
-        return NavigationResult(contextStack.last().menu, null)
+    private fun moveDown(it: ItemLayout?) {
+        if (it != null && it.children.isNotEmpty())
+            contextStack.add(createContext(it.description ?: it.name, it.children, backItem))
     }
 
     private fun createContext(description: String, items: List<ItemLayout>, backItem: ItemView? = null): MenuContext {
@@ -60,8 +56,7 @@ class MenuNavigator(
     }
 }
 
-class MenuNavigatorFactory(private val menuLayout: MenuLayout, ) {
-    fun mainMenuNavigator(): MenuNavigator {
-        return MenuNavigator(menuLayout)
-    }
-}
+class MenuContext(
+    val menu: MenuView,
+    val childrenLayouts : Map<String, ItemLayout>
+)

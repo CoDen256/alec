@@ -4,7 +4,7 @@
 //import coden.alec.app.fsm.TextCommand
 //import coden.alec.console.menu.ConsoleMenuViewer
 //import coden.alec.console.view.ConsoleView
-//import coden.alec.ui.menu.MenuNavigatorFactory
+//import coden.alec.bot.menu.MenuNavigatorFactory
 //import coden.fsm.StateExecutor
 //
 //class ConsoleApp(
