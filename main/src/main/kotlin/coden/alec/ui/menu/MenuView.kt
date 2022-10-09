@@ -4,12 +4,10 @@ import coden.fsm.Command
 
 class MenuView(
     val description: String,
-    val itemRows: List<MenuItemView>,
-    val backItem: MenuItemView?,
-    val action: Command? = null
+    val itemRows: List<ItemView>,
 )
 
-class MenuItemView(
+class ItemView(
     val name: String,
     val id: String
 )

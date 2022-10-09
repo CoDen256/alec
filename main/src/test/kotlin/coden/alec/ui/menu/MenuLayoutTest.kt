@@ -4,7 +4,6 @@ import coden.alec.ui.menu.ItemLayout.Companion.itemLayout
 import coden.alec.ui.menu.MenuLayout.Companion.menuLayout
 import coden.fsm.BaseCommand
 import com.google.common.truth.Truth.assertThat
-import net.bytebuddy.pool.TypePool.Empty
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -57,15 +56,22 @@ internal class MenuLayoutTest {
     @Test
     internal fun invalidBackItem() {
         assertThrows(InvalidBackItemException::class.java) {
-            menuLayout("Main Menu", itemLayout("Back", action = EmptyCommand()))
+            menuLayout("Main Menu", itemLayout("Back", action = EmptyCommand()), itemLayout("Inner child"))
         }
         assertThrows(InvalidBackItemException::class.java) {
-            menuLayout("Main Menu", itemLayout("Back", "Description"))
+            menuLayout("Main Menu", itemLayout("Back", "Description"), itemLayout("Inner child"))
         }
         assertThrows(InvalidBackItemException::class.java) {
-            menuLayout("Main Menu", itemLayout("Back", children = listOf(itemLayout("Inner child"))))
+            menuLayout("Main Menu", itemLayout("Back", children = listOf(itemLayout("Inner child"))), itemLayout("Inner child"))
         }
 
+    }
+
+    @Test
+    internal fun invalidMenuLayout() {
+        assertThrows(InvalidMenuLayoutException::class.java) {
+            menuLayout("Main Menu", itemLayout("Back"))
+        }
     }
 }
 

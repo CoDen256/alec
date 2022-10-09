@@ -1,25 +1,22 @@
 package coden.alec.ui.menu
 
-import coden.fsm.Command
 
-//
-//class MenuNavigator (
-//    private val menuLayout: MenuLayout,
-//    backItemLayout: BackItemLayout
-//){
-//
-//    private val backCommand = "MenuNavigator.BACK"
-//    private val backView = MenuItemView(backItemLayout.description, id = backCommand)
-//    private val parentStack = ArrayList<MenuLayout>()
-//    private var current: MenuLayout = menuLayout
-//
-//    fun createMain(): MenuView {
-//        return MenuView(
-//            menuLayout.description,
-//            menuItemsToView(menuLayout.items),
-//            parentStack.lastOrNull()?.let { backView },
-//        )
-//    }
+class MenuNavigator (
+    private val menuLayout: MenuLayout,
+){
+
+    private val backCommand = "MenuNavigator.BACK"
+    private val backView = ItemView(menuLayout.backItem.name, id = backCommand)
+    private val parentStack = ArrayList<MenuLayout>()
+    private var current: MenuLayout = menuLayout
+
+    fun createMainMenu(): MenuView {
+        // parentStack.lastOrNull()?.let { backView }
+        return MenuView(
+            menuLayout.description,
+            itemLayoutToView(menuLayout.items),
+        )
+    }
 //
 //
 //    fun navigate(data: String): MenuView {
@@ -62,15 +59,17 @@ import coden.fsm.Command
 //    }
 //
 //
-//    private fun menuItemsToView(items: List<MenuLayout>): List<MenuItemView> {
-//        return items.map { menuItemToView(it) }
-//    }
-//
-//    private fun menuItemToView(item: MenuLayout): MenuItemView {
-//        return MenuItemView(item.name, id = item.name)
-//    }
-//}
-//
+
+
+    private fun itemLayoutToView(items: List<ItemLayout>): List<ItemView> {
+        return items.map { menuItemToView(it) }
+    }
+
+    private fun menuItemToView(item: ItemLayout): ItemView {
+        return ItemView(item.name, id = item.name)
+    }
+}
+
 //class MenuNavigatorFactory(
 //    private val menuLayout: MenuLayout,
 //    private val backItemLayout: BackItemLayout
