@@ -75,4 +75,4 @@ internal class MenuLayoutTest {
     }
 }
 
-class EmptyCommand: BaseCommand()
+class EmptyCommand(args: String?=null): BaseCommand(args)

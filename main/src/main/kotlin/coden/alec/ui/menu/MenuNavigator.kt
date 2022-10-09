@@ -1,5 +1,8 @@
 package coden.alec.ui.menu
 
+import coden.fsm.Command
+import java.util.UUID
+
 
 class MenuNavigator (
     private val menuLayout: MenuLayout,
@@ -9,6 +12,7 @@ class MenuNavigator (
     private val backView = ItemView(menuLayout.backItem.name, id = backCommand)
     private val parentStack = ArrayList<MenuLayout>()
     private var current: MenuLayout = menuLayout
+    private val actions = HashMap<String, Command?>()
 
     fun createMainMenu(): MenuView {
         // parentStack.lastOrNull()?.let { backView }
@@ -19,7 +23,18 @@ class MenuNavigator (
     }
 //
 //
-//    fun navigate(data: String): MenuView {
+    fun navigate(data: String): NavigationResult {
+    val targetAction = actions[data]
+    return NavigationResult(
+            MenuView(
+                menuLayout.description,
+                itemLayoutToView(menuLayout.items)
+            ),
+            targetAction,
+            null
+        )
+
+
 //        val next = moveToNext(data)
 //        var action: Command? = null
 //        next?.let {
@@ -32,7 +47,7 @@ class MenuNavigator (
 //            parentStack.lastOrNull()?.let { backView },
 //            action
 //        )
-//    }
+    }
 //
 //    private fun moveToNext(data: String): Pair<MenuLayout?, Command?>? {
 //        return if (data == backCommand) {
@@ -66,7 +81,9 @@ class MenuNavigator (
     }
 
     private fun menuItemToView(item: ItemLayout): ItemView {
-        return ItemView(item.name, id = item.name)
+        return ItemView(item.name, id = UUID.randomUUID().toString()).also {
+            actions[it.id] = item.action
+        }
     }
 }
 
