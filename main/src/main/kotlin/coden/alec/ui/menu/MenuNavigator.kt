@@ -1,133 +1,67 @@
 package coden.alec.ui.menu
 
-import java.util.UUID
+import java.lang.IllegalArgumentException
+import java.util.*
 
+class MenuContext(
+    val menu: MenuView,
+    val childrenLayouts : Map<String, ItemLayout>
+)
 
 class MenuNavigator(
     private val menuLayout: MenuLayout,
 ) {
 
-    private val backCommand = "MenuNavigator.BACK"
-    private val backView = ItemView(menuLayout.backItem.name, id = backCommand)
-    private val parentStack = ArrayList<MenuView>()
-    private val layouts = HashMap<String, ItemLayout>()
+    private val backItem = ItemView(menuLayout.backItem.name, id = UUID.randomUUID().toString())
+    private val contextStack = ArrayList<MenuContext>()
 
     fun createMainMenu(): MenuView {
-        // parentStack.lastOrNull()?.let { backView }
-        return MenuView(
-            menuLayout.description,
-            itemLayoutsToViews(menuLayout.items),
-            null
-        ).also {
-            parentStack.add(it)
-        }
+        val newContext = createContext(menuLayout.description, menuLayout.items)
+        contextStack.add(newContext)
+        return newContext.menu
     }
 
-    //
-//
     fun navigate(data: String): NavigationResult {
-        if (data == backCommand){
-            if (parentStack.size == 1){
-                return NavigationResult(
-                    parentStack.lastOrNull()!!,
-                    null
-                )
-            }else{
-                parentStack.removeLast()
-                return NavigationResult(
-                    parentStack.lastOrNull()!!,
-                    null
-                )
-            }
+        if (data == backItem.id) {
+            return moveBack()
+        }
+        val action = contextStack.last().childrenLayouts[data]?.let {
+            addSubMenuIfExists(it)
+            it.action
         }
 
-        return parentStack.lastOrNull()?.items?.find { it.id == data }?.let {
-            val layout = layouts[data]!!
-            val targetAction = layout.action
-
-            if (layout.children.isEmpty()){
-                return NavigationResult(
-                    parentStack.lastOrNull()!!,
-                    targetAction,
-                )
-            }
-            val newMenu = MenuView(
-                layout.description ?: it.name,
-                itemLayoutsToViews(layout.children),
-                backView
-            )
-            return NavigationResult(
-                newMenu,
-                targetAction,
-            ).also {
-                parentStack.add(it.menu)
-            }
-        } ?: NavigationResult(MenuView(
-            menuLayout.description, itemLayoutsToViews(menuLayout.items), null),
-            null
-        ).also {
-            parentStack.add(it.menu)
-        }
-
-
-
-//        val next = moveToNext(data)
-//        var action: Command? = null
-//        next?.let {
-//            current = next.first ?: current
-//            action = next.second
-//        }
-//        return MenuView(
-//            current.description,
-//            menuItemsToView(current.items),
-//            parentStack.lastOrNull()?.let { backView },
-//            action
-//        )
-    }
-//
-//    private fun moveToNext(data: String): Pair<MenuLayout?, Command?>? {
-//        return if (data == backCommand) {
-//            moveBack()
-//        } else {
-//            moveToSubMenu(data)
-//        }
-//    }
-//
-//    private fun moveBack(): Pair<MenuLayout?, Command?>? {
-//        return parentStack.removeLastOrNull()?.let {
-//            return it to null
-//        }
-//    }
-//
-//    private fun moveToSubMenu(data: String): Pair<MenuLayout?, Command?>? {
-//        return current.items.find { it.name == data }?.let {
-//            if (it.items.isEmpty()) {
-//                return@let Pair(null, it.action)
-//            }
-//            parentStack.add(current)
-//            return@let Pair(it, it.action)
-//        }
-//    }
-//
-//
-
-
-    private fun itemLayoutsToViews(items: List<ItemLayout>): List<ItemView> {
-        return items.map { menuItemToView(it) }
+        return NavigationResult(contextStack.last().menu, action)
     }
 
-    private fun menuItemToView(item: ItemLayout): ItemView {
-        return ItemView(item.name, id = UUID.randomUUID().toString()).also {
-            layouts[it.id] = item
-        }
+    private fun addSubMenuIfExists(it: ItemLayout) {
+        if (it.children.isNotEmpty())
+            contextStack.add(createContext(it.description ?: it.name, it.children, backItem))
+    }
+
+    private fun moveBack(): NavigationResult {
+        if (contextStack.size > 1) contextStack.removeLast()
+        return NavigationResult(contextStack.last().menu, null)
+    }
+
+    private fun createContext(description: String, items: List<ItemLayout>, backItem: ItemView? = null): MenuContext {
+        val layouts = itemLayoutsToViews(items)
+        return MenuContext(
+            MenuView(description, layouts.map { it.second }, backItem),
+            layouts.associate { it.second.id to it.first }
+        )
+    }
+
+    private fun itemLayoutsToViews(items: List<ItemLayout>): List<Pair<ItemLayout, ItemView>> {
+        return items.map { it to  itemLayoutToView(it)}
+    }
+
+    private fun itemLayoutToView(item: ItemLayout): ItemView {
+        return ItemView(item.name, id = UUID.randomUUID().toString())
     }
 }
 
-//class MenuNavigatorFactory(
-//    private val menuLayout: MenuLayout,
-//    private val backItemLayout: BackItemLayout
-//) {
-//    fun mainMenuNavigator(): MenuNavigator {
-//        return MenuNavigator(menuLayout, backItemLayout)
-//    }
-//}
+class MenuNavigatorFactory(private val menuLayout: MenuLayout, ) {
+    fun mainMenuNavigator(): MenuNavigator {
+        return MenuNavigator(menuLayout)
+    }
+}
