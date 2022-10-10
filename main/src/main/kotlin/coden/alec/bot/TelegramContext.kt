@@ -1,16 +1,15 @@
 package coden.alec.bot
 
-import coden.alec.bot.utils.send
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.entities.Message
 
 class TelegramContext {
 
     lateinit var bot: Bot
-    lateinit var lastMessage: Message
+    lateinit var current: Message
 
-    fun update(bot: Bot, lastMessage: Message){
+    fun update(bot: Bot, current: Message){
         this.bot = bot
-        this.lastMessage = lastMessage
+        this.current = current
     }
 }

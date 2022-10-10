@@ -2,9 +2,6 @@ package coden.alec.bot
 
 import coden.alec.app.fsm.*
 import coden.alec.bot.menu.TelegramMenuNavigatorDirector
-import coden.alec.bot.utils.edit
-import coden.alec.bot.utils.send
-import coden.alec.bot.view.TelegramMenuFormatter
 import coden.alec.bot.view.TelegramView
 import coden.fsm.StateExecutor
 import com.github.kotlintelegrambot.bot
@@ -31,26 +28,24 @@ class AlecTelegramBot (
         dispatch {
 
             command("help") {
-                ctx.update(bot, lastMessage = message)
+                ctx.update(bot, current = message)
                 stateExecutor.submit(HelpCommand)
             }
 
             command("start") {
-                ctx.update(bot, lastMessage = message)
+                ctx.update(bot, current = message)
                 stateExecutor.submit(HelpCommand)
 
-                val (mainMenu, callback) = manager.createNewMainMenu()
-                telegramView.displayMenu(mainMenu)
-                callback(ctx.lastMessage.messageId)
+                telegramView.displayMenu(manager.createNewMainMenu())
             }
 
             command("list_scales") {
-                ctx.update(bot, lastMessage = message)
+                ctx.update(bot, current = message)
                 stateExecutor.submit(ListScalesCommand)
             }
 
             command("create_scale"){
-                ctx.update(bot, lastMessage = message)
+                ctx.update(bot, current = message)
                 if (args.isEmpty()){
                     stateExecutor.submit(CreateScaleCommandNoArgs)
                 }else {
@@ -60,14 +55,14 @@ class AlecTelegramBot (
 
             text {
                 if (text.startsWith("/")) return@text
-                ctx.update(bot, lastMessage = message)
+                ctx.update(bot, current = message)
                 stateExecutor.submit(TextCommand(text))
             }
 
             callbackQuery{
                 callbackQuery.message?.let {
-                    ctx.update(bot, it)
-                    manager.handleCommand(it.messageId, callbackQuery.data).onSuccess {result ->
+                    ctx.update(bot, current = it)
+                    manager.handleCommand(callbackQuery.data).onSuccess {result ->
                         telegramView.displayMenu(result.menu)
                         result.action?.let { action -> stateExecutor.submit(action) }
                     }.onFailure { throwable ->

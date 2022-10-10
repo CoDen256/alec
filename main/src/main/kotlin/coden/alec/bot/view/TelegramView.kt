@@ -5,37 +5,35 @@ import coden.alec.bot.TelegramContext
 import coden.alec.bot.utils.edit
 import coden.alec.bot.utils.send
 import coden.menu.MenuView
+import com.github.kotlintelegrambot.entities.Message
 
-class TelegramView(
-    private val ctx: TelegramContext,
-): View {
+class TelegramView(private val ctx: TelegramContext): View {
 
     private val formatter = TelegramMenuFormatter()
 
-    private val messageIds: List<Long> = ArrayList()
-
     override fun displayPrompt(message: String) {
-        ctx.bot.send(ctx.lastMessage, message)
+        ctx.bot.send(ctx.current, message)
     }
 
     override fun displayMessage(message: String) {
-        ctx.bot.send(ctx.lastMessage, message)
+        ctx.bot.send(ctx.current, message)
     }
 
-    override fun displayMenu(mainMenu: MenuView) {
-        val response = formatter.format(mainMenu)
-        val lastMessage = ctx.lastMessage
-        if (messageIds.contains(lastMessage.messageId)){
-             ctx.bot.edit(lastMessage, text = response.message, replyMarkup = response.replyMarkup)
+    override fun displayMenu(menu: MenuView) {
+        val response = formatter.format(menu)
+        val current = ctx.current
+        if (isMessageFromBot(current)){
+            ctx.bot.edit(current, text = response.message, replyMarkup = response.replyMarkup)
         }else{
-            val msg = ctx.bot.send(lastMessage, response.message, replyMarkup = response.replyMarkup)
-            ctx.lastMessage = msg.get()
+            ctx.bot.send(current, response.message, replyMarkup = response.replyMarkup)
         }
 
     }
 
+    private fun isMessageFromBot(current: Message) = current.from?.isBot == true
+
     override fun displayError(message: String) {
-        ctx.bot.send(ctx.lastMessage, message)
+        ctx.bot.send(ctx.current, message)
     }
 
 }

@@ -7,7 +7,7 @@ import java.util.*
 class MenuNavigator(private val menuLayout: MenuLayout) {
 
     private val backItem = ItemView(menuLayout.backItem.name, id = UUID.randomUUID().toString())
-    private val contextStack = ArrayList<MenuContext>()
+    val contextStack = ArrayList<MenuContext>()
 
     fun createMainMenu(): MenuView {
         val newContext = createContext(menuLayout.description, menuLayout.items)
