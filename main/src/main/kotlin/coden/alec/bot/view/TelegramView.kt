@@ -18,9 +18,8 @@ class TelegramView(
         ctx.bot.send(ctx.lastMessage, message)
     }
 
-    override fun displayMainMenu(message: String) {
-
-        println("")
+    override fun displayMenu(message: String) {
+        println(message)
     }
 
     override fun displayError(message: String) {

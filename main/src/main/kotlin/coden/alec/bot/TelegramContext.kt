@@ -1,5 +1,6 @@
 package coden.alec.bot
 
+import coden.alec.bot.utils.send
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.entities.Message
 

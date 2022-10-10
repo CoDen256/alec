@@ -2,11 +2,13 @@ package coden.alec.main
 
 import coden.fsm.StateExecutor
 import coden.alec.app.fsm.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
+@Disabled
 class MainApplicationTests {
 
     @Autowired

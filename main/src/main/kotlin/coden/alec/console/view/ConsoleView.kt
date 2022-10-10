@@ -11,7 +11,7 @@ class ConsoleView: View {
         println(message)
     }
 
-    override fun displayMainMenu(message: String) {
+    override fun displayMenu(message: String) {
         println(message)
     }
 
