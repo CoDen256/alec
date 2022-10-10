@@ -7,7 +7,6 @@ import coden.menu.MenuLayout
 
 class TelegramView(
     private val ctx: TelegramContext,
-    private val menu: MenuLayout
 ): View {
 
     override fun displayPrompt(message: String) {
