@@ -108,7 +108,7 @@ fun main(args: Array<String>) {
 
     val manager = TelegramMenuNavigatorDirector(menuNagivatorFactory)
 
-    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, ctx, stateExecutor, manager)
+    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, view, ctx, stateExecutor, manager)
     bot.launch()
 
 //    val app = ConsoleApp(consoleView, stateExecutor, menuNagivatorFactory)

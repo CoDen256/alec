@@ -5,7 +5,6 @@ import coden.alec.app.fsm.TextCommand
 import coden.alec.app.menu.MenuNavigatorFactory
 import coden.alec.app.views.View
 import coden.alec.console.menu.ConsoleMenuReindexingNavigator
-import coden.alec.console.view.ConsoleMenuFormatter
 import coden.fsm.StateExecutor
 
 class ConsoleApp(
@@ -13,12 +12,10 @@ class ConsoleApp(
     private val stateExecutor: StateExecutor,
     private val menuFactory: MenuNavigatorFactory
 ) {
-
     private val menuViewer = ConsoleMenuReindexingNavigator(menuFactory.mainMenuNavigator())
-    private val formatter = ConsoleMenuFormatter()
 
     fun start() {
-        view.displayMenu(formatter.format(menuViewer.createMain()))
+        view.displayMenu(menuViewer.createMain())
         stateExecutor.submit(HelpCommand)
         while (true) {
             val input = readLine() ?: break
@@ -32,7 +29,7 @@ class ConsoleApp(
             }else {
                 menuViewer.navigate(input).onSuccess { result ->
                     result.action?.let { stateExecutor.submit(it) }
-                    view.displayMenu(formatter.format(result.menu))
+                    view.displayMenu(result.menu)
                 }.onFailure { error ->
                     error.message?.let {  view.displayError(it) }
                 }

@@ -5,6 +5,7 @@ import coden.alec.bot.menu.TelegramMenuNavigatorDirector
 import coden.alec.bot.utils.edit
 import coden.alec.bot.utils.send
 import coden.alec.bot.view.TelegramMenuFormatter
+import coden.alec.bot.view.TelegramView
 import coden.fsm.StateExecutor
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
@@ -16,12 +17,12 @@ import com.github.kotlintelegrambot.logging.LogLevel
 class AlecTelegramBot (
     botToken: String,
     log: LogLevel,
+    private val telegramView: TelegramView,
     private val ctx: TelegramContext,
     private val stateExecutor: StateExecutor,
     private val manager: TelegramMenuNavigatorDirector
 ) {
 
-    private val formatter = TelegramMenuFormatter()
 
     private val bot = bot {
         token = botToken
@@ -39,8 +40,8 @@ class AlecTelegramBot (
                 stateExecutor.submit(HelpCommand)
 
                 val (mainMenu, callback) = manager.createNewMainMenu()
-                val response = formatter.format(mainMenu)
-                callback(bot.send(message, response.message, replyMarkup = response.replyMarkup).get().messageId)
+                telegramView.displayMenu(mainMenu)
+                callback(ctx.lastMessage.messageId)
             }
 
             command("list_scales") {
@@ -65,10 +66,12 @@ class AlecTelegramBot (
 
             callbackQuery{
                 callbackQuery.message?.let {
+                    ctx.update(bot, it)
                     manager.handleCommand(it.messageId, callbackQuery.data).onSuccess {result ->
-                        val response = formatter.format(result.menu)
-                        bot.edit(it, text = response.message, replyMarkup = response.replyMarkup)
+                        telegramView.displayMenu(result.menu)
                         result.action?.let { action -> stateExecutor.submit(action) }
+                    }.onFailure { throwable ->
+                        throwable.message?.let { msg -> telegramView.displayError(msg) }
                     }
                 }
             }
