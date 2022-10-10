@@ -6,28 +6,22 @@ import coden.menu.NavigationResult
 
 
 class TelegramMenuNavigatorDirector(private val factory: MenuNavigatorFactory) {
-    private val menus = HashMap<String, TelegramMenuNavigator>()
+    private val navigators = ArrayList<TelegramMenuNavigator>()
 
     fun createNewMainMenu(): MenuView {
         val navigator = TelegramMenuNavigator(factory.mainMenuNavigator())
         val menu = navigator.createMainMenu()
-        captureHandleableIds(menu, navigator)
+        navigators.add(navigator)
         return menu
     }
 
     fun handleCommand(dest: String): Result<NavigationResult> {
-        return menus[dest]?.let {
+        return findNavigatorByDestination(dest)?.let {
             Result.success(it.navigate(dest))
         } ?: Result.failure(IllegalArgumentException("Navigation Destination with id $dest does not exist"))
     }
 
-    private fun captureHandleableIds(menuView: MenuView, navigator: TelegramMenuNavigator) {
-        menuView.items.forEach {
-            menus[it.id] = navigator
-        }
-        menuView.backItemView?.let {
-            menus[it.id] = navigator
-        }
+    private fun findNavigatorByDestination(dest: String): TelegramMenuNavigator? {
+        return navigators.find { it.canNavigate(dest) }
     }
-
 }

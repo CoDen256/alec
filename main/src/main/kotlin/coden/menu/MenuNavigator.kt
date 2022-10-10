@@ -4,10 +4,15 @@ import coden.fsm.Command
 import java.util.*
 
 
-class MenuNavigator(private val menuLayout: MenuLayout) {
+open class MenuNavigator(private val menuLayout: MenuLayout) {
 
     private val backItem = ItemView(menuLayout.backItem.name, id = UUID.randomUUID().toString())
-    val contextStack = ArrayList<MenuContext>()
+    private val contextStack = ArrayList<MenuContext>()
+
+    fun canNavigate(destination: String): Boolean{
+        return ( contextStack.size != 1 && destination == backItem.id) ||
+        contextStack.lastOrNull()?.childrenLayouts?.containsKey(destination) ?: false
+    }
 
     fun createMainMenu(): MenuView {
         val newContext = createContext(menuLayout.description, menuLayout.items)

@@ -173,6 +173,49 @@ internal class MenuNavigatorTest {
 
     }
 
+
+    @Test
+    internal fun canNavigate() {
+        val menuLayout = menuLayout(
+            "Main Menu",
+            ItemLayout.itemLayout("Back"),
+            ItemLayout.itemLayout(
+                "Scales Commands", description = "Select one of the Scales Commands",
+                children = listOf(
+                    ItemLayout.itemLayout(
+                        "View Scales", action = TestCommand("v"),
+                        children = listOf(
+                            ItemLayout.itemLayout(
+                                "View Scales detailed", action = TestCommand("d")
+                            )
+                        )
+                    )
+                )
+            ),
+            ItemLayout.itemLayout("Common Commands", action = TestCommand("c")))
+
+        val navigator = MenuNavigator(menuLayout)
+        val mainMenu = navigator.createMainMenu()
+
+        assertFalse(navigator.canNavigate(UUID.randomUUID().toString()))
+        assertFalse(navigator.canNavigate(UUID.randomUUID().toString()))
+        assertTrue(navigator.canNavigate(mainMenu.items[0].id))
+        assertTrue(navigator.canNavigate(mainMenu.items[1].id))
+
+        val sub = navigator.navigate(mainMenu.items[0].id)
+        assertFalse(navigator.canNavigate(mainMenu.items[0].id))
+        assertFalse(navigator.canNavigate(mainMenu.items[1].id))
+        assertTrue(navigator.canNavigate(sub.menu.items[0].id))
+        assertTrue(navigator.canNavigate(sub.menu.backItemView!!.id))
+
+        val subsub = navigator.navigate(sub.menu.items[0].id)
+        assertFalse(navigator.canNavigate(mainMenu.items[0].id))
+        assertFalse(navigator.canNavigate(mainMenu.items[1].id))
+        assertFalse(navigator.canNavigate(sub.menu.items[0].id))
+        assertTrue(navigator.canNavigate(subsub.menu.backItemView!!.id))
+        assertTrue(navigator.canNavigate(subsub.menu.items[0].id))
+    }
+
     private fun verifyNavResult(
         result: NavigationResult,
         menuDescription: String,
