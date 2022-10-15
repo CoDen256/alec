@@ -8,9 +8,8 @@ import coden.alec.app.fsm.ListScalesCommand
 import coden.alec.app.fsm.Start
 import coden.alec.app.menu.MenuNavigatorFactory
 import coden.alec.app.messages.MessageResource
-import coden.alec.bot.AlecTelegramBot
-import coden.alec.bot.TelegramContext
 import coden.alec.bot.menu.TelegramMenuNavigatorDirector
+import coden.alec.bot.view.TelegramContext
 import coden.alec.bot.view.TelegramView
 import coden.alec.console.view.ConsoleView
 import coden.alec.core.*
@@ -21,10 +20,8 @@ import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
 import coden.fsm.FSM
 import coden.fsm.StateExecutor
-import coden.menu.ItemLayout
 import coden.menu.ItemLayout.Companion.itemLayout
 import coden.menu.MenuLayout.Companion.menuLayout
-import com.github.kotlintelegrambot.logging.LogLevel
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
@@ -90,13 +87,13 @@ fun main(args: Array<String>) {
     )
 
 
-    val ctx = TelegramContext()
-    val telegramView = TelegramView(ctx)
+//    val ctx = TelegramContext()
+//    val telegramView = TelegramView(ctx)
     val consoleView = ConsoleView()
 
 
-        val view = telegramView
-//    val view = consoleView
+//        val view = telegramView
+    val view = consoleView
 
 
     val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages)
@@ -108,8 +105,8 @@ fun main(args: Array<String>) {
 
     val manager = TelegramMenuNavigatorDirector(menuNagivatorFactory)
 
-    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, view, ctx, stateExecutor, manager)
-    bot.launch()
+//    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, view, ctx, stateExecutor, manager)
+//    bot.launch()
 
 //    val app = ConsoleApp(consoleView, stateExecutor, menuNagivatorFactory)
 //    app.start()
