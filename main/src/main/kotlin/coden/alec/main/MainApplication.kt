@@ -70,7 +70,7 @@ fun main(args: Array<String>) {
         itemLayout(
             "Common", "Common commands",
             itemLayout("Start", action = HelpCommand),
-            itemLayout("Help", action = HelpCommand)
+            itemLayout("Help", "Help commands", itemLayout("Help again", action = HelpCommand))
         ),
         itemLayout(
             "Scales", "Scale management",
