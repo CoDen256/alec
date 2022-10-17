@@ -7,7 +7,7 @@ import coden.alec.bot.view.format.TelegramMenuFormatter
 import coden.menu.MenuView
 
 class CommonTelegramView(
-    private val context: TelegramContext,
+    private val context: TelegramChatContext,
     private val messageSender: TelegramMessageSender,
     private val formatter: TelegramMenuFormatter,
 ) : View {
