@@ -1,8 +1,5 @@
 package coden.alec.bot.view
 
-import coden.alec.bot.sender.TelegramMessage
-import coden.alec.bot.sender.TelegramMessageSender
-import coden.alec.bot.view.format.TelegramMenuFormatter
 import coden.menu.MenuView
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -30,8 +27,10 @@ internal class TelegramViewTest {
         view.displayMessage("hustensaft")
 
         assertEquals(1, sender.recordedSends.size)
-        assertEquals("hustensaft", sender.recordedSends[0].message)
-        assertNull( sender.recordedSends[0].replyMarkup)
+        assertEquals(0, sender.recordedEdits.size)
+        assertEquals("hustensaft", sender.recordedSends[0].message.content)
+        assertEquals(0, sender.recordedSends[0].chatId)
+        assertNull( sender.recordedSends[0].message.replyMarkup)
     }
 
     @Test
@@ -39,7 +38,7 @@ internal class TelegramViewTest {
         val sender = RecordingMessageSender()
 
         val view = CommonTelegramView(
-            TelegramContext(0),
+            TelegramContext(10),
             sender,
             DummyMenuFormatter()
         )
@@ -48,8 +47,10 @@ internal class TelegramViewTest {
 
 
         assertEquals(1, sender.recordedSends.size)
-        assertEquals("hustensaft", sender.recordedSends[0].message)
-        assertNull( sender.recordedSends[0].replyMarkup)
+        assertEquals(0, sender.recordedEdits.size)
+        assertEquals("hustensaft", sender.recordedSends[0].message.content)
+        assertEquals(10, sender.recordedSends[0].chatId)
+        assertNull( sender.recordedSends[0].message.replyMarkup)
     }
 
     @Test
@@ -66,8 +67,10 @@ internal class TelegramViewTest {
 
 
         assertEquals(1, sender.recordedSends.size)
-        assertEquals("hustensaft", sender.recordedSends[0].message)
-        assertNull( sender.recordedSends[0].replyMarkup)
+        assertEquals(0, sender.recordedEdits.size)
+        assertEquals("hustensaft", sender.recordedSends[0].message.content)
+        assertEquals(0, sender.recordedSends[0].chatId)
+        assertNull( sender.recordedSends[0].message.replyMarkup)
     }
 
     @Test
@@ -75,41 +78,19 @@ internal class TelegramViewTest {
         val sender = RecordingMessageSender()
 
         val view = CommonTelegramView(
-            TelegramContext(0),
+            TelegramContext(12),
             sender,
             DummyMenuFormatter()
         )
 
         view.displayMenu(MenuView("Description", emptyList(), null))
 
-
         assertEquals(1, sender.recordedSends.size)
-        assertEquals("Description", sender.recordedSends[0].message)
-        assertNull( sender.recordedSends[0].replyMarkup)
-    }
-
-    companion object {
-
-        class DummyMenuFormatter: TelegramMenuFormatter {
-            override fun format(menu: MenuView): TelegramMessage {
-                return TelegramMessage(message = menu.description, null)
-            }
-        }
-
-
-        class RecordingMessageSender : TelegramMessageSender {
-
-            val recordedSends = ArrayList<TelegramMessage>()
-            val recordedEdits = ArrayList<TelegramMessage>()
-            override fun send(chatId: Long, message: TelegramMessage) {
-                recordedSends.add(message)
-            }
-
-            override fun edit(chatId: Long, messageId: Long, message: TelegramMessage) {
-                recordedEdits.add(message)
-            }
-
-        }
+        assertEquals(0, sender.recordedEdits.size)
+        assertEquals("Description" +
+                "", sender.recordedSends[0].message.content)
+        assertEquals(12, sender.recordedSends[0].chatId)
+        assertNull( sender.recordedSends[0].message.replyMarkup)
     }
 
 }
