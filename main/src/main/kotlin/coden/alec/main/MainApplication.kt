@@ -9,8 +9,6 @@ import coden.alec.app.fsm.Start
 import coden.alec.app.menu.MenuNavigatorFactory
 import coden.alec.app.messages.MessageResource
 import coden.alec.bot.menu.TelegramMenuNavigatorDirector
-import coden.alec.bot.view.TelegramContext
-import coden.alec.bot.view.TelegramView
 import coden.alec.console.view.ConsoleView
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor

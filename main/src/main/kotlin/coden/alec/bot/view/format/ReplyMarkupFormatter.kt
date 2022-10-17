@@ -1,14 +1,14 @@
-package coden.alec.bot.view
+package coden.alec.bot.view.format
 
+import coden.alec.bot.sender.TelegramMessage
 import coden.menu.ItemView
 import coden.menu.MenuView
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
-import com.github.kotlintelegrambot.entities.ReplyMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 
-class TelegramMenuFormatter(private val itemsPerRow: Int = 4) {
-    fun format(menu: MenuView): TelegramMessageResponse{
-        return TelegramMessageResponse(menu.description, itemsToPlainString(menu.items, menu.backItemView))
+class ReplyMarkupFormatter(private val itemsPerRow: Int = 4) {
+    fun format(menu: MenuView): TelegramMessage {
+        return TelegramMessage(menu.description, itemsToPlainString(menu.items, menu.backItemView))
     }
 
     private fun itemsToPlainString(items: List<ItemView>, backView: ItemView?): InlineKeyboardMarkup {
@@ -35,7 +35,3 @@ class TelegramMenuFormatter(private val itemsPerRow: Int = 4) {
     }
 }
 
-class TelegramMessageResponse(
-    val message: String,
-    val replyMarkup: ReplyMarkup
-)

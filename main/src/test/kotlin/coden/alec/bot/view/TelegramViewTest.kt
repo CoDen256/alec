@@ -1,8 +1,8 @@
 package coden.alec.bot.view
 
-import coden.alec.app.views.View
-import coden.alec.bot.TelegramMessage
-import coden.alec.bot.TelegramMessageSender
+import coden.alec.bot.sender.TelegramMessage
+import coden.alec.bot.sender.TelegramMessageSender
+import coden.alec.bot.view.format.TelegramMenuFormatter
 import coden.menu.MenuView
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -13,7 +13,8 @@ internal class TelegramViewTest {
     @Test
     internal fun create() {
         assertDoesNotThrow {
-            CommonTelegramView(TelegramContext(0), RecordingMessageSender())
+            CommonTelegramView(TelegramContext(0), RecordingMessageSender(), DummyMenuFormatter()
+            )
         }
     }
 
@@ -22,48 +23,79 @@ internal class TelegramViewTest {
         val sender = RecordingMessageSender()
         val view = CommonTelegramView(
             TelegramContext(0),
-            sender
+            sender,
+            DummyMenuFormatter()
         )
 
         view.displayMessage("hustensaft")
 
+        assertEquals(1, sender.recordedSends.size)
         assertEquals("hustensaft", sender.recordedSends[0].message)
+        assertNull( sender.recordedSends[0].replyMarkup)
+    }
+
+    @Test
+    internal fun sendError() {
+        val sender = RecordingMessageSender()
+
+        val view = CommonTelegramView(
+            TelegramContext(0),
+            sender,
+            DummyMenuFormatter()
+        )
+
+        view.displayError("hustensaft")
+
+
+        assertEquals(1, sender.recordedSends.size)
+        assertEquals("hustensaft", sender.recordedSends[0].message)
+        assertNull( sender.recordedSends[0].replyMarkup)
+    }
+
+    @Test
+    internal fun sendPrompt() {
+        val sender = RecordingMessageSender()
+
+        val view = CommonTelegramView(
+            TelegramContext(0),
+            sender,
+            DummyMenuFormatter()
+        )
+
+        view.displayError("hustensaft")
+
+
+        assertEquals(1, sender.recordedSends.size)
+        assertEquals("hustensaft", sender.recordedSends[0].message)
+        assertNull( sender.recordedSends[0].replyMarkup)
+    }
+
+    @Test
+    internal fun sendMenu() {
+        val sender = RecordingMessageSender()
+
+        val view = CommonTelegramView(
+            TelegramContext(0),
+            sender,
+            DummyMenuFormatter()
+        )
+
+        view.displayMenu(MenuView("Description", emptyList(), null))
+
+
+        assertEquals(1, sender.recordedSends.size)
+        assertEquals("Description", sender.recordedSends[0].message)
         assertNull( sender.recordedSends[0].replyMarkup)
     }
 
     companion object {
 
-        class CommonTelegramView(private val context: TelegramContext,
-                                 private val messageSender: TelegramMessageSender): View {
-
-            override fun displayPrompt(message: String) {
-                messageSender.send(context.chatId, TelegramMessage(
-                    message, null
-                )
-                )
+        class DummyMenuFormatter: TelegramMenuFormatter {
+            override fun format(menu: MenuView): TelegramMessage {
+                return TelegramMessage(message = menu.description, null)
             }
-
-            override fun displayMessage(message: String) {
-                messageSender.send(context.chatId, TelegramMessage(
-                    message, null
-                ))
-            }
-
-            override fun displayMenu(menu: MenuView) {
-//                messageSender.send(context.chatId, TelegramMessage(
-//                    message, null
-//                ))
-            }
-
-            override fun displayError(message: String) {
-                messageSender.send(context.chatId, TelegramMessage(
-                    message, null
-                ))
-            }
-
         }
 
-        class TelegramContext(val chatId: Long)
 
         class RecordingMessageSender : TelegramMessageSender {
 
