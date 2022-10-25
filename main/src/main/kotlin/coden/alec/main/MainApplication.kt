@@ -10,8 +10,11 @@ import coden.alec.app.menu.MenuNavigatorFactory
 import coden.alec.app.messages.MessageResource
 import coden.alec.bot.AlecTelegramBot
 import coden.alec.bot.menu.TelegramMenuNavigatorDirector
-import coden.alec.bot.view.ViewController
+import coden.alec.bot.sender.BaseMessageSender
+import coden.alec.bot.view.*
 import coden.alec.bot.view.format.ReplyMarkupFormatter
+import coden.alec.console.ConsoleApp
+import coden.alec.console.view.ConsoleView
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
@@ -89,12 +92,16 @@ fun main(args: Array<String>) {
     )
 
 
-//    val ctx = TelegramContext()
-    val telegramView = ViewController(ReplyMarkupFormatter(4))
-//    val consoleView = ConsoleView()
+    val mainView = ViewContextController() {
+        CommonTelegramView(TelegramChatContext( it.chatId), BaseMessageSender(it.bot), ReplyMarkupFormatter(4))
+    }
+    val menuView = ViewContextController() {
+        TelegramInlineView(TelegramMessageContext(it.chatId, it.messageId!!), BaseMessageSender(it.bot), ReplyMarkupFormatter(4))
+    }
+    val consoleView = ConsoleView()
 
 
-    val view = telegramView
+    val view = mainView
 //    val view = consoleView
 
 
@@ -107,9 +114,9 @@ fun main(args: Array<String>) {
 
     val manager = TelegramMenuNavigatorDirector(menuNagivatorFactory)
 
-    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, view, stateExecutor, manager)
+    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, view, menuView, stateExecutor, manager)
     bot.launch()
 
-//    val app = ConsoleApp(consoleView, stateExecutor, menuNagivatorFactory)
+    val app = ConsoleApp(consoleView, stateExecutor, menuNagivatorFactory)
 //    app.start()
 }

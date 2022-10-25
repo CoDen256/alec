@@ -17,7 +17,8 @@ import com.github.kotlintelegrambot.logging.LogLevel
 class AlecTelegramBot (
     botToken: String,
     log: LogLevel,
-    private val viewController: ViewController,
+    private val viewContextController: ViewContextController,
+    private val menuViewContextController: ViewContextController,
     private val stateExecutor: StateExecutor,
     private val director: TelegramMenuNavigatorDirector
 ) {
@@ -34,7 +35,9 @@ class AlecTelegramBot (
                 }
 
                 override fun handleUpdate(bot: Bot, update: Update) {
-                    viewController.context = Context(bot, update.message!!.chat.id, null)
+                    val chatContext = Context(bot, update.message!!.chat.id, null)
+                    viewContextController.updateContext(chatContext)
+                    menuViewContextController.updateContext(chatContext)
                 }
 
             })
@@ -45,9 +48,13 @@ class AlecTelegramBot (
                 }
 
                 override fun handleUpdate(bot: Bot, update: Update) {
-                    viewController.context = Context(bot, update.callbackQuery!!.message!!.chat.id,
-                    update.callbackQuery!!.message!!.messageId
-                        )
+                    val messageContext = Context(
+                        bot, update.callbackQuery!!.message!!.chat.id,
+                        update.callbackQuery!!.message!!.messageId
+                    )
+                    viewContextController.updateContext(messageContext)
+                    menuViewContextController.updateContext(messageContext)
+
                 }
 
             })
@@ -59,7 +66,7 @@ class AlecTelegramBot (
             command("start") {
                 stateExecutor.submit(HelpCommand)
 
-                viewController.displayMenu(director.createNewMainMenu())
+                viewContextController.displayMenu(director.createNewMainMenu())
             }
 
             command("list_scales") {
@@ -82,12 +89,10 @@ class AlecTelegramBot (
             callbackQuery{
                 callbackQuery.message?.let {
                     director.handleCommand(callbackQuery.data).onSuccess { result ->
-                        viewController.displayMenu(result.menu)
-                        viewController.context = Context(bot, it.chat.id, null)
-
+                        menuViewContextController.displayMenu(result.menu)
                         result.action?.let { action -> stateExecutor.submit(action) }
                     }.onFailure { throwable ->
-                        throwable.message?.let { msg -> viewController.displayError(msg) }
+                        throwable.message?.let { msg -> viewContextController.displayError(msg) }
                     }
                 }
             }
