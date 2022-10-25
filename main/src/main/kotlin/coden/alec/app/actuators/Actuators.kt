@@ -1,7 +1,7 @@
 package coden.alec.app.actuators
 
 import coden.alec.app.messages.MessageResource
-import coden.alec.app.views.View
+import coden.alec.app.views.MessageDisplay
 import coden.alec.core.UseCaseFactory
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
@@ -43,7 +43,7 @@ interface ScaleActuator {
 
 class BaseHelpActuator(
     private val useCaseFactory: UseCaseFactory,
-    private val view: View,
+    private val view: MessageDisplay,
     private val messages: MessageResource,
 ) : HelpActuator {
     override fun displayHelp(command: Command) {
@@ -54,7 +54,7 @@ class BaseHelpActuator(
 
 class BaseScaleActuator(
     private val useCaseFactory: UseCaseFactory,
-    private val view: View,
+    private val view: MessageDisplay,
     private val messages: MessageResource,
 ) : ScaleActuator {
 

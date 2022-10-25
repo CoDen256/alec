@@ -4,7 +4,7 @@ import coden.alec.app.actuators.BaseHelpActuator
 import coden.alec.app.actuators.BaseScaleActuator
 import coden.alec.app.fsm.*
 import coden.alec.app.messages.MessageResource
-import coden.alec.console.view.ConsoleView
+import coden.alec.console.view.ConsoleDisplay
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
@@ -13,7 +13,6 @@ import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
 import coden.fsm.FSM
 import coden.fsm.LoggingStateExecutor
-import coden.fsm.StateExecutor
 import gateway.memory.ScaleInMemoryGateway
 import org.junit.jupiter.api.Test
 
@@ -50,7 +49,7 @@ class MainTest {
                 TODO("Not yet implemented")
             }
         }
-        val consoleView = ConsoleView()
+        val consoleView = ConsoleDisplay()
 
 //        val view = telegramView
         val view = consoleView

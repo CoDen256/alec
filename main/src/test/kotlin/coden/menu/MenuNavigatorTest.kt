@@ -1,13 +1,9 @@
 package coden.menu
 
-import coden.menu.ItemLayout
 import coden.menu.MenuLayout.Companion.menuLayout
-import coden.menu.MenuNavigator
-import coden.menu.NavigationResult
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import java.lang.IllegalStateException
 import java.util.UUID
 
 internal class MenuNavigatorTest {
@@ -19,7 +15,7 @@ internal class MenuNavigatorTest {
             ItemLayout.itemLayout("View Scales", action = TestCommand())
         )
 
-        val navigator = MenuNavigator(menu)
+        val navigator = LayoutBasedMenuNavigator(menu)
 
         val mainMenu = navigator.createMainMenu()
         assertEquals("Main Menu", mainMenu.description)
@@ -36,7 +32,7 @@ internal class MenuNavigatorTest {
             ItemLayout.itemLayout("View Scales", action = TestCommand("t"))
         )
 
-        val navigator = MenuNavigator(menu)
+        val navigator = LayoutBasedMenuNavigator(menu)
         val mainMenu = navigator.createMainMenu()
         (0..3).forEach { _ ->
             // exercise
@@ -56,7 +52,7 @@ internal class MenuNavigatorTest {
             ItemLayout.itemLayout("List Scales", action = TestCommand("l"))
         )
 
-        val navigator = MenuNavigator(menu)
+        val navigator = LayoutBasedMenuNavigator(menu)
         val mainMenu = navigator.createMainMenu()
         // exercise
         val viewScalesResult = navigator.navigate(mainMenu.items[0].id)
@@ -83,7 +79,7 @@ internal class MenuNavigatorTest {
             ),
         )
 
-        val navigator = MenuNavigator(menuLayout)
+        val navigator = LayoutBasedMenuNavigator(menuLayout)
         val mainMenu = navigator.createMainMenu()
         // exercise
         val scalesItems = mainMenu.items[0]
@@ -130,7 +126,7 @@ internal class MenuNavigatorTest {
             ),
         )
 
-        val navigator = MenuNavigator(menuLayout)
+        val navigator = LayoutBasedMenuNavigator(menuLayout)
         val mainMenu = navigator.createMainMenu()
         // exercise
         val scalesItem = mainMenu.items[0]
@@ -194,7 +190,7 @@ internal class MenuNavigatorTest {
             ),
             ItemLayout.itemLayout("Common Commands", action = TestCommand("c")))
 
-        val navigator = MenuNavigator(menuLayout)
+        val navigator = LayoutBasedMenuNavigator(menuLayout)
         val mainMenu = navigator.createMainMenu()
 
         assertFalse(navigator.canNavigate(UUID.randomUUID().toString()))

@@ -4,7 +4,7 @@ import coden.fsm.Command
 import java.util.*
 
 
-open class MenuNavigator(private val menuLayout: MenuLayout) {
+open class LayoutBasedMenuNavigator(private val menuLayout: MenuLayout){
 
     private val backItem = ItemView(menuLayout.backItem.name, id = UUID.randomUUID().toString())
     private val contextStack = ArrayList<MenuContext>()

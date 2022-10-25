@@ -1,13 +1,13 @@
 package coden.alec.bot.view
 
-import coden.alec.app.views.View
+import coden.alec.app.views.MessageDisplay
 import coden.alec.bot.sender.TelegramMessage
 import coden.alec.bot.sender.TelegramMessageSender
 
-class CommonTelegramView(
+class TelegramMessageDisplay(
     private val context: TelegramChatContext,
     private val messageSender: TelegramMessageSender,
-) : View {
+) : MessageDisplay {
 
     override fun displayPrompt(message: String) {
         messageSender.send(context.chatId, TelegramMessage(message, null))

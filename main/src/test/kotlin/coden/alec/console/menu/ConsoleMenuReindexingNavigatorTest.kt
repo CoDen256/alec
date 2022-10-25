@@ -5,7 +5,7 @@ import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.ListScalesCommand
 import coden.menu.ItemLayout
 import coden.menu.MenuLayout
-import coden.menu.MenuNavigator
+import coden.menu.LayoutBasedMenuNavigator
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -36,7 +36,7 @@ internal class ConsoleMenuReindexingNavigatorTest{
             )
         )
 
-        val controller = ConsoleMenuReindexingNavigator(MenuNavigator(menu))
+        val controller = ConsoleMenuReindexingNavigator(LayoutBasedMenuNavigator(menu))
 
         assertEquals("Choose anything from the main menu", controller.createMain().description )
         assertEquals("Common commands", controller.navigate("1").getOrThrow().menu.description )

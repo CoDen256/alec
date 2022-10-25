@@ -2,7 +2,6 @@ package coden.alec.bot
 
 import coden.alec.app.fsm.*
 import coden.alec.app.menu.MenuExecutor
-import coden.alec.bot.menu.TelegramMenuExecutor
 import coden.alec.bot.view.ContextData
 import coden.fsm.StateExecutor
 import com.github.kotlintelegrambot.bot
@@ -17,7 +16,7 @@ class AlecTelegramBot (
     log: LogLevel,
     private val context: ContextData,
     private val stateExecutor: StateExecutor,
-    private val telegramMenuExecutor: MenuExecutor
+    private val menuExecutor: MenuExecutor
 ) {
 
     private val bot = bot {
@@ -31,12 +30,12 @@ class AlecTelegramBot (
 
             command("help") {
                 stateExecutor.submit(HelpCommand)
-                telegramMenuExecutor.displayMenu()
+                menuExecutor.displayMenu()
             }
 
             command("start") {
                 stateExecutor.submit(HelpCommand)
-                telegramMenuExecutor.displayMenu()
+                menuExecutor.displayMenu()
             }
 
             command("list_scales") {
@@ -58,7 +57,7 @@ class AlecTelegramBot (
 
             callbackQuery{
                 callbackQuery.message?.let {
-                    telegramMenuExecutor.navigate(callbackQuery.data)?.let {
+                    menuExecutor.navigate(callbackQuery.data)?.let {
                         stateExecutor.submit(it)
                     }
                 }

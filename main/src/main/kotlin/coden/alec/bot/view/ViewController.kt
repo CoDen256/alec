@@ -1,12 +1,12 @@
 package coden.alec.bot.view
 
-import coden.alec.app.views.View
+import coden.alec.app.views.MessageDisplay
 import coden.menu.MenuView
 
 class ViewController(
     private val contextHolder: ContextData,
-    private val viewFactory: (Context) -> View
-): View {
+    private val viewFactory: (Context) -> MessageDisplay
+): MessageDisplay {
 
     override fun displayPrompt(message: String) {
         viewFactory(contextHolder.context).displayPrompt(message)
@@ -22,8 +22,8 @@ class ViewController(
 }
 
 class MenuViewController(
-    private val viewFactory: () -> coden.alec.app.views.MenuView
-): coden.alec.app.views.MenuView {
+    private val viewFactory: () -> coden.alec.app.views.MenuDisplay
+): coden.alec.app.views.MenuDisplay {
 
     override fun displayMenu(menu: MenuView) {
         viewFactory().displayMenu(menu)

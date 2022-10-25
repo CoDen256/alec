@@ -8,17 +8,13 @@ interface TelegramMessageSender {
     fun edit(chatId: Long, messageId: Long, message: TelegramMessage)
 }
 
-class BaseMessageSender
-    (private val bot: Bot)
-    : TelegramMessageSender {
+class BaseMessageSender(private val bot: Bot) : TelegramMessageSender {
     override fun send(chatId: Long, message: TelegramMessage) {
-        bot.sendMessage(
-            ChatId.fromId(chatId), message.content, replyMarkup = message.replyMarkup)
+        bot.sendMessage(ChatId.fromId(chatId), message.content, replyMarkup = message.replyMarkup)
     }
 
     override fun edit(chatId: Long, messageId: Long, message: TelegramMessage) {
-        bot.editMessageText(
-            ChatId.fromId(chatId), messageId= messageId, text = message.content, replyMarkup = message.replyMarkup)
+        bot.editMessageText(ChatId.fromId(chatId), messageId= messageId, text = message.content, replyMarkup = message.replyMarkup)
     }
 
 }

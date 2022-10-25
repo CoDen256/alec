@@ -1,5 +1,5 @@
 package coden.alec.app.views
 
-interface ErrorView {
+interface ErrorDisplay {
     fun displayError(message: String)
 }

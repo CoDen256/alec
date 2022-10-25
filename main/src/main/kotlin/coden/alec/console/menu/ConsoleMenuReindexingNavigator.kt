@@ -1,21 +1,19 @@
 package coden.alec.console.menu
 
-import coden.menu.ItemView
-import coden.menu.MenuNavigator
-import coden.menu.MenuView
-import coden.menu.NavigationResult
+import coden.alec.app.menu.MenuNavigator
+import coden.menu.*
 import java.lang.IllegalArgumentException
 
-class ConsoleMenuReindexingNavigator(private val navigator: MenuNavigator) {
+class ConsoleMenuReindexingNavigator(private val navigator: LayoutBasedMenuNavigator): MenuNavigator {
 
     private val destinationMapping = HashMap<String, String>()
     private var currentId = 0
 
-    fun createMain(): MenuView {
+    override fun createMainMenu(): MenuView {
         return reindexMenu(navigator.createMainMenu())
     }
 
-    fun navigate(destination: String): Result<NavigationResult> {
+    override fun navigate(destination: String): Result<NavigationResult> {
         val innerDestination = destinationMapping[destination]
             ?: return Result.failure(IllegalArgumentException("Selection $destination is invalid"))
         val result = navigator.navigate(innerDestination)

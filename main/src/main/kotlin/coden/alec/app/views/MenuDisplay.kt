@@ -2,6 +2,6 @@ package coden.alec.app.views
 
 import coden.menu.MenuView
 
-interface MenuView {
+interface MenuDisplay {
     fun displayMenu(menu: MenuView)
 }

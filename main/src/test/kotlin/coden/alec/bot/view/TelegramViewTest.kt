@@ -10,7 +10,7 @@ internal class TelegramViewTest {
     @Test
     internal fun create() {
         assertDoesNotThrow {
-            CommonTelegramView(TelegramChatContext(0), RecordingMessageSender(), DummyMenuFormatter()
+            TelegramMessageDisplay(TelegramChatContext(0), RecordingMessageSender(), DummyMenuFormatter()
             )
         }
     }
@@ -18,7 +18,7 @@ internal class TelegramViewTest {
     @Test
     internal fun send() {
         val sender = RecordingMessageSender()
-        val view = CommonTelegramView(
+        val view = TelegramMessageDisplay(
             TelegramChatContext(0),
             sender,
             DummyMenuFormatter()
@@ -37,7 +37,7 @@ internal class TelegramViewTest {
     internal fun sendError() {
         val sender = RecordingMessageSender()
 
-        val view = CommonTelegramView(
+        val view = TelegramMessageDisplay(
             TelegramChatContext(10),
             sender,
             DummyMenuFormatter()
@@ -57,7 +57,7 @@ internal class TelegramViewTest {
     internal fun sendPrompt() {
         val sender = RecordingMessageSender()
 
-        val view = CommonTelegramView(
+        val view = TelegramMessageDisplay(
             TelegramChatContext(0),
             sender,
             DummyMenuFormatter()
@@ -77,7 +77,7 @@ internal class TelegramViewTest {
     internal fun sendMenu() {
         val sender = RecordingMessageSender()
 
-        val view = CommonTelegramView(
+        val view = TelegramMessageDisplay(
             TelegramChatContext(12),
             sender,
             DummyMenuFormatter()

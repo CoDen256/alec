@@ -3,11 +3,10 @@ package coden.alec.console
 import coden.alec.app.fsm.CreateScaleCommandNoArgs
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.ListScalesCommand
-import coden.alec.app.menu.MenuNavigatorFactory
 import coden.alec.console.menu.ConsoleMenuReindexingNavigator
 import coden.menu.ItemLayout
 import coden.menu.MenuLayout
-import coden.menu.MenuNavigator
+import coden.menu.LayoutBasedMenuNavigator
 import org.junit.jupiter.api.Test
 
 internal class ConsoleAppTest{
@@ -36,7 +35,7 @@ internal class ConsoleAppTest{
             )
         )
 
-        val controller = ConsoleMenuReindexingNavigator(MenuNavigator(menu))
+        val controller = ConsoleMenuReindexingNavigator(LayoutBasedMenuNavigator(menu))
 
 //        val app = ConsoleApp(MenuNavigatorFactory(menu), )
     }
