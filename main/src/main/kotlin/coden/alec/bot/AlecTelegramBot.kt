@@ -1,6 +1,7 @@
 package coden.alec.bot
 
 import coden.alec.app.fsm.*
+import coden.alec.app.views.View
 import coden.alec.bot.menu.TelegramMenuNavigatorDirector
 import coden.alec.bot.view.*
 import coden.fsm.StateExecutor
@@ -17,8 +18,9 @@ import com.github.kotlintelegrambot.logging.LogLevel
 class AlecTelegramBot (
     botToken: String,
     log: LogLevel,
-    private val viewContextController: ViewContextController,
-    private val menuViewContextController: ViewContextController,
+    private val mainView: View,
+    private val menuView: View,
+    private val context: ViewContextHolder,
     private val stateExecutor: StateExecutor,
     private val director: TelegramMenuNavigatorDirector
 ) {
@@ -35,9 +37,7 @@ class AlecTelegramBot (
                 }
 
                 override fun handleUpdate(bot: Bot, update: Update) {
-                    val chatContext = Context(bot, update.message!!.chat.id, null)
-                    viewContextController.updateContext(chatContext)
-                    menuViewContextController.updateContext(chatContext)
+                    context.updateContext(Context(bot, update.message!!.chat.id, null))
                 }
 
             })
@@ -48,13 +48,12 @@ class AlecTelegramBot (
                 }
 
                 override fun handleUpdate(bot: Bot, update: Update) {
-                    val messageContext = Context(
-                        bot, update.callbackQuery!!.message!!.chat.id,
-                        update.callbackQuery!!.message!!.messageId
+                    context.updateContext(
+                        Context(
+                            bot, update.callbackQuery!!.message!!.chat.id,
+                            update.callbackQuery!!.message!!.messageId
+                        )
                     )
-                    viewContextController.updateContext(messageContext)
-                    menuViewContextController.updateContext(messageContext)
-
                 }
 
             })
@@ -66,7 +65,7 @@ class AlecTelegramBot (
             command("start") {
                 stateExecutor.submit(HelpCommand)
 
-                viewContextController.displayMenu(director.createNewMainMenu())
+                mainView.displayMenu(director.createNewMainMenu())
             }
 
             command("list_scales") {
@@ -89,10 +88,10 @@ class AlecTelegramBot (
             callbackQuery{
                 callbackQuery.message?.let {
                     director.handleCommand(callbackQuery.data).onSuccess { result ->
-                        menuViewContextController.displayMenu(result.menu)
+                        menuView.displayMenu(result.menu)
                         result.action?.let { action -> stateExecutor.submit(action) }
                     }.onFailure { throwable ->
-                        throwable.message?.let { msg -> viewContextController.displayError(msg) }
+                        throwable.message?.let { msg -> mainView.displayError(msg) }
                     }
                 }
             }

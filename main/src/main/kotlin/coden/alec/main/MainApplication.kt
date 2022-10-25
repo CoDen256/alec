@@ -91,11 +91,11 @@ fun main(args: Array<String>) {
         )
     )
 
-
-    val mainView = ViewContextController() {
+    val contextHolder = ViewContextHolder()
+    val mainView = ViewController(contextHolder) {
         CommonTelegramView(TelegramChatContext( it.chatId), BaseMessageSender(it.bot), ReplyMarkupFormatter(4))
     }
-    val menuView = ViewContextController() {
+    val menuView = ViewController(contextHolder) {
         TelegramInlineView(TelegramMessageContext(it.chatId, it.messageId!!), BaseMessageSender(it.bot), ReplyMarkupFormatter(4))
     }
     val consoleView = ConsoleView()
@@ -114,7 +114,7 @@ fun main(args: Array<String>) {
 
     val manager = TelegramMenuNavigatorDirector(menuNagivatorFactory)
 
-    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, view, menuView, stateExecutor, manager)
+    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, view, menuView, contextHolder, stateExecutor, manager)
     bot.launch()
 
     val app = ConsoleApp(consoleView, stateExecutor, menuNagivatorFactory)
