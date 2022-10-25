@@ -2,29 +2,25 @@ package coden.alec.bot
 
 import coden.alec.app.fsm.*
 import coden.alec.bot.menu.TelegramMenuNavigatorDirector
-import coden.alec.bot.sender.TelegramMessageSender
 import coden.alec.bot.view.*
-import coden.alec.bot.view.format.TelegramMenuFormatter
 import coden.fsm.StateExecutor
+import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.callbackQuery
 import com.github.kotlintelegrambot.dispatcher.command
+import com.github.kotlintelegrambot.dispatcher.handlers.Handler
 import com.github.kotlintelegrambot.dispatcher.text
-import com.github.kotlintelegrambot.entities.ChatId
+import com.github.kotlintelegrambot.entities.Update
 import com.github.kotlintelegrambot.logging.LogLevel
 
 class AlecTelegramBot (
     botToken: String,
     log: LogLevel,
-    private val sender: TelegramMessageSender,
-    private val formatter: TelegramMenuFormatter,
-    private val telegramView: TelegramView,
-    private val ctx: TelegramContext,
+    private val viewController: ViewController,
     private val stateExecutor: StateExecutor,
-    private val manager: TelegramMenuNavigatorDirector
+    private val director: TelegramMenuNavigatorDirector
 ) {
-
 
     private val bot = bot {
         token = botToken
@@ -32,25 +28,45 @@ class AlecTelegramBot (
 
         dispatch {
 
+            addHandler(object: Handler{
+                override fun checkUpdate(update: Update): Boolean {
+                    return update.message != null
+                }
+
+                override fun handleUpdate(bot: Bot, update: Update) {
+                    viewController.context = Context(bot, update.message!!.chat.id, null)
+                }
+
+            })
+
+            addHandler(object: Handler{
+                override fun checkUpdate(update: Update): Boolean {
+                    return update.callbackQuery?.message != null
+                }
+
+                override fun handleUpdate(bot: Bot, update: Update) {
+                    viewController.context = Context(bot, update.callbackQuery!!.message!!.chat.id,
+                    update.callbackQuery!!.message!!.messageId
+                        )
+                }
+
+            })
+
             command("help") {
-                ctx.update(bot, current = message)
                 stateExecutor.submit(HelpCommand)
             }
 
             command("start") {
-                ctx.update(bot, current = message)
                 stateExecutor.submit(HelpCommand)
 
-                CommonTelegramView(TelegramChatContext(message.chat.id), sender, formatter).displayMenu(manager.createNewMainMenu())
+                viewController.displayMenu(director.createNewMainMenu())
             }
 
             command("list_scales") {
-                ctx.update(bot, current = message)
                 stateExecutor.submit(ListScalesCommand)
             }
 
             command("create_scale"){
-                ctx.update(bot, current = message)
                 if (args.isEmpty()){
                     stateExecutor.submit(CreateScaleCommandNoArgs)
                 }else {
@@ -60,28 +76,26 @@ class AlecTelegramBot (
 
             text {
                 if (text.startsWith("/")) return@text
-                ctx.update(bot, current = message)
                 stateExecutor.submit(TextCommand(text))
             }
 
             callbackQuery{
                 callbackQuery.message?.let {
-                    ctx.update(bot, current = it)
-                    manager.handleCommand(callbackQuery.data).onSuccess {result ->
+                    director.handleCommand(callbackQuery.data).onSuccess { result ->
+                        viewController.displayMenu(result.menu)
+                        viewController.context = Context(bot, it.chat.id, null)
 
-//                        TelegramInlineView(
-//                            TelegramMessageContext(message)
-//                        )
-
-                        telegramView.displayMenu(result.menu)
                         result.action?.let { action -> stateExecutor.submit(action) }
                     }.onFailure { throwable ->
-                        throwable.message?.let { msg -> telegramView.displayError(msg) }
+                        throwable.message?.let { msg -> viewController.displayError(msg) }
                     }
                 }
             }
         }
     }
+
+
+
     fun launch(){
         bot.startPolling()
     }

@@ -6,8 +6,8 @@ import coden.menu.MenuView
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 
-class ReplyMarkupFormatter(private val itemsPerRow: Int = 4) {
-    fun format(menu: MenuView): TelegramMessage {
+class ReplyMarkupFormatter(private val itemsPerRow: Int = 4) : TelegramMenuFormatter{
+    override fun format(menu: MenuView): TelegramMessage {
         return TelegramMessage(menu.description, itemsToPlainString(menu.items, menu.backItemView))
     }
 
