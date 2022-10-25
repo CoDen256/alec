@@ -14,6 +14,8 @@ import coden.alec.bot.sender.BaseMessageSender
 import coden.alec.bot.view.*
 import coden.alec.bot.view.format.ReplyMarkupFormatter
 import coden.alec.console.ConsoleApp
+import coden.alec.console.view.ConsoleMenuFormatter
+import coden.alec.console.view.ConsoleMenuView
 import coden.alec.console.view.ConsoleView
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
@@ -92,17 +94,25 @@ fun main(args: Array<String>) {
     )
 
     val contextHolder = ViewContextHolder()
-    val mainView = ViewController(contextHolder) {
-        CommonTelegramView(TelegramChatContext( it.chatId), BaseMessageSender(it.bot), ReplyMarkupFormatter(4))
+    val mainTelegramView = ViewController(contextHolder) {
+        CommonTelegramView(TelegramChatContext( it.chatId), BaseMessageSender(it.bot))
     }
-    val menuView = ViewController(contextHolder) {
-        TelegramInlineView(TelegramMessageContext(it.chatId, it.messageId!!), BaseMessageSender(it.bot), ReplyMarkupFormatter(4))
+    val menuTelegramView = MenuViewController(contextHolder) { ctx ->
+        ctx.messageId?.let {
+            TelegramInlineMenuView(TelegramMessageContext(ctx.chatId, it), BaseMessageSender(ctx.bot), ReplyMarkupFormatter(4))
+        } ?: TelegramMenuView(TelegramChatContext(ctx.chatId), BaseMessageSender(ctx.bot), ReplyMarkupFormatter(4))
     }
+
     val consoleView = ConsoleView()
+    val consoleMenuView = ConsoleMenuView(ConsoleMenuFormatter())
 
 
-    val view = mainView
-//    val view = consoleView
+
+//    val view = mainTelegramView
+    val view = consoleView
+
+//    val menuView = menuTelegramView
+    val menuView = consoleMenuView
 
 
     val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages)
@@ -114,9 +124,9 @@ fun main(args: Array<String>) {
 
     val manager = TelegramMenuNavigatorDirector(menuNagivatorFactory)
 
-    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, view, menuView, contextHolder, stateExecutor, manager)
-    bot.launch()
-
-    val app = ConsoleApp(consoleView, stateExecutor, menuNagivatorFactory)
-//    app.start()
+//    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, view, menuView, contextHolder, stateExecutor, manager)
+//    bot.launch()
+//
+    val app = ConsoleApp(consoleView, menuView, stateExecutor, menuNagivatorFactory)
+    app.start()
 }

@@ -3,22 +3,24 @@ package coden.alec.console
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.TextCommand
 import coden.alec.app.menu.MenuNavigatorFactory
-import coden.alec.app.views.View
+import coden.alec.app.views.ErrorView
+import coden.alec.app.views.MenuView
 import coden.alec.console.menu.ConsoleMenuReindexingNavigator
 import coden.fsm.StateExecutor
 
 class ConsoleApp(
-    private val view: View,
+    private val errorView: ErrorView,
+    private val menuView: MenuView,
     private val stateExecutor: StateExecutor,
     private val menuFactory: MenuNavigatorFactory
 ) {
     private val menuViewer = ConsoleMenuReindexingNavigator(menuFactory.mainMenuNavigator())
 
     fun start() {
-        view.displayMenu(menuViewer.createMain())
+        menuView.displayMenu(menuViewer.createMain())
         stateExecutor.submit(HelpCommand)
         while (true) {
-            val input = readLine() ?: break
+            val input = readlnOrNull() ?: break
             if (input.startsWith("/")){
                 if (input.startsWith("/help")){
                     stateExecutor.submit(HelpCommand)
@@ -29,9 +31,9 @@ class ConsoleApp(
             }else {
                 menuViewer.navigate(input).onSuccess { result ->
                     result.action?.let { stateExecutor.submit(it) }
-                    view.displayMenu(result.menu)
+                    menuView.displayMenu(result.menu)
                 }.onFailure { error ->
-                    error.message?.let {  view.displayError(it) }
+                    error.message?.let {  errorView.displayError(it) }
                 }
             }
         }

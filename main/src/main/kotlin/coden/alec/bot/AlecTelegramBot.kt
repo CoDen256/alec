@@ -1,6 +1,8 @@
 package coden.alec.bot
 
 import coden.alec.app.fsm.*
+import coden.alec.app.views.ErrorView
+import coden.alec.app.views.MenuView
 import coden.alec.app.views.View
 import coden.alec.bot.menu.TelegramMenuNavigatorDirector
 import coden.alec.bot.view.ViewContextHolder
@@ -15,8 +17,8 @@ import com.github.kotlintelegrambot.logging.LogLevel
 class AlecTelegramBot (
     botToken: String,
     log: LogLevel,
-    private val mainView: View,
-    private val menuView: View,
+    private val errorView: ErrorView,
+    private val menuView: MenuView,
     private val context: ViewContextHolder,
     private val stateExecutor: StateExecutor,
     private val director: TelegramMenuNavigatorDirector
@@ -38,7 +40,7 @@ class AlecTelegramBot (
             command("start") {
                 stateExecutor.submit(HelpCommand)
 
-                mainView.displayMenu(director.createNewMainMenu())
+                menuView.displayMenu(director.createNewMainMenu())
             }
 
             command("list_scales") {
@@ -64,7 +66,7 @@ class AlecTelegramBot (
                         menuView.displayMenu(result.menu)
                         result.action?.let { action -> stateExecutor.submit(action) }
                     }.onFailure { throwable ->
-                        throwable.message?.let { msg -> mainView.displayError(msg) }
+                        throwable.message?.let { msg -> errorView.displayError(msg) }
                     }
                 }
             }

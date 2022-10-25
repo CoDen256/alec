@@ -16,11 +16,18 @@ class ViewController(
         viewFactory(contextHolder.context).displayMessage(message)
     }
 
+    override fun displayError(message: String) {
+        viewFactory(contextHolder.context).displayError(message)
+    }
+}
+
+class MenuViewController(
+    private val contextHolder: ViewContextHolder,
+    private val viewFactory: (Context) -> coden.alec.app.views.MenuView
+): coden.alec.app.views.MenuView {
+
     override fun displayMenu(menu: MenuView) {
         viewFactory(contextHolder.context).displayMenu(menu)
     }
 
-    override fun displayError(message: String) {
-        viewFactory(contextHolder.context).displayError(message)
-    }
 }

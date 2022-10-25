@@ -3,6 +3,7 @@ package coden.alec.console.view
 import coden.menu.ItemView
 import coden.menu.MenuView
 
+
 class ConsoleMenuFormatter {
     fun format(menu: MenuView): String{
         return menu.description + "\n" + itemsToPlainString(menu.items, menu.backItemView)
