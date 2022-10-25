@@ -3,16 +3,13 @@ package coden.alec.bot
 import coden.alec.app.fsm.*
 import coden.alec.app.views.View
 import coden.alec.bot.menu.TelegramMenuNavigatorDirector
-import coden.alec.bot.view.*
+import coden.alec.bot.view.ViewContextHolder
 import coden.fsm.StateExecutor
-import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.callbackQuery
 import com.github.kotlintelegrambot.dispatcher.command
-import com.github.kotlintelegrambot.dispatcher.handlers.Handler
 import com.github.kotlintelegrambot.dispatcher.text
-import com.github.kotlintelegrambot.entities.Update
 import com.github.kotlintelegrambot.logging.LogLevel
 
 class AlecTelegramBot (
@@ -31,32 +28,8 @@ class AlecTelegramBot (
 
         dispatch {
 
-            addHandler(object: Handler{
-                override fun checkUpdate(update: Update): Boolean {
-                    return update.message != null
-                }
-
-                override fun handleUpdate(bot: Bot, update: Update) {
-                    context.updateContext(Context(bot, update.message!!.chat.id, null))
-                }
-
-            })
-
-            addHandler(object: Handler{
-                override fun checkUpdate(update: Update): Boolean {
-                    return update.callbackQuery?.message != null
-                }
-
-                override fun handleUpdate(bot: Bot, update: Update) {
-                    context.updateContext(
-                        Context(
-                            bot, update.callbackQuery!!.message!!.chat.id,
-                            update.callbackQuery!!.message!!.messageId
-                        )
-                    )
-                }
-
-            })
+            addHandler(MessageCapturingHandler(context))
+            addHandler(CallbackQueryCapturingHandler(context))
 
             command("help") {
                 stateExecutor.submit(HelpCommand)
