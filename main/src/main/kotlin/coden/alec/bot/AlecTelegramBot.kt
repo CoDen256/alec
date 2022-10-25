@@ -1,11 +1,9 @@
 package coden.alec.bot
 
 import coden.alec.app.fsm.*
-import coden.alec.app.views.ErrorView
-import coden.alec.app.views.MenuView
-import coden.alec.app.views.View
-import coden.alec.bot.menu.TelegramMenuNavigatorDirector
-import coden.alec.bot.view.ViewContextHolder
+import coden.alec.app.menu.MenuExecutor
+import coden.alec.bot.menu.TelegramMenuExecutor
+import coden.alec.bot.view.ContextData
 import coden.fsm.StateExecutor
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
@@ -17,11 +15,9 @@ import com.github.kotlintelegrambot.logging.LogLevel
 class AlecTelegramBot (
     botToken: String,
     log: LogLevel,
-    private val errorView: ErrorView,
-    private val menuView: MenuView,
-    private val context: ViewContextHolder,
+    private val context: ContextData,
     private val stateExecutor: StateExecutor,
-    private val director: TelegramMenuNavigatorDirector
+    private val telegramMenuExecutor: MenuExecutor
 ) {
 
     private val bot = bot {
@@ -35,12 +31,12 @@ class AlecTelegramBot (
 
             command("help") {
                 stateExecutor.submit(HelpCommand)
+                telegramMenuExecutor.displayMenu()
             }
 
             command("start") {
                 stateExecutor.submit(HelpCommand)
-
-                menuView.displayMenu(director.createNewMainMenu())
+                telegramMenuExecutor.displayMenu()
             }
 
             command("list_scales") {
@@ -62,11 +58,8 @@ class AlecTelegramBot (
 
             callbackQuery{
                 callbackQuery.message?.let {
-                    director.handleCommand(callbackQuery.data).onSuccess { result ->
-                        menuView.displayMenu(result.menu)
-                        result.action?.let { action -> stateExecutor.submit(action) }
-                    }.onFailure { throwable ->
-                        throwable.message?.let { msg -> errorView.displayError(msg) }
+                    telegramMenuExecutor.navigate(callbackQuery.data)?.let {
+                        stateExecutor.submit(it)
                     }
                 }
             }

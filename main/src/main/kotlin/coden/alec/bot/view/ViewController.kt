@@ -4,7 +4,7 @@ import coden.alec.app.views.View
 import coden.menu.MenuView
 
 class ViewController(
-    private val contextHolder: ViewContextHolder,
+    private val contextHolder: ContextData,
     private val viewFactory: (Context) -> View
 ): View {
 
@@ -22,12 +22,11 @@ class ViewController(
 }
 
 class MenuViewController(
-    private val contextHolder: ViewContextHolder,
-    private val viewFactory: (Context) -> coden.alec.app.views.MenuView
+    private val viewFactory: () -> coden.alec.app.views.MenuView
 ): coden.alec.app.views.MenuView {
 
     override fun displayMenu(menu: MenuView) {
-        viewFactory(contextHolder.context).displayMenu(menu)
+        viewFactory().displayMenu(menu)
     }
 
 }

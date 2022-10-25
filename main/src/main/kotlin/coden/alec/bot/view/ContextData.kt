@@ -2,11 +2,11 @@ package coden.alec.bot.view
 
 import com.github.kotlintelegrambot.Bot
 
-class ViewContextHolder {
+class ContextData {
 
     lateinit var context: Context
 
-    fun updateContext(context: Context){
+    fun update(context: Context){
         this.context = context
     }
 }
