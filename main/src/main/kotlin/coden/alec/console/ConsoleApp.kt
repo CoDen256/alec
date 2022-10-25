@@ -2,12 +2,12 @@ package coden.alec.console
 
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.TextCommand
-import coden.alec.app.menu.MenuExecutor
+import coden.alec.app.menu.MenuPresenter
 import coden.fsm.StateExecutor
 
 class ConsoleApp(
     private val stateExecutor: StateExecutor,
-    private val menuExecutor: MenuExecutor
+    private val menuExecutor: MenuPresenter
 ) {
 
     fun start() {

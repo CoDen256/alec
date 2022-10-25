@@ -1,8 +1,8 @@
 package coden.alec.bot
 
 import coden.alec.app.fsm.*
-import coden.alec.app.menu.MenuExecutor
-import coden.alec.bot.view.ContextData
+import coden.alec.app.menu.MenuPresenter
+import coden.alec.bot.context.ContextObserver
 import coden.fsm.StateExecutor
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
@@ -14,9 +14,9 @@ import com.github.kotlintelegrambot.logging.LogLevel
 class AlecTelegramBot (
     botToken: String,
     log: LogLevel,
-    private val context: ContextData,
+    private val context: ContextObserver,
     private val stateExecutor: StateExecutor,
-    private val menuExecutor: MenuExecutor
+    private val menuExecutor: MenuPresenter
 ) {
 
     private val bot = bot {

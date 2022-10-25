@@ -6,17 +6,23 @@ import coden.alec.app.fsm.CreateScaleCommandNoArgs
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.ListScalesCommand
 import coden.alec.app.fsm.Start
-import coden.alec.app.menu.BaseMenuExecutor
-import coden.alec.app.menu.MenuExecutor
+import coden.alec.app.menu.BaseMenuPresenter
+import coden.alec.app.menu.MenuPresenter
 import coden.menu.LayoutBasedMenuNavigatorFactory
 import coden.alec.app.messages.MessageResource
-import coden.alec.bot.AlecTelegramBot
+import coden.alec.bot.context.*
 import coden.alec.bot.menu.TelegramAggregatedMenuNavigator
 import coden.alec.bot.sender.BaseMessageSender
 import coden.alec.bot.sender.TelegramMessageSender
-import coden.alec.bot.view.*
+import coden.alec.bot.view.context.TelegramContextMenuDisplay
+import coden.alec.bot.view.context.TelegramContextMessageDisplay
+import coden.alec.bot.view.display.TelegramInlineMenuDisplay
+import coden.alec.bot.view.display.TelegramMenuDisplay
+import coden.alec.bot.view.display.TelegramMessageDisplay
 import coden.alec.bot.view.format.ReplyMarkupFormatter
 import coden.alec.bot.view.format.TelegramMenuFormatter
+import coden.alec.bot.view.proxy.MenuDisplayContextProxy
+import coden.alec.bot.view.proxy.MessageDisplayContextProxy
 import coden.alec.console.ConsoleApp
 import coden.alec.console.menu.ConsoleMenuReindexingNavigator
 import coden.alec.console.view.ConsoleDisplay
@@ -32,7 +38,6 @@ import coden.fsm.FSM
 import coden.fsm.StateExecutor
 import coden.menu.ItemLayout.Companion.itemLayout
 import coden.menu.MenuLayout.Companion.menuLayout
-import com.github.kotlintelegrambot.logging.LogLevel
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
@@ -103,16 +108,10 @@ fun main(args: Array<String>) {
     val menuFormatterFactory: (Context) -> TelegramMenuFormatter =
         { ReplyMarkupFormatter(4) }
 
-    val contextHolder = ContextData()
-    val mainTelegramDisplay = ViewController(contextHolder) {
-        TelegramMessageDisplay(TelegramChatContext( it.chatId), messageSenderFactory(it))
-    }
-    val menuTelegramDisplay = MenuViewController() {
-        val ctx = contextHolder.context
-        ctx.messageId?.let {
-            TelegramInlineMenuDisplay(TelegramMessageContext(ctx.chatId, it), messageSenderFactory(ctx), menuFormatterFactory(ctx))
-        } ?: TelegramMenuDisplay(TelegramChatContext(ctx.chatId), messageSenderFactory(ctx), menuFormatterFactory(ctx))
-    }
+    val contextObserver = ContextObserver()
+
+    val telMessageDisplay = TelegramContextMessageDisplay(contextObserver, messageSenderFactory)
+    val telMenuDisplay = TelegramContextMenuDisplay(contextObserver, messageSenderFactory, menuFormatterFactory)
 
 
     val consoleDisplay = ConsoleDisplay()
@@ -120,10 +119,10 @@ fun main(args: Array<String>) {
 
 
 
-//    val display = mainTelegramDisplay
+//    val display = telMessageDisplay
     val display = consoleDisplay
 
-//    val menuDisplay = menuTelegramDisplay
+//    val menuDisplay = telMenuDisplay
     val menuDisplay = consoleMenuDisplay
 
 
@@ -141,7 +140,7 @@ fun main(args: Array<String>) {
     val menuNavigator = consoleNavigator
 
 
-    val menuExecutor: MenuExecutor = BaseMenuExecutor(
+    val menuExecutor: MenuPresenter = BaseMenuPresenter(
         display, menuDisplay, menuNavigator
     )
 

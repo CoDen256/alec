@@ -2,7 +2,7 @@ package coden.alec.app.menu
 
 import coden.fsm.Command
 
-interface MenuExecutor {
+interface MenuPresenter {
     fun displayMenu()
     fun navigate(dest: String): Command?
 }

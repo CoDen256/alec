@@ -1,5 +1,7 @@
 package coden.alec.bot.view
 
+import coden.alec.bot.context.TelegramChatContext
+import coden.alec.bot.view.display.TelegramMessageDisplay
 import coden.menu.MenuView
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -10,7 +12,8 @@ internal class TelegramViewTest {
     @Test
     internal fun create() {
         assertDoesNotThrow {
-            TelegramMessageDisplay(TelegramChatContext(0), RecordingMessageSender(), DummyMenuFormatter()
+            TelegramMessageDisplay(
+                TelegramChatContext(0), RecordingMessageSender(), DummyMenuFormatter()
             )
         }
     }

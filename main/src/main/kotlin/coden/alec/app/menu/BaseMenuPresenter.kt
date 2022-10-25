@@ -4,11 +4,11 @@ import coden.alec.app.views.ErrorDisplay
 import coden.alec.app.views.MenuDisplay
 import coden.fsm.Command
 
-class BaseMenuExecutor(
+class BaseMenuPresenter(
     private val errorDisplay: ErrorDisplay,
     private val menuDisplay: MenuDisplay,
     private val navigator: MenuNavigator
-) : MenuExecutor {
+) : MenuPresenter {
 
     override fun displayMenu() {
         menuDisplay.displayMenu(navigator.createMainMenu())

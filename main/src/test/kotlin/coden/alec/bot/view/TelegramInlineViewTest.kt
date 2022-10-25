@@ -1,5 +1,7 @@
 package coden.alec.bot.view
 
+import coden.alec.bot.context.TelegramMessageContext
+import coden.alec.bot.view.display.TelegramMenuDisplay
 import coden.menu.MenuView
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
