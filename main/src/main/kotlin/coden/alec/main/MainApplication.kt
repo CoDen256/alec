@@ -8,21 +8,16 @@ import coden.alec.app.fsm.ListScalesCommand
 import coden.alec.app.fsm.Start
 import coden.alec.app.menu.BaseMenuPresenter
 import coden.alec.app.menu.MenuPresenter
-import coden.menu.LayoutBasedMenuNavigatorFactory
 import coden.alec.app.messages.MessageResource
-import coden.alec.bot.context.*
+import coden.alec.bot.context.Context
+import coden.alec.bot.context.ContextObserver
+import coden.alec.bot.context.proxy.ContextBasedTelegramMenuDisplay
+import coden.alec.bot.context.proxy.ContextBasedTelegramMessageDisplay
 import coden.alec.bot.menu.TelegramAggregatedMenuNavigator
 import coden.alec.bot.sender.BaseMessageSender
 import coden.alec.bot.sender.TelegramMessageSender
-import coden.alec.bot.view.context.TelegramContextMenuDisplay
-import coden.alec.bot.view.context.TelegramContextMessageDisplay
-import coden.alec.bot.view.display.TelegramInlineMenuDisplay
-import coden.alec.bot.view.display.TelegramMenuDisplay
-import coden.alec.bot.view.display.TelegramMessageDisplay
 import coden.alec.bot.view.format.ReplyMarkupFormatter
 import coden.alec.bot.view.format.TelegramMenuFormatter
-import coden.alec.bot.view.proxy.MenuDisplayContextProxy
-import coden.alec.bot.view.proxy.MessageDisplayContextProxy
 import coden.alec.console.ConsoleApp
 import coden.alec.console.menu.ConsoleMenuReindexingNavigator
 import coden.alec.console.view.ConsoleDisplay
@@ -37,6 +32,7 @@ import coden.alec.main.config.table.ScaleTable
 import coden.fsm.FSM
 import coden.fsm.StateExecutor
 import coden.menu.ItemLayout.Companion.itemLayout
+import coden.menu.LayoutBasedMenuNavigatorFactory
 import coden.menu.MenuLayout.Companion.menuLayout
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -110,12 +106,13 @@ fun main(args: Array<String>) {
 
     val contextObserver = ContextObserver()
 
-    val telMessageDisplay = TelegramContextMessageDisplay(contextObserver, messageSenderFactory)
-    val telMenuDisplay = TelegramContextMenuDisplay(contextObserver, messageSenderFactory, menuFormatterFactory)
+    val telMessageDisplay = ContextBasedTelegramMessageDisplay(contextObserver, messageSenderFactory)
+    val telMenuDisplay = ContextBasedTelegramMenuDisplay(contextObserver, messageSenderFactory, menuFormatterFactory)
 
 
+    val consoleMenuFormatter = ConsoleMenuFormatter()
     val consoleDisplay = ConsoleDisplay()
-    val consoleMenuDisplay = ConsoleMenuDisplay(ConsoleMenuFormatter())
+    val consoleMenuDisplay = ConsoleMenuDisplay(consoleMenuFormatter)
 
 
 
