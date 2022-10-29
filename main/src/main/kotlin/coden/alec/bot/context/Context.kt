@@ -5,14 +5,14 @@ import com.github.kotlintelegrambot.Bot
 
 class ContextObserver: () -> Context {
 
-    private lateinit var context: Context
+    private var context: Context? = null
 
     fun update(context: Context){
         this.context = context
     }
 
     override fun invoke(): Context {
-        return context
+        return context ?: throw IllegalStateException("Context is not provided")
     }
 }
 

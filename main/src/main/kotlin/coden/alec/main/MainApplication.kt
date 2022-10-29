@@ -9,6 +9,7 @@ import coden.alec.app.fsm.Start
 import coden.alec.app.menu.BaseMenuPresenter
 import coden.alec.app.menu.MenuPresenter
 import coden.alec.app.messages.MessageResource
+import coden.alec.bot.AlecTelegramBot
 import coden.alec.bot.context.Context
 import coden.alec.bot.context.ContextObserver
 import coden.alec.bot.context.proxy.ContextBasedTelegramMenuDisplay
@@ -34,6 +35,7 @@ import coden.fsm.StateBasedCommandExecutor
 import coden.menu.ItemLayout.Companion.itemLayout
 import coden.menu.LayoutBasedMenuNavigatorFactory
 import coden.menu.MenuLayout.Companion.menuLayout
+import com.github.kotlintelegrambot.logging.LogLevel
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
@@ -105,9 +107,10 @@ fun main(args: Array<String>) {
         { ReplyMarkupFormatter(4) }
 
     val contextObserver = ContextObserver()
+    val contextProvider = contextObserver
 
-    val telMessageDisplay = ContextBasedTelegramMessageDisplay(contextObserver, messageSenderFactory)
-    val telMenuDisplay = ContextBasedTelegramMenuDisplay(contextObserver, messageSenderFactory, menuFormatterFactory)
+    val telMessageDisplay = ContextBasedTelegramMessageDisplay(contextProvider, messageSenderFactory)
+    val telMenuDisplay = ContextBasedTelegramMenuDisplay(contextProvider, messageSenderFactory, menuFormatterFactory)
 
 
     val consoleMenuFormatter = ConsoleMenuFormatter()
@@ -116,8 +119,8 @@ fun main(args: Array<String>) {
 
 
 
-//    val display = telMessageDisplay
-    val display = consoleDisplay
+    val display = telMessageDisplay
+//    val display = consoleDisplay
 
 //    val menuDisplay = telMenuDisplay
     val menuDisplay = consoleMenuDisplay
@@ -141,9 +144,9 @@ fun main(args: Array<String>) {
         display, menuDisplay, menuNavigator
     )
 
-//    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, contextHolder, stateExecutor, menuExecutor)
-//    bot.launch()
-//
+    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, contextObserver, commandExecutor, menuPresenter)
+    bot.launch()
+
     val app = ConsoleApp(commandExecutor, menuPresenter)
     app.start()
 }
