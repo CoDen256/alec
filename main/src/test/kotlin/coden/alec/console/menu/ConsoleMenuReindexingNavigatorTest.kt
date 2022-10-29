@@ -38,7 +38,7 @@ internal class ConsoleMenuReindexingNavigatorTest{
 
         val controller = ConsoleMenuReindexingNavigator(LayoutBasedMenuNavigator(menu))
 
-        assertEquals("Choose anything from the main menu", controller.createMain().description )
+        assertEquals("Choose anything from the main menu", controller.createMainMenu().description )
         assertEquals("Common commands", controller.navigate("1").getOrThrow().menu.description )
         assertEquals("Choose anything from the main menu", controller.navigate("3").getOrThrow().menu.description )
         assertEquals("Factor management", controller.navigate("3").getOrThrow().menu.description )

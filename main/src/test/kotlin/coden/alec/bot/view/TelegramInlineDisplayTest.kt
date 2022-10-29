@@ -1,33 +1,37 @@
 package coden.alec.bot.view
 
 import coden.alec.bot.context.TelegramMessageContext
-import coden.alec.bot.view.display.TelegramMenuDisplay
+import coden.alec.bot.view.display.TelegramInlineMenuDisplay
+import coden.alec.bot.view.display.TelegramInlineMessageDisplay
 import coden.menu.MenuView
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
-internal class TelegramInlineViewTest {
+internal class TelegramInlineDisplayTest {
 
     @Test
     internal fun create() {
         assertDoesNotThrow {
-            TelegramMenuDisplay(
-                TelegramMessageContext(0, 1),
+            TelegramInlineMenuDisplay(
+                TelegramMessageContext(0, 41),
                 RecordingMessageSender(),
                 DummyMenuFormatter()
             )
         }
+        TelegramInlineMessageDisplay(
+            TelegramMessageContext(0, 41),
+            RecordingMessageSender(),
+        )
     }
 
     @Test
     internal fun send() {
         val sender = RecordingMessageSender()
-        val view = TelegramMenuDisplay(
+        val view = TelegramInlineMessageDisplay(
             TelegramMessageContext(20, 112),
             sender,
-            DummyMenuFormatter()
         )
 
 
@@ -46,7 +50,7 @@ internal class TelegramInlineViewTest {
     @Test
     internal fun sendMenu() {
         val sender = RecordingMessageSender()
-        val view = TelegramMenuDisplay(
+        val view = TelegramInlineMenuDisplay(
             TelegramMessageContext(0, 1),
             sender,
             DummyMenuFormatter()
@@ -68,10 +72,9 @@ internal class TelegramInlineViewTest {
     @Test
     internal fun error() {
         val sender = RecordingMessageSender()
-        val view = TelegramMenuDisplay(
+        val view = TelegramInlineMessageDisplay(
             TelegramMessageContext(0, 1),
             sender,
-            DummyMenuFormatter()
         )
 
 
@@ -90,10 +93,9 @@ internal class TelegramInlineViewTest {
     @Test
     internal fun prompt() {
         val sender = RecordingMessageSender()
-        val view = TelegramMenuDisplay(
+        val view = TelegramInlineMessageDisplay(
             TelegramMessageContext(30, 41),
             sender,
-            DummyMenuFormatter()
         )
 
 

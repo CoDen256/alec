@@ -1,6 +1,7 @@
 package coden.alec.bot.view
 
 import coden.alec.bot.context.TelegramChatContext
+import coden.alec.bot.view.display.TelegramMenuDisplay
 import coden.alec.bot.view.display.TelegramMessageDisplay
 import coden.menu.MenuView
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -8,12 +9,17 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
-internal class TelegramViewTest {
+internal class TelegramDisplayTest {
     @Test
     internal fun create() {
         assertDoesNotThrow {
-            TelegramMessageDisplay(
+            TelegramMenuDisplay(
                 TelegramChatContext(0), RecordingMessageSender(), DummyMenuFormatter()
+            )
+        }
+        assertDoesNotThrow {
+            TelegramMessageDisplay(
+                TelegramChatContext(0), RecordingMessageSender()
             )
         }
     }
@@ -24,7 +30,6 @@ internal class TelegramViewTest {
         val view = TelegramMessageDisplay(
             TelegramChatContext(0),
             sender,
-            DummyMenuFormatter()
         )
 
         view.displayMessage("hustensaft")
@@ -43,7 +48,6 @@ internal class TelegramViewTest {
         val view = TelegramMessageDisplay(
             TelegramChatContext(10),
             sender,
-            DummyMenuFormatter()
         )
 
         view.displayError("hustensaft")
@@ -63,7 +67,6 @@ internal class TelegramViewTest {
         val view = TelegramMessageDisplay(
             TelegramChatContext(0),
             sender,
-            DummyMenuFormatter()
         )
 
         view.displayError("hustensaft")
@@ -80,7 +83,7 @@ internal class TelegramViewTest {
     internal fun sendMenu() {
         val sender = RecordingMessageSender()
 
-        val view = TelegramMessageDisplay(
+        val view = TelegramMenuDisplay(
             TelegramChatContext(12),
             sender,
             DummyMenuFormatter()
