@@ -9,6 +9,7 @@ import coden.alec.app.fsm.Start
 import coden.display.menu.BaseMenuPresenter
 import coden.display.menu.MenuPresenter
 import coden.alec.app.messages.MessageResource
+import coden.alec.bot.AlecBotConfigurator
 import coden.bot.run.BotRunner
 import coden.bot.context.Context
 import coden.bot.context.ContextObserver
@@ -30,11 +31,17 @@ import coden.alec.interactors.definer.scale.ListScalesInteractor
 import coden.alec.main.config.AlecBotProperties
 import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
+import coden.bot.BaseBotFactory
+import coden.bot.BotDispatcherConfigurator
+import coden.bot.config.BotConfigurationParameters
+import coden.bot.config.BotFactory
+import coden.display.AppRunner
 import coden.fsm.FSM
 import coden.fsm.StateBasedCommandExecutor
 import coden.menu.ItemLayout.Companion.itemLayout
 import coden.menu.LayoutBasedMenuNavigatorFactory
 import coden.menu.MenuLayout.Companion.menuLayout
+import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.logging.LogLevel
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -122,8 +129,8 @@ fun main(args: Array<String>) {
     val display = telMessageDisplay
 //    val display = consoleDisplay
 
-//    val menuDisplay = telMenuDisplay
-    val menuDisplay = consoleMenuDisplay
+    val menuDisplay = telMenuDisplay
+//    val menuDisplay = consoleMenuDisplay
 
 
     val scaleActuator = BaseScaleActuator(useCaseFactory, display, messages)
@@ -136,17 +143,26 @@ fun main(args: Array<String>) {
     val consoleNavigator = ConsoleMenuReindexingNavigator(layoutBasedMenuNavigatorFactory.newMenuNavigator())
     val telNavigator = TelegramAggregatedMenuNavigator(layoutBasedMenuNavigatorFactory)
 
-//    val menuNavigator = telNavigator
-    val menuNavigator = consoleNavigator
+    val menuNavigator = telNavigator
+//    val menuNavigator = consoleNavigator
 
 
     val menuPresenter: MenuPresenter = BaseMenuPresenter(
         display, menuDisplay, menuNavigator
     )
 
-    val bot = BotRunner(botProperties.token, log = LogLevel.Error, contextObserver, commandExecutor, menuPresenter)
-    bot.launch()
 
-    val app = ConsoleApp(commandExecutor, menuPresenter)
-    app.start()
+    val configurator: BotDispatcherConfigurator = AlecBotConfigurator(contextObserver, commandExecutor, menuPresenter)
+    val botFactory: BotFactory = BaseBotFactory(configurator)
+
+    val botRunner: AppRunner = BotRunner(
+         BotConfigurationParameters(botProperties.token, log = LogLevel.Error), botFactory
+    )
+
+//    val consoleRunner
+
+    val runner: AppRunner = botRunner
+//    val runner: AppRunner = consoleRunner
+
+    runner.run()
 }
