@@ -1,4 +1,4 @@
-package coden.display
+package coden.alec.app
 
 interface AppRunner {
     fun run()

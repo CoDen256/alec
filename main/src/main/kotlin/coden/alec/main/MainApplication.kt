@@ -20,7 +20,7 @@ import coden.bot.sender.BaseMessageSender
 import coden.bot.sender.TelegramMessageSender
 import coden.bot.view.format.ReplyMarkupFormatter
 import coden.bot.view.format.TelegramMenuFormatter
-import coden.alec.console.ConsoleApp
+import coden.alec.console.ConsoleRunner
 import coden.console.menu.ConsoleMenuReindexingNavigator
 import coden.console.view.ConsoleDisplay
 import coden.console.view.ConsoleMenuDisplay
@@ -35,13 +35,13 @@ import coden.bot.BaseBotFactory
 import coden.bot.BotDispatcherConfigurator
 import coden.bot.config.BotConfigurationParameters
 import coden.bot.config.BotFactory
-import coden.display.AppRunner
+import coden.alec.app.AppRunner
+import coden.alec.bot.BotRunnerAdapter
 import coden.fsm.FSM
 import coden.fsm.StateBasedCommandExecutor
 import coden.menu.ItemLayout.Companion.itemLayout
 import coden.menu.LayoutBasedMenuNavigatorFactory
 import coden.menu.MenuLayout.Companion.menuLayout
-import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.logging.LogLevel
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -126,11 +126,11 @@ fun main(args: Array<String>) {
 
 
 
-    val display = telMessageDisplay
-//    val display = consoleDisplay
-
-    val menuDisplay = telMenuDisplay
-//    val menuDisplay = consoleMenuDisplay
+//    val display = telMessageDisplay
+    val display = consoleDisplay
+//
+//    val menuDisplay = telMenuDisplay
+    val menuDisplay = consoleMenuDisplay
 
 
     val scaleActuator = BaseScaleActuator(useCaseFactory, display, messages)
@@ -143,8 +143,8 @@ fun main(args: Array<String>) {
     val consoleNavigator = ConsoleMenuReindexingNavigator(layoutBasedMenuNavigatorFactory.newMenuNavigator())
     val telNavigator = TelegramAggregatedMenuNavigator(layoutBasedMenuNavigatorFactory)
 
-    val menuNavigator = telNavigator
-//    val menuNavigator = consoleNavigator
+//    val menuNavigator = telNavigator
+    val menuNavigator = consoleNavigator
 
 
     val menuPresenter: MenuPresenter = BaseMenuPresenter(
@@ -155,14 +155,13 @@ fun main(args: Array<String>) {
     val configurator: BotDispatcherConfigurator = AlecBotConfigurator(contextObserver, commandExecutor, menuPresenter)
     val botFactory: BotFactory = BaseBotFactory(configurator)
 
-    val botRunner: AppRunner = BotRunner(
+    val botRunner: AppRunner = BotRunnerAdapter(BotRunner(
          BotConfigurationParameters(botProperties.token, log = LogLevel.Error), botFactory
-    )
+    ))
+    val consoleRunner = ConsoleRunner(commandExecutor, menuPresenter)
 
-//    val consoleRunner
-
-    val runner: AppRunner = botRunner
-//    val runner: AppRunner = consoleRunner
+//    val runner: AppRunner = botRunner
+    val runner: AppRunner = consoleRunner
 
     runner.run()
 }
