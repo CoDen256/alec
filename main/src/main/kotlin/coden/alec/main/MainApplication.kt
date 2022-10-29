@@ -6,24 +6,24 @@ import coden.alec.app.fsm.CreateScaleCommandNoArgs
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.ListScalesCommand
 import coden.alec.app.fsm.Start
-import coden.alec.app.menu.BaseMenuPresenter
-import coden.alec.app.menu.MenuPresenter
+import coden.display.menu.BaseMenuPresenter
+import coden.display.menu.MenuPresenter
 import coden.alec.app.messages.MessageResource
-import coden.alec.bot.run.BotRunner
-import coden.alec.bot.context.Context
-import coden.alec.bot.context.ContextObserver
-import coden.alec.bot.context.proxy.ContextBasedTelegramMenuDisplay
-import coden.alec.bot.context.proxy.ContextBasedTelegramMessageDisplay
-import coden.alec.bot.menu.TelegramAggregatedMenuNavigator
-import coden.alec.bot.sender.BaseMessageSender
-import coden.alec.bot.sender.TelegramMessageSender
-import coden.alec.bot.view.format.ReplyMarkupFormatter
-import coden.alec.bot.view.format.TelegramMenuFormatter
+import coden.bot.run.BotRunner
+import coden.bot.context.Context
+import coden.bot.context.ContextObserver
+import coden.bot.context.proxy.ContextBasedTelegramMenuDisplay
+import coden.bot.context.proxy.ContextBasedTelegramMessageDisplay
+import coden.bot.menu.TelegramAggregatedMenuNavigator
+import coden.bot.sender.BaseMessageSender
+import coden.bot.sender.TelegramMessageSender
+import coden.bot.view.format.ReplyMarkupFormatter
+import coden.bot.view.format.TelegramMenuFormatter
 import coden.alec.console.ConsoleApp
-import coden.alec.console.menu.ConsoleMenuReindexingNavigator
-import coden.alec.console.view.ConsoleDisplay
-import coden.alec.console.view.ConsoleMenuDisplay
-import coden.alec.console.view.ConsoleMenuFormatter
+import coden.console.menu.ConsoleMenuReindexingNavigator
+import coden.console.view.ConsoleDisplay
+import coden.console.view.ConsoleMenuDisplay
+import coden.console.view.ConsoleMenuFormatter
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
@@ -102,7 +102,7 @@ fun main(args: Array<String>) {
     )
 
     val messageSenderFactory: (Context) -> TelegramMessageSender =
-        {BaseMessageSender(it.bot)}
+        { BaseMessageSender(it.bot) }
     val menuFormatterFactory: (Context) -> TelegramMenuFormatter =
         { ReplyMarkupFormatter(4) }
 

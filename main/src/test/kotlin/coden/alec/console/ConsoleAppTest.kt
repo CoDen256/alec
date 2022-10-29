@@ -3,7 +3,7 @@ package coden.alec.console
 import coden.alec.app.fsm.CreateScaleCommandNoArgs
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.ListScalesCommand
-import coden.alec.console.menu.ConsoleMenuReindexingNavigator
+import coden.console.menu.ConsoleMenuReindexingNavigator
 import coden.menu.ItemLayout
 import coden.menu.MenuLayout
 import coden.menu.LayoutBasedMenuNavigator

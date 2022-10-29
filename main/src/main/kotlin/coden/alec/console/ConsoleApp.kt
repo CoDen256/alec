@@ -2,7 +2,7 @@ package coden.alec.console
 
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.TextCommand
-import coden.alec.app.menu.MenuPresenter
+import coden.display.menu.MenuPresenter
 import coden.fsm.CommandExecutor
 
 class ConsoleApp(

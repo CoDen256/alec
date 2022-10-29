@@ -1,7 +1,7 @@
 package coden.alec.app.actuators
 
 import coden.alec.app.messages.MessageResource
-import coden.alec.app.views.MessageDisplay
+import coden.display.displays.MessageDisplay
 import coden.alec.core.UseCaseFactory
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse

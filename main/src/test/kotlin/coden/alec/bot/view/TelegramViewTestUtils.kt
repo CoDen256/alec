@@ -1,8 +1,8 @@
 package coden.alec.bot.view
 
-import coden.alec.bot.sender.TelegramMessage
-import coden.alec.bot.sender.TelegramMessageSender
-import coden.alec.bot.view.format.TelegramMenuFormatter
+import coden.bot.sender.TelegramMessage
+import coden.bot.sender.TelegramMessageSender
+import coden.bot.view.format.TelegramMenuFormatter
 import coden.menu.MenuView
 
 class RecordingMessageSender : TelegramMessageSender {
