@@ -3,7 +3,8 @@ package coden.alec.bot
 import coden.alec.app.fsm.*
 import coden.alec.app.menu.MenuPresenter
 import coden.alec.bot.context.ContextObserver
-import coden.fsm.StateExecutor
+import coden.fsm.CommandExecutor
+import coden.fsm.StateBasedCommandExecutor
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.callbackQuery
@@ -15,7 +16,7 @@ class AlecTelegramBot (
     botToken: String,
     log: LogLevel,
     private val context: ContextObserver,
-    private val stateExecutor: StateExecutor,
+    private val commandExecutor: CommandExecutor,
     private val menuExecutor: MenuPresenter
 ) {
 
@@ -29,36 +30,36 @@ class AlecTelegramBot (
             addHandler(CallbackQueryCapturingHandler(context))
 
             command("help") {
-                stateExecutor.submit(HelpCommand)
+                commandExecutor.submit(HelpCommand)
                 menuExecutor.displayMenu()
             }
 
             command("start") {
-                stateExecutor.submit(HelpCommand)
+                commandExecutor.submit(HelpCommand)
                 menuExecutor.displayMenu()
             }
 
             command("list_scales") {
-                stateExecutor.submit(ListScalesCommand)
+                commandExecutor.submit(ListScalesCommand)
             }
 
             command("create_scale"){
                 if (args.isEmpty()){
-                    stateExecutor.submit(CreateScaleCommandNoArgs)
+                    commandExecutor.submit(CreateScaleCommandNoArgs)
                 }else {
-                    stateExecutor.submit(CreateScaleCommand(message.text!!))
+                    commandExecutor.submit(CreateScaleCommand(message.text!!))
                 }
             }
 
             text {
                 if (text.startsWith("/")) return@text
-                stateExecutor.submit(TextCommand(text))
+                commandExecutor.submit(TextCommand(text))
             }
 
             callbackQuery{
                 callbackQuery.message?.let {
                     menuExecutor.navigate(callbackQuery.data)?.let {
-                        stateExecutor.submit(it)
+                        commandExecutor.submit(it)
                     }
                 }
             }

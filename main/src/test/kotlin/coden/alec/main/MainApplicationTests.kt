@@ -1,6 +1,6 @@
 package coden.alec.main
 
-import coden.fsm.StateExecutor
+import coden.fsm.StateBasedCommandExecutor
 import coden.alec.app.fsm.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest
 class MainApplicationTests {
 
     @Autowired
-    lateinit var stateExecutor: StateExecutor
+    lateinit var stateExecutor: StateBasedCommandExecutor
 
     @Test
     fun contextLoads() {

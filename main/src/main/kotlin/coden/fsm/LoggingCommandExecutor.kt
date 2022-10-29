@@ -4,13 +4,13 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.lang.StringBuilder
 
-class LoggingStateExecutor(fsm: FSM): StateExecutor(fsm) {
+class LoggingCommandExecutor(fsm: FSM): StateBasedCommandExecutor(fsm) {
 
     private val log: Logger = LogManager.getLogger()
     private var debugLine = StringBuilder()
 
-    override fun submit(submittedCommand: Command) {
-        super.submit(submittedCommand)
+    override fun submit(command: Command) {
+        super.submit(command)
         log.debug(debugLine.toString())
         debugLine.clear()
     }

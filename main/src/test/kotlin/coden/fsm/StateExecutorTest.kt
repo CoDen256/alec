@@ -120,7 +120,7 @@ internal class StateExecutorTest {
     }
 }
 
-class TestStateExecutor(fsm: FSM): StateExecutor(fsm){
+class TestStateExecutor(fsm: FSM): StateBasedCommandExecutor(fsm){
 
     var path = fsm.start.javaClass.simpleName
     var commands = ""

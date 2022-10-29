@@ -3,28 +3,28 @@ package coden.alec.console
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.TextCommand
 import coden.alec.app.menu.MenuPresenter
-import coden.fsm.StateExecutor
+import coden.fsm.CommandExecutor
 
 class ConsoleApp(
-    private val stateExecutor: StateExecutor,
+    private val commandExecutor: CommandExecutor,
     private val menuExecutor: MenuPresenter
 ) {
 
     fun start() {
         menuExecutor.displayMenu()
-        stateExecutor.submit(HelpCommand)
+        commandExecutor.submit(HelpCommand)
         while (true) {
             val input = readlnOrNull() ?: break
             if (input.startsWith("/")){
                 if (input.startsWith("/help")){
-                    stateExecutor.submit(HelpCommand)
+                    commandExecutor.submit(HelpCommand)
                 }
                 if (input.startsWith("/text")){
-                    stateExecutor.submit(TextCommand(input.split("/text ")[1]))
+                    commandExecutor.submit(TextCommand(input.split("/text ")[1]))
                 }
             }else {
                 menuExecutor.navigate(input)?.let {
-                    stateExecutor.submit(it)
+                    commandExecutor.submit(it)
                 }
             }
         }

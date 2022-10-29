@@ -30,7 +30,7 @@ import coden.alec.main.config.AlecBotProperties
 import coden.alec.main.config.table.HelpTable
 import coden.alec.main.config.table.ScaleTable
 import coden.fsm.FSM
-import coden.fsm.StateExecutor
+import coden.fsm.StateBasedCommandExecutor
 import coden.menu.ItemLayout.Companion.itemLayout
 import coden.menu.LayoutBasedMenuNavigatorFactory
 import coden.menu.MenuLayout.Companion.menuLayout
@@ -126,7 +126,7 @@ fun main(args: Array<String>) {
     val scaleActuator = BaseScaleActuator(useCaseFactory, display, messages)
     val helpActuator = BaseHelpActuator(useCaseFactory, display, messages)
 
-    val stateExecutor = StateExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
+    val commandExecutor = StateBasedCommandExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
 
     val layoutBasedMenuNavigatorFactory = LayoutBasedMenuNavigatorFactory(menu)
 
@@ -137,13 +137,13 @@ fun main(args: Array<String>) {
     val menuNavigator = consoleNavigator
 
 
-    val menuExecutor: MenuPresenter = BaseMenuPresenter(
+    val menuPresenter: MenuPresenter = BaseMenuPresenter(
         display, menuDisplay, menuNavigator
     )
 
 //    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, contextHolder, stateExecutor, menuExecutor)
 //    bot.launch()
 //
-    val app = ConsoleApp(stateExecutor, menuExecutor)
+    val app = ConsoleApp(commandExecutor, menuPresenter)
     app.start()
 }

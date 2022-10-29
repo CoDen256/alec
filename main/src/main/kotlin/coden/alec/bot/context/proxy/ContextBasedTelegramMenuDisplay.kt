@@ -28,7 +28,7 @@ class ContextBasedTelegramMenuDisplay(
     override fun createFromContext(context: Context): MenuDisplay {
         val sender = messageSenderFactory(context)
         val formatter = menuFormatterFactory(context)
-        return context.messageId?.let {
+        return context.messageId?.let { // TODO: Make TelegramInlineMenuDisplay unaware. Just something that accepts MessageContext/ChatContext
             TelegramInlineMenuDisplay(TelegramMessageContext(context.chatId, it), sender, formatter)
         } ?: TelegramMenuDisplay(TelegramChatContext(context.chatId), sender, formatter)
     }
