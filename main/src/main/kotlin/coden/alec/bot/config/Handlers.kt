@@ -1,4 +1,4 @@
-package coden.alec.bot
+package coden.alec.bot.config
 
 import coden.alec.bot.context.Context
 import coden.alec.bot.context.ContextObserver

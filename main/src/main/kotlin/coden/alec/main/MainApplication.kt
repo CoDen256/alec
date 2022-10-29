@@ -9,7 +9,7 @@ import coden.alec.app.fsm.Start
 import coden.alec.app.menu.BaseMenuPresenter
 import coden.alec.app.menu.MenuPresenter
 import coden.alec.app.messages.MessageResource
-import coden.alec.bot.AlecTelegramBot
+import coden.alec.bot.run.BotRunner
 import coden.alec.bot.context.Context
 import coden.alec.bot.context.ContextObserver
 import coden.alec.bot.context.proxy.ContextBasedTelegramMenuDisplay
@@ -144,7 +144,7 @@ fun main(args: Array<String>) {
         display, menuDisplay, menuNavigator
     )
 
-    val bot = AlecTelegramBot(botProperties.token, log = LogLevel.Error, contextObserver, commandExecutor, menuPresenter)
+    val bot = BotRunner(botProperties.token, log = LogLevel.Error, contextObserver, commandExecutor, menuPresenter)
     bot.launch()
 
     val app = ConsoleApp(commandExecutor, menuPresenter)
