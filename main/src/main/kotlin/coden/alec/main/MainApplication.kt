@@ -20,7 +20,6 @@ import coden.bot.sender.BaseMessageSender
 import coden.bot.sender.TelegramMessageSender
 import coden.bot.view.format.ReplyMarkupFormatter
 import coden.bot.view.format.TelegramMenuFormatter
-import coden.alec.console.ConsoleRunner
 import coden.console.menu.ConsoleMenuReindexingNavigator
 import coden.console.view.ConsoleDisplay
 import coden.console.view.ConsoleMenuDisplay
@@ -37,6 +36,10 @@ import coden.bot.config.BotConfigurationParameters
 import coden.bot.config.BotFactory
 import coden.alec.app.AppRunner
 import coden.alec.bot.BotRunnerAdapter
+import coden.alec.console.*
+import coden.console.dispatcher.ConsoleDispatcher
+import coden.console.dispatcher.ConsoleDispatcherConfigurator
+import coden.console.read.CommandReader
 import coden.fsm.FSM
 import coden.fsm.StateBasedCommandExecutor
 import coden.menu.ItemLayout.Companion.itemLayout
@@ -151,14 +154,22 @@ fun main(args: Array<String>) {
         display, menuDisplay, menuNavigator
     )
 
+    val telConfigurator: BotDispatcherConfigurator = AlecBotConfigurator(contextObserver, commandExecutor, menuPresenter)
+    val botFactory: BotFactory = BaseBotFactory(telConfigurator)
 
-    val configurator: BotDispatcherConfigurator = AlecBotConfigurator(contextObserver, commandExecutor, menuPresenter)
-    val botFactory: BotFactory = BaseBotFactory(configurator)
+    val consoleConfigurator: ConsoleDispatcherConfigurator = AlecConsoleConfigurator(commandExecutor, menuPresenter)
+    val commandReader: CommandReader = AliasBasedCommandReader(
+        listOf(RegexBasedMapper("", ""))
+    )
+    val dispatcher: ConsoleDispatcher = BaseConsoleDispatcherBuilder().run {
+        consoleConfigurator.apply(this)
+        build()
+    }
 
     val botRunner: AppRunner = BotRunnerAdapter(BotRunner(
          BotConfigurationParameters(botProperties.token, log = LogLevel.Error), botFactory
     ))
-    val consoleRunner = ConsoleRunner(commandExecutor, menuPresenter)
+    val consoleRunner = ConsoleRunner(commandReader, dispatcher)
 
 //    val runner: AppRunner = botRunner
     val runner: AppRunner = consoleRunner

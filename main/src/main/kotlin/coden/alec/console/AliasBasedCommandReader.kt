@@ -2,9 +2,34 @@ package coden.alec.console
 
 import coden.console.dispatcher.CommandRequest
 import coden.console.read.CommandReader
+import java.util.regex.Pattern
 
-class AliasBasedCommandReader: CommandReader {
+class AliasBasedCommandReader(private val aliasMappers: List<AliasMapper>) : CommandReader {
     override fun read(): CommandRequest? {
-        TODO("Not yet implemented")
+        return readlnOrNull()?.let {input ->
+            parse(aliasMappers.firstOrNull { it.canMap(input) }?.map(input) ?: input)
+        }
+    }
+
+    private fun parse(input: String): CommandRequest{
+        val command = input.split(" ", limit = 2)
+        return CommandRequest(command[0], command[1])
+    }
+}
+
+interface AliasMapper{
+    fun canMap(input: String): Boolean
+    fun map(input: String): String
+}
+
+class RegexBasedMapper(pattern: String, private val result: String) : AliasMapper {
+    private val matcher = Pattern.compile(pattern).asMatchPredicate()
+
+    override fun canMap(input: String): Boolean {
+       return matcher.test(input)
+    }
+
+    override fun map(input: String): String {
+        return result
     }
 }
