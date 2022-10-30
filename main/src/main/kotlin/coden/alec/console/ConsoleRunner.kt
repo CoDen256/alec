@@ -5,6 +5,7 @@ import coden.alec.app.fsm.TextCommand
 import coden.alec.app.AppRunner
 import coden.display.menu.MenuPresenter
 import coden.fsm.CommandExecutor
+import java.util.regex.Pattern
 
 class ConsoleRunner(
     private val commandExecutor: CommandExecutor,
@@ -46,7 +47,7 @@ class ConsoleRunner(
     }
 
     fun isCommand(input: String): Boolean{
-        return input.startsWith("/") && !input.startsWith("/text")
+        return input.matches(Pattern.compile("/\\w+").toRegex()) && !input.startsWith("/text")
     }
 
     fun isText(input: String): Boolean{
@@ -54,7 +55,7 @@ class ConsoleRunner(
     }
 
     fun isMenuNavigation(input: String): Boolean{
-        return !input.startsWith("/")
+        return input.matches(Pattern.compile("/\\d+").toRegex())
     }
 
     fun handleCommand(command: String, args: String?){
