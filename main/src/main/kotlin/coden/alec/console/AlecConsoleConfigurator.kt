@@ -1,14 +1,21 @@
 package coden.alec.console
 
 import coden.alec.app.fsm.*
+import coden.console.dispatcher.ConsoleDispatcherConfigurator
+import coden.console.dispatcher.ConsoleDispatcherBuilder
 import coden.display.menu.MenuPresenter
 import coden.fsm.CommandExecutor
 
 class AlecConsoleConfigurator(
     private val commandExecutor: CommandExecutor,
     private val menuExecutor: MenuPresenter
-): ConsoleConfigurator {
-    override fun ConsoleDispatcher.configure(){
+): ConsoleDispatcherConfigurator {
+    override fun ConsoleDispatcherBuilder.configure(){
+        init {
+            menuExecutor.displayMenu()
+            commandExecutor.submit(HelpCommand)
+        }
+
         command("help") {
             commandExecutor.submit(HelpCommand)
             menuExecutor.displayMenu()
@@ -40,8 +47,4 @@ class AlecConsoleConfigurator(
         }
     }
 
-    override fun init(){
-        menuExecutor.displayMenu()
-        commandExecutor.submit(HelpCommand)
-    }
 }

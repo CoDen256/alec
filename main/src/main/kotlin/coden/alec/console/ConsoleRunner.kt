@@ -1,76 +1,35 @@
 package coden.alec.console
 
-import coden.alec.app.fsm.HelpCommand
-import coden.alec.app.fsm.TextCommand
 import coden.alec.app.AppRunner
-import coden.display.menu.MenuPresenter
-import coden.fsm.CommandExecutor
-import java.util.regex.Pattern
+import coden.console.read.CommandReader
+import coden.console.dispatcher.CommandHandler
+import coden.console.dispatcher.ConsoleDispatcherBuilder
 
 class ConsoleRunner(
-    private val commandExecutor: CommandExecutor,
-    private val menuExecutor: MenuPresenter
-): AppRunner {
+    private val reader: CommandReader,
+): AppRunner, ConsoleDispatcherBuilder {
+
+    private val handlers: MutableMap<String, CommandHandler> = HashMap()
+    private var initBlock: () -> Unit = {}
+
+    override fun command(command: String, handler: CommandHandler) {
+        handlers[command] = handler
+    }
+
+    override fun init(newInitBlock: () -> Unit) {
+        initBlock = { // :D
+            initBlock()
+            newInitBlock()
+        }
+    }
 
     override fun run() {
-        init()
+        initBlock()
         while (true) {
-            val input = readInputOrNull() ?: break
-            when{
-                isCommand(input) -> {
-                    val (command, args) = extractCommand(input)
-                    handleCommand(command, args)
-                }
-                isText(input) -> handleText(extractText(input))
-                isMenuNavigation(input) -> handleMenuNavigation(extractMenuNavigation(input))
+            val request = reader.read() ?: break
+            handlers[request.command]?.apply {
+                handle(request)
             }
-        }
-    }
-
-    private fun readInputOrNull(): String? = readlnOrNull()
-
-    fun init() {
-        menuExecutor.displayMenu()
-        commandExecutor.submit(HelpCommand)
-    }
-
-    fun extractCommand(input: String): Pair<String, String?> {
-        return input.drop(1) to input.split(" ", limit = 2)[1].ifEmpty { null }
-    }
-
-    fun extractText(input: String): String{
-        return input.split(" ", limit = 2)[1]
-    }
-
-    fun extractMenuNavigation(input: String): String{
-        return input
-    }
-
-    fun isCommand(input: String): Boolean{
-        return input.matches(Pattern.compile("/\\w+").toRegex()) && !input.startsWith("/text")
-    }
-
-    fun isText(input: String): Boolean{
-        return input.startsWith("/text")
-    }
-
-    fun isMenuNavigation(input: String): Boolean{
-        return input.matches(Pattern.compile("/\\d+").toRegex())
-    }
-
-    fun handleCommand(command: String, args: String?){
-        if (command == "help"){
-            commandExecutor.submit(HelpCommand)
-        }
-    }
-
-    fun handleText(text: String){
-        commandExecutor.submit(TextCommand(text))
-    }
-
-    fun handleMenuNavigation(destination: String){
-        menuExecutor.navigate(destination)?.let {
-            commandExecutor.submit(it)
         }
     }
 }

@@ -1,21 +1,17 @@
-package coden.alec.console
+package coden.console.dispatcher
 
-interface ConsoleDispatcher {
+interface ConsoleDispatcherBuilder {
     fun command(command: String, handler: CommandRequest.() -> Unit){
-        command(command, object: CommandHandler{
+        command(command, object: CommandHandler {
             override fun handle(request: CommandRequest) {
                 request.handler()
             }
         })
     }
     fun command(command: String, handler: CommandHandler)
+
+    fun init(newInitBlock: () -> Unit)
+
 }
 
-interface CommandHandler{
-    fun handle(request: CommandRequest)
-}
 
-data class CommandRequest(
-    val command: String,
-    val args: String
-)
