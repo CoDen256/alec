@@ -37,6 +37,8 @@ import coden.bot.config.BotFactory
 import coden.alec.app.AppRunner
 import coden.alec.bot.BotRunnerAdapter
 import coden.alec.console.*
+import coden.console.BaseConsoleDispatcherBuilder
+import coden.console.ConsoleRunner
 import coden.console.dispatcher.ConsoleDispatcher
 import coden.console.dispatcher.ConsoleDispatcherConfigurator
 import coden.console.read.CommandReader
@@ -169,7 +171,7 @@ fun main(args: Array<String>) {
     val botRunner: AppRunner = BotRunnerAdapter(BotRunner(
          BotConfigurationParameters(botProperties.token, log = LogLevel.Error), botFactory
     ))
-    val consoleRunner = ConsoleRunner(commandReader, dispatcher)
+    val consoleRunner = ConsoleRunnerAdapter(ConsoleRunner(commandReader, dispatcher))
 
 //    val runner: AppRunner = botRunner
     val runner: AppRunner = consoleRunner

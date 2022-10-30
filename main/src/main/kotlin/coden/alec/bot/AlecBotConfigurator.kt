@@ -22,7 +22,7 @@ class AlecBotConfigurator(
         addHandler(MessageCapturingHandler(context))
         addHandler(CallbackQueryCapturingHandler(context))
 
-        command("help") {
+        command("help") {// TODO: extract hardcoded string to separate resource
             commandExecutor.submit(HelpCommand)
             menuExecutor.displayMenu()
         }
