@@ -15,13 +15,19 @@ class BaseConsoleDispatcherBuilder: ConsoleDispatcherBuilder {
     }
 
     override fun init(newInitBlock: () -> Unit) {
+        val prevBlock = initBlock
         initBlock = { // :D
-            initBlock()
+            prevBlock()
             newInitBlock()
         }
     }
     override fun build(): ConsoleDispatcher {
         return BaseDispatcher(handlers, initBlock)
+    }
+
+    override fun clear() {
+        handlers.clear()
+        initBlock = {}
     }
 
     private inner class BaseDispatcher(private val handlers: Map<String, CommandHandler>, private val initBlock: () -> Unit): ConsoleDispatcher {

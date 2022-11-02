@@ -10,6 +10,7 @@ class LoggingCommandExecutor(fsm: FSM): StateBasedCommandExecutor(fsm) {
     private var debugLine = StringBuilder()
 
     override fun submit(command: Command) {
+        debugLine.append("$command: ")
         super.submit(command)
         log.debug(debugLine.toString())
         debugLine.clear()

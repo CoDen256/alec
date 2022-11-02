@@ -13,6 +13,8 @@ interface ConsoleDispatcherBuilder {
     fun init(newInitBlock: () -> Unit)
 
     fun build(): ConsoleDispatcher
+
+    fun clear()
 }
 
 

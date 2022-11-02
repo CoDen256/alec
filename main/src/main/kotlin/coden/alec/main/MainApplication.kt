@@ -39,11 +39,12 @@ import coden.alec.bot.BotRunnerAdapter
 import coden.alec.console.*
 import coden.console.BaseConsoleDispatcherBuilder
 import coden.console.ConsoleRunner
-import coden.console.dispatcher.ConsoleDispatcher
 import coden.console.dispatcher.ConsoleDispatcherBuilder
 import coden.console.dispatcher.ConsoleDispatcherConfigurator
+import coden.console.read.CommandParser
 import coden.console.read.CommandReader
 import coden.fsm.FSM
+import coden.fsm.LoggingCommandExecutor
 import coden.fsm.StateBasedCommandExecutor
 import coden.menu.ItemLayout.Companion.itemLayout
 import coden.menu.LayoutBasedMenuNavigatorFactory
@@ -142,7 +143,7 @@ fun main(args: Array<String>) {
     val scaleActuator = BaseScaleActuator(useCaseFactory, display, messages)
     val helpActuator = BaseHelpActuator(useCaseFactory, display, messages)
 
-    val commandExecutor = StateBasedCommandExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
+    val commandExecutor = LoggingCommandExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))
 
     val layoutBasedMenuNavigatorFactory = LayoutBasedMenuNavigatorFactory(menu)
 
@@ -161,15 +162,30 @@ fun main(args: Array<String>) {
     val botFactory: BotFactory = BaseBotFactory(telConfigurator)
 
     val consoleConfigurator: ConsoleDispatcherConfigurator = AlecConsoleConfigurator(commandExecutor, menuPresenter)
-    val commandReader: CommandReader = AliasBasedCommandReader(
-        listOf(RegexBasedMapper("", ""))
+    val commandParser: CommandParser = AliasBasedCommandParser(
+        listOf(object: AliasMapper {
+            override fun canMap(input: String): Boolean {
+                return true
+            }
+
+            override fun map(input: String): String {
+                return when {
+                    input.startsWith("~") -> input.replace("~", "/nav ")
+                    input.first().isDigit() -> "/nav $input"
+                    input.startsWith("!") -> input.replace("!", "/text ")
+                    input.startsWith("/") -> input
+                    else -> "/text $input"
+                }
+            }
+        })
     )
+    val commandReader: CommandReader = ConsoleCommandReader()
     val dispatcherBuilder: ConsoleDispatcherBuilder = BaseConsoleDispatcherBuilder()
 
     val botRunner: AppRunner = BotRunnerAdapter(BotRunner(
          BotConfigurationParameters(botProperties.token, log = LogLevel.Error), botFactory
     ))
-    val consoleRunner = ConsoleRunnerAdapter(ConsoleRunner(commandReader, dispatcherBuilder, consoleConfigurator))
+    val consoleRunner = ConsoleRunnerAdapter(ConsoleRunner(commandParser, commandReader, dispatcherBuilder, consoleConfigurator, display))
 
 //    val runner: AppRunner = botRunner
     val runner: AppRunner = consoleRunner
