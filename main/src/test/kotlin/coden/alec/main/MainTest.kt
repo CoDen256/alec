@@ -8,9 +8,9 @@ import coden.console.view.ConsoleMessageDisplay
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
-import coden.alec.main.config.AlecBotProperties
-import coden.alec.main.config.table.HelpTable
-import coden.alec.main.config.table.ScaleTable
+import coden.alec.main.bot.AlecBotProperties
+import coden.alec.main.table.HelpTable
+import coden.alec.main.table.ScaleTable
 import coden.fsm.FSM
 import coden.fsm.LoggingCommandExecutor
 import gateway.memory.ScaleInMemoryGateway

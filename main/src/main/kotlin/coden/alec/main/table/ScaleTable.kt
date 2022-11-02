@@ -1,4 +1,4 @@
-package coden.alec.main.config.table
+package coden.alec.main.table
 
 import coden.alec.app.actuators.ScaleActuator
 import coden.alec.app.fsm.*

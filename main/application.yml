@@ -5,3 +5,12 @@ messages:
   listScalesEmptyMessage: "Empty"
   listScalesMessage: "Scales:"
   errorMessage: "Error ocurred:"
+  menuBackMessage: "Back"
+
+commands:
+  startCommand: "start"
+  helpCommand: "help"
+  listScalesCommand: "list_scales"
+  createScaleCommand: "create_scales"
+  textCommand: "text"
+  navCommand: "nav"

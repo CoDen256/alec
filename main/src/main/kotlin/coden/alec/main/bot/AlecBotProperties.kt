@@ -1,4 +1,4 @@
-package coden.alec.main.config
+package coden.alec.main.bot
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
