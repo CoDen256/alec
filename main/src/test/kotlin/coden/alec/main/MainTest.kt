@@ -4,7 +4,7 @@ import coden.alec.app.actuators.BaseHelpActuator
 import coden.alec.app.actuators.BaseScaleActuator
 import coden.alec.app.fsm.*
 import coden.alec.app.messages.MessageResource
-import coden.console.view.ConsoleDisplay
+import coden.console.view.ConsoleMessageDisplay
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
@@ -49,7 +49,7 @@ class MainTest {
                 TODO("Not yet implemented")
             }
         }
-        val consoleView = ConsoleDisplay()
+        val consoleView = ConsoleMessageDisplay()
 
 //        val view = telegramView
         val view = consoleView

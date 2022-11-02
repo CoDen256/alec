@@ -21,9 +21,9 @@ import coden.bot.sender.TelegramMessageSender
 import coden.bot.view.format.ReplyMarkupFormatter
 import coden.bot.view.format.TelegramMenuFormatter
 import coden.console.menu.ConsoleMenuReindexingNavigator
-import coden.console.view.ConsoleDisplay
+import coden.console.view.ConsoleMessageDisplay
 import coden.console.view.ConsoleMenuDisplay
-import coden.console.view.ConsoleMenuFormatter
+import coden.console.BaseConsoleMenuFormatter
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
@@ -40,6 +40,7 @@ import coden.alec.console.*
 import coden.console.BaseConsoleDispatcherBuilder
 import coden.console.ConsoleRunner
 import coden.console.dispatcher.ConsoleDispatcher
+import coden.console.dispatcher.ConsoleDispatcherBuilder
 import coden.console.dispatcher.ConsoleDispatcherConfigurator
 import coden.console.read.CommandReader
 import coden.fsm.FSM
@@ -125,8 +126,8 @@ fun main(args: Array<String>) {
     val telMenuDisplay = ContextBasedTelegramMenuDisplay(contextProvider, messageSenderFactory, menuFormatterFactory)
 
 
-    val consoleMenuFormatter = ConsoleMenuFormatter()
-    val consoleDisplay = ConsoleDisplay()
+    val consoleMenuFormatter = BaseConsoleMenuFormatter()
+    val consoleDisplay = ConsoleMessageDisplay()
     val consoleMenuDisplay = ConsoleMenuDisplay(consoleMenuFormatter)
 
 
@@ -163,15 +164,12 @@ fun main(args: Array<String>) {
     val commandReader: CommandReader = AliasBasedCommandReader(
         listOf(RegexBasedMapper("", ""))
     )
-    val dispatcher: ConsoleDispatcher = BaseConsoleDispatcherBuilder().run {
-        consoleConfigurator.apply(this)
-        build()
-    }
+    val dispatcherBuilder: ConsoleDispatcherBuilder = BaseConsoleDispatcherBuilder()
 
     val botRunner: AppRunner = BotRunnerAdapter(BotRunner(
          BotConfigurationParameters(botProperties.token, log = LogLevel.Error), botFactory
     ))
-    val consoleRunner = ConsoleRunnerAdapter(ConsoleRunner(commandReader, dispatcher))
+    val consoleRunner = ConsoleRunnerAdapter(ConsoleRunner(commandReader, dispatcherBuilder, consoleConfigurator))
 
 //    val runner: AppRunner = botRunner
     val runner: AppRunner = consoleRunner

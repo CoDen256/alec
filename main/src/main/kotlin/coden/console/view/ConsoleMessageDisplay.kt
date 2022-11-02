@@ -2,8 +2,9 @@ package coden.console.view
 
 import coden.display.displays.MenuDisplay
 import coden.display.displays.MessageDisplay
+import coden.menu.MenuView
 
-class ConsoleDisplay: MessageDisplay {
+class ConsoleMessageDisplay: MessageDisplay {
 
     override fun displayPrompt(message: String) {
         println("Please add something: $message")
@@ -20,7 +21,7 @@ class ConsoleDisplay: MessageDisplay {
 
 
 class ConsoleMenuDisplay(private val formatter: ConsoleMenuFormatter): MenuDisplay {
-    override fun displayMenu(menu: coden.menu.MenuView) {
+    override fun displayMenu(menu: MenuView) {
         println(formatter.format(menu))
     }
 }

@@ -4,16 +4,22 @@ import coden.console.dispatcher.CommandRequest
 import coden.console.read.CommandReader
 import java.util.regex.Pattern
 
-class AliasBasedCommandReader(private val aliasMappers: List<AliasMapper>) : CommandReader {
+class AliasBasedCommandReader(
+    private val aliasMappers: List<AliasMapper>
+    ) : CommandReader {
     override fun read(): CommandRequest? {
         return readlnOrNull()?.let {input ->
-            parse(aliasMappers.firstOrNull { it.canMap(input) }?.map(input) ?: input)
+            parse( map(input))
         }
     }
 
     private fun parse(input: String): CommandRequest{
         val command = input.split(" ", limit = 2)
         return CommandRequest(command[0], command[1])
+    }
+
+    private fun map(input: String): String{
+        aliasMappers.firstOrNull { it.canMap(input) }?.map(input) ?:
     }
 }
 
