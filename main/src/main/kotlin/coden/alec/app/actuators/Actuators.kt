@@ -1,6 +1,6 @@
 package coden.alec.app.actuators
 
-import coden.alec.app.messages.MessageResource
+import coden.alec.app.resources.MessageResource
 import coden.display.displays.MessageDisplay
 import coden.alec.core.UseCaseFactory
 import coden.alec.interactors.definer.scale.CreateScaleRequest

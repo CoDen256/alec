@@ -1,6 +1,7 @@
 package coden.alec.bot
 
 import coden.alec.app.fsm.*
+import coden.alec.app.resources.CommandNamesResource
 import coden.display.menu.MenuPresenter
 import coden.bot.BotDispatcherConfigurator
 import coden.bot.config.CallbackQueryCapturingHandler
@@ -15,28 +16,29 @@ import com.github.kotlintelegrambot.dispatcher.text
 class AlecBotConfigurator(
     private val context: ContextObserver,
     private val commandExecutor: CommandExecutor,
-    private val menuExecutor: MenuPresenter
+    private val menuExecutor: MenuPresenter,
+    private val commandNamesResource: CommandNamesResource
 ): BotDispatcherConfigurator {
 
     override fun Dispatcher.configure() {
         addHandler(MessageCapturingHandler(context))
         addHandler(CallbackQueryCapturingHandler(context))
 
-        command("help") {// TODO: extract hardcoded string to separate resource
+        command(commandNamesResource.helpCommand) {
             commandExecutor.submit(HelpCommand)
             menuExecutor.displayMenu()
         }
 
-        command("start") {
+        command(commandNamesResource.startCommand) {
             commandExecutor.submit(HelpCommand)
             menuExecutor.displayMenu()
         }
 
-        command("list_scales") {
+        command(commandNamesResource.listScalesCommand) {
             commandExecutor.submit(ListScalesCommand)
         }
 
-        command("create_scale") {
+        command(commandNamesResource.createScaleCommand) {
             if (args.isEmpty()) {
                 commandExecutor.submit(CreateScaleCommandNoArgs)
             } else {

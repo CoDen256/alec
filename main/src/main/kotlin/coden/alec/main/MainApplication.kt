@@ -8,7 +8,7 @@ import coden.alec.app.fsm.ListScalesCommand
 import coden.alec.app.fsm.Start
 import coden.display.menu.BaseMenuPresenter
 import coden.display.menu.MenuPresenter
-import coden.alec.app.messages.MessageResource
+import coden.alec.app.resources.MessageResource
 import coden.alec.bot.AlecBotConfigurator
 import coden.bot.run.BotRunner
 import coden.bot.context.Context
@@ -45,7 +45,6 @@ import coden.console.read.CommandParser
 import coden.console.read.CommandReader
 import coden.fsm.FSM
 import coden.fsm.LoggingCommandExecutor
-import coden.fsm.StateBasedCommandExecutor
 import coden.menu.ItemLayout.Companion.itemLayout
 import coden.menu.LayoutBasedMenuNavigatorFactory
 import coden.menu.MenuLayout.Companion.menuLayout
@@ -59,6 +58,15 @@ class MainApplication
 
 fun main(args: Array<String>) {
 //    runApplication<MainApplication>(*args)
+    val commandNames = ConsoleCommandNamesResource().apply {
+        startCommand = "start"
+        helpCommand = "help"
+        textCommand = "text"
+        navCommand = "nav"
+        listScalesCommand = "list_scales"
+        createScaleCommand = "create_scales"
+    }
+
     val messages = MessageResource()
     messages.errorMessage = "error"
     messages.startMessage = "start"
@@ -158,10 +166,10 @@ fun main(args: Array<String>) {
         display, menuDisplay, menuNavigator
     )
 
-    val telConfigurator: BotDispatcherConfigurator = AlecBotConfigurator(contextObserver, commandExecutor, menuPresenter)
+    val telConfigurator: BotDispatcherConfigurator = AlecBotConfigurator(contextObserver, commandExecutor, menuPresenter, commandNames)
     val botFactory: BotFactory = BaseBotFactory(telConfigurator)
 
-    val consoleConfigurator: ConsoleDispatcherConfigurator = AlecConsoleConfigurator(commandExecutor, menuPresenter)
+    val consoleConfigurator: ConsoleDispatcherConfigurator = AlecConsoleConfigurator(commandExecutor, menuPresenter, commandNames)
     val commandParser: CommandParser = AliasBasedCommandParser(
         listOf(object: AliasMapper {
             override fun canMap(input: String): Boolean {
@@ -170,11 +178,11 @@ fun main(args: Array<String>) {
 
             override fun map(input: String): String {
                 return when {
-                    input.startsWith("~") -> input.replace("~", "/nav ")
-                    input.first().isDigit() -> "/nav $input"
-                    input.startsWith("!") -> input.replace("!", "/text ")
+                    input.startsWith("~") -> input.replace("~", "/${commandNames.navCommand} ")
+                    input.first().isDigit() -> "/${commandNames.navCommand} $input"
+                    input.startsWith("!") -> input.replace("!", "/${commandNames.textCommand} ")
                     input.startsWith("/") -> input
-                    else -> "/text $input"
+                    else -> "/${commandNames.textCommand} $input"
                 }
             }
         })

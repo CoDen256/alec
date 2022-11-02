@@ -3,7 +3,7 @@ package coden.alec.main
 import coden.alec.app.actuators.BaseHelpActuator
 import coden.alec.app.actuators.BaseScaleActuator
 import coden.alec.app.fsm.*
-import coden.alec.app.messages.MessageResource
+import coden.alec.app.resources.MessageResource
 import coden.console.view.ConsoleMessageDisplay
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
