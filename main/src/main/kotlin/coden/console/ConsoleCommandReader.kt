@@ -1,4 +1,4 @@
-package coden.alec.console
+package coden.console
 
 import coden.console.read.CommandReader
 

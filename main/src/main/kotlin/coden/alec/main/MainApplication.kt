@@ -23,7 +23,6 @@ import coden.bot.view.format.TelegramMenuFormatter
 import coden.console.menu.ConsoleMenuReindexingNavigator
 import coden.console.view.ConsoleMessageDisplay
 import coden.console.view.ConsoleMenuDisplay
-import coden.console.BaseConsoleMenuFormatter
 import coden.alec.core.*
 import coden.alec.interactors.definer.scale.CreateScaleInteractor
 import coden.alec.interactors.definer.scale.ListScalesInteractor
@@ -37,8 +36,7 @@ import coden.bot.config.BotFactory
 import coden.alec.app.AppRunner
 import coden.alec.bot.BotRunnerAdapter
 import coden.alec.console.*
-import coden.console.BaseConsoleDispatcherBuilder
-import coden.console.ConsoleRunner
+import coden.console.*
 import coden.console.dispatcher.ConsoleDispatcherBuilder
 import coden.console.dispatcher.ConsoleDispatcherConfigurator
 import coden.console.read.CommandParser
