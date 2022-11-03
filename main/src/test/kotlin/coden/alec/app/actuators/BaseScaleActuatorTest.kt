@@ -9,15 +9,8 @@ import coden.alec.data.ScaleDivision
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
 import coden.display.displays.MessageDisplay
-import org.hamcrest.Matchers
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.isA
-import org.mockito.ArgumentMatchers.notNull
-import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
