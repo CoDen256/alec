@@ -59,7 +59,7 @@ class BotConfiguration {
         )
     }
 
-    @Bean("telegram")
+    @Bean
     fun telegram(botRunner: BotRunner): AppRunner {
         return BotRunnerAdapter(botRunner)
     }

@@ -16,4 +16,4 @@ commands:
 runner:
   bot:
     token: '5402767430:AAEXVe8s8IAow9z9Ip69NCU9JnUaEHIgcrw'
-  active: bot
+  active: console

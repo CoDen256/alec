@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ConsoleEnabled
 class ConsoleMenuNavigatorConfiguration {
-    @Bean("consoleMenuNavigator")
+    @Bean
     fun menuNavigator(layoutNavigator: LayoutBasedMenuNavigatorFactory): MenuNavigator{
         return ConsoleMenuReindexingNavigator(
             layoutNavigator.newMenuNavigator()

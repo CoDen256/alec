@@ -1,14 +1,11 @@
 package coden.alec.main.console
 
 import coden.alec.main.annotations.ConsoleEnabled
-import coden.bot.context.Context
-import coden.bot.context.proxy.ContextBasedTelegramMessageDisplay
-import coden.bot.sender.TelegramMessageSender
-import coden.bot.view.format.TelegramMenuFormatter
 import coden.console.BaseConsoleMenuFormatter
 import coden.console.view.ConsoleMenuDisplay
 import coden.console.view.ConsoleMenuFormatter
 import coden.console.view.ConsoleMessageDisplay
+import coden.display.displays.ErrorDisplay
 import coden.display.displays.MenuDisplay
 import coden.display.displays.MessageDisplay
 import org.springframework.context.annotation.Bean
@@ -19,17 +16,22 @@ import org.springframework.context.annotation.Configuration
 class ConsoleDisplayConfiguration {
 
     @Bean
-    fun formatter(): ConsoleMenuFormatter{
+    fun consoleFormatter(): ConsoleMenuFormatter{
         return BaseConsoleMenuFormatter()
     }
 
-    @Bean("consoleMenuDisplay")
-    fun menuDisplay(formatter: ConsoleMenuFormatter): MenuDisplay {
+    @Bean
+    fun consoleMenuDisplay(formatter: ConsoleMenuFormatter): MenuDisplay {
         return ConsoleMenuDisplay(formatter)
     }
 
-    @Bean("consoleMessageDisplay")
-    fun messageDisplay(): MessageDisplay {
+    @Bean
+    fun consoleMessageDisplay(): MessageDisplay {
         return ConsoleMessageDisplay()
+    }
+
+    @Bean("errorDisplay")
+    fun errorDisplay(consoleMessageDisplay: MessageDisplay): ErrorDisplay {
+        return consoleMessageDisplay
     }
 }

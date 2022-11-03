@@ -9,6 +9,7 @@ import coden.bot.sender.BaseMessageSender
 import coden.bot.sender.TelegramMessageSender
 import coden.bot.view.format.ReplyMarkupFormatter
 import coden.bot.view.format.TelegramMenuFormatter
+import coden.display.displays.ErrorDisplay
 import coden.display.displays.MenuDisplay
 import coden.display.displays.MessageDisplay
 import org.springframework.context.annotation.Bean
@@ -33,8 +34,8 @@ class BotDisplayConfiguration {
         return { ReplyMarkupFormatter(4) }
     }
 
-    @Bean("telegramMenuDisplay")
-    fun menuDisplay(
+    @Bean
+    fun botMenuDisplay(
         contextProvider: () -> Context,
         senderFactory: (Context) -> TelegramMessageSender,
         formatterFactory: (Context) -> TelegramMenuFormatter
@@ -46,8 +47,8 @@ class BotDisplayConfiguration {
         )
     }
 
-    @Bean("telegramMessageDisplay")
-    fun messageDisplay(
+    @Bean
+    fun botMessageDisplay(
         contextProvider: () -> Context,
         senderFactory: (Context) -> TelegramMessageSender,
         formatterFactory: (Context) -> TelegramMenuFormatter
@@ -58,4 +59,8 @@ class BotDisplayConfiguration {
         )
     }
 
+    @Bean("errorDisplay")
+    fun errorDisplay(botMessageDisplay: MessageDisplay): ErrorDisplay {
+        return botMessageDisplay
+    }
 }

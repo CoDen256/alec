@@ -52,7 +52,7 @@ class ConsoleConfiguration {
         )
     }
 
-    @Bean("console")
+    @Bean
     fun console(consoleRunner: ConsoleRunner): AppRunner {
         return ConsoleRunnerAdapter(consoleRunner)
     }

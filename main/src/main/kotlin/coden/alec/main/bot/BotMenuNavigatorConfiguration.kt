@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @BotEnabled
 class BotMenuNavigatorConfiguration {
-    @Bean("telegramMenuNavigator")
-    fun navigator(layoutBasedMenuNavigatorFactory: LayoutBasedMenuNavigatorFactory): MenuNavigator {
+    @Bean
+    fun botNavigator(layoutBasedMenuNavigatorFactory: LayoutBasedMenuNavigatorFactory): MenuNavigator {
         return TelegramAggregatedMenuNavigator(layoutBasedMenuNavigatorFactory)
     }
 }
