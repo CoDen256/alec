@@ -4,7 +4,6 @@ import coden.alec.app.formatter.ListScalesResponseFormatter
 import coden.alec.app.resources.MessageResource
 import coden.alec.app.util.s
 import coden.alec.core.UseCaseFactory
-import coden.alec.data.Scale
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
@@ -15,21 +14,12 @@ import java.util.regex.Pattern
 
 class BaseScaleActuator(
     private val useCaseFactory: UseCaseFactory,
-    private val view: MessageDisplay,
+    private val display: MessageDisplay,
     private val messages: MessageResource,
+    private val formatter: ListScalesResponseFormatter
 ) : ScaleActuator {
 
-    private val formatter = object : ListScalesResponseFormatter{
-        override fun format(response: List<Scale>): String {
-            return response.mapIndexed { index, scale ->
-                "${index}.[${scale.id}] - ${scale.name}(${scale.unit}):\n" +
-                        scale.divisions.joinToString("\n") {
-                            "\t${it.value} - ${it.description}"
-                        }
-            }.joinToString("\n\n")
-        }
 
-    }
 
     private val scalePattern = Pattern.compile(
         "" +
@@ -54,12 +44,12 @@ class BaseScaleActuator(
         val response = listScales.execute(ListScalesRequest()) as ListScalesResponse
         response.scales.onSuccess {
             if (it.isEmpty()) {
-                view.displayMessage(messages.listScalesEmptyMessage)
+                display.displayMessage(messages.listScalesEmptyMessage)
             } else {
-                view.displayMessage(messages.listScalesMessage.s(formatter.format(it)))
+                display.displayMessage(messages.listScalesMessage.s(formatter.format(it)))
             }
         }.onFailure {
-            view.displayError("${messages.errorMessage} ${it.message}")
+            display.displayError("${messages.errorMessage} ${it.message}")
         }
     }
 
@@ -88,19 +78,19 @@ class BaseScaleActuator(
             )
         ) as CreateScaleResponse
         response.scaleId.onSuccess {
-            view.displayMessage("Added id: $it")
+            display.displayMessage("Added id: $it")
         }.onFailure {
-            view.displayError("${messages.errorMessage} ${it.message}")
+            display.displayError("${messages.errorMessage} ${it.message}")
         }
     }
 
     override fun rejectScale(command: Command) {
-        view.displayError("Scale is invalid")
+        display.displayError("Scale is invalid")
     }
 
 
     override fun displayScaleNamePrompt(command: Command) {
-        view.displayPrompt("Input the name of the scale:")
+        display.displayPrompt("Input the name of the scale:")
     }
 
     override fun isValidScaleName(command: Command): Boolean {
@@ -111,16 +101,16 @@ class BaseScaleActuator(
         command.arguments.onSuccess {
             name = it
         }.onFailure {
-            view.displayError("Invalid name format")
+            display.displayError("Invalid name format")
         }
     }
 
     override fun rejectScaleName(command: Command) {
-        view.displayError("Invalid scale name")
+        display.displayError("Invalid scale name")
     }
 
     override fun displayScaleUnitPrompt(command: Command) {
-        view.displayPrompt("Input the unit")
+        display.displayPrompt("Input the unit")
     }
 
     override fun isValidScaleUnit(command: Command): Boolean {
@@ -131,16 +121,16 @@ class BaseScaleActuator(
         command.arguments.onSuccess {
             unit = it
         }.onFailure {
-            view.displayError("Invalid name format")
+            display.displayError("Invalid name format")
         }
     }
 
     override fun rejectScaleUnit(command: Command) {
-        view.displayError("Invalid format of the unit")
+        display.displayError("Invalid format of the unit")
     }
 
     override fun displayScaleDivisionsPrompt(command: Command) {
-        view.displayPrompt("Input the divisions:")
+        display.displayPrompt("Input the divisions:")
     }
 
     override fun isValidScaleDivisions(command: Command): Boolean {
@@ -151,12 +141,12 @@ class BaseScaleActuator(
         command.arguments.onSuccess {
             divisions = it
         }.onFailure {
-            view.displayError("Invalid name format")
+            display.displayError("Invalid name format")
         }
     }
 
     override fun rejectScaleDivisions(command: Command) {
-        view.displayError("Invalid division format")
+        display.displayError("Invalid division format")
     }
 
     override fun resetScale(command: Command) {
