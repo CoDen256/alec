@@ -1,5 +1,6 @@
 package coden.alec.main.bot
 
+import coden.alec.main.annotations.BotEnabled
 import coden.bot.context.Context
 import coden.bot.context.ContextObserver
 import coden.bot.context.proxy.ContextBasedTelegramMenuDisplay
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
+@BotEnabled
 class BotDisplayConfiguration {
 
     @Bean

@@ -3,6 +3,7 @@ package coden.alec.main.bot
 import coden.alec.app.AppRunner
 import coden.alec.bot.AlecBotConfigurator
 import coden.alec.bot.BotRunnerAdapter
+import coden.alec.main.annotations.BotEnabled
 import coden.alec.main.resources.CommandNames
 import coden.bot.BaseBotFactory
 import coden.bot.BotDispatcherConfigurator
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @EnableConfigurationProperties(AlecBotProperties::class, CommandNames::class)
+@BotEnabled
 class BotConfiguration {
 
     @Bean

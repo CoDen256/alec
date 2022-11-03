@@ -3,6 +3,7 @@ package coden.alec.main.console
 import coden.alec.app.AppRunner
 import coden.alec.console.AlecConsoleConfigurator
 import coden.alec.console.ConsoleRunnerAdapter
+import coden.alec.main.annotations.ConsoleEnabled
 import coden.alec.main.resources.CommandNames
 import coden.console.BaseConsoleDispatcherBuilder
 import coden.console.ConsoleRunner
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @EnableConfigurationProperties(CommandNames::class)
+@ConsoleEnabled
 class ConsoleConfiguration {
 
     @Bean

@@ -1,17 +1,20 @@
 package coden.alec.main.console
 
+import coden.alec.main.annotations.ConsoleEnabled
 import coden.alec.main.resources.CommandNames
 import coden.console.AliasBasedCommandParser
 import coden.console.AliasMapper
 import coden.console.ConsoleCommandReader
 import coden.console.read.CommandParser
 import coden.console.read.CommandReader
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 @EnableConfigurationProperties(CommandNames::class)
+@ConsoleEnabled
 class ConsoleCommandProcessorConfiguration {
     @Bean
     fun reader(): CommandReader{
