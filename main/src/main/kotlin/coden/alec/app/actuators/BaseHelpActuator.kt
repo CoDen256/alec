@@ -11,6 +11,6 @@ class BaseHelpActuator(
     private val messages: MessageResource,
 ) : HelpActuator {
     override fun displayHelp(command: Command) {
-//        view.displayMenu(messages.startMessage)
+        view.displayMessage(messages.startMessage)
     }
 }
