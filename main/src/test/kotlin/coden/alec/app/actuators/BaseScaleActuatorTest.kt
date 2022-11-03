@@ -138,6 +138,20 @@ class BaseScaleActuatorTest {
         verify(display, times(1)).displayMessage(resource.createdScaleMessage)
     }
 
+    @Test
+    fun createScaleInvalidFormat() {
+        val scaleActuator = BaseScaleActuator(
+            useCaseFactory,
+            display,
+            resource,
+            formatter
+        )
+
+        scaleActuator.createAndDisplayScale(CreateScaleCommand("name"))
+
+        verify(display, times(1)).displayError(resource.invalidScaleFormatMessage+"")
+    }
+
     private fun generateResponse() = ListScalesResponse(
         Result.success(
             listOf(
