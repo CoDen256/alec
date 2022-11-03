@@ -2,7 +2,7 @@ package coden.alec.main
 
 import coden.alec.app.actuators.BaseHelpActuator
 import coden.alec.app.actuators.BaseScaleActuator
-import coden.alec.app.formatter.ListScalesResponseFormatter
+import coden.alec.app.formatter.ScaleFormatter
 import coden.alec.app.fsm.*
 import coden.alec.app.resources.MessageResource
 import coden.console.view.ConsoleMessageDisplay
@@ -57,12 +57,7 @@ class MainTest {
         val view = consoleView
 
 
-        val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages, object: ListScalesResponseFormatter {
-            override fun format(response: List<Scale>): String {
-                return response.toString()
-            }
-
-        })
+        val scaleActuator = BaseScaleActuator(useCaseFactory, view, messages, object: ScaleFormatter{})
         val helpActuator = BaseHelpActuator(useCaseFactory, view, messages)
 
         val stateExecutor = LoggingCommandExecutor(FSM(Start, HelpTable(helpActuator) + ScaleTable(scaleActuator)))

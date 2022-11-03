@@ -4,7 +4,7 @@ import coden.alec.app.actuators.BaseHelpActuator
 import coden.alec.app.actuators.BaseScaleActuator
 import coden.alec.app.actuators.HelpActuator
 import coden.alec.app.actuators.ScaleActuator
-import coden.alec.app.formatter.ListScalesResponseFormatter
+import coden.alec.app.formatter.ScaleFormatter
 import coden.alec.core.UseCaseFactory
 import coden.alec.data.Scale
 import coden.alec.main.resources.Messages
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration
 @EnableConfigurationProperties(Messages::class)
 class ActuatorConfiguration {
 
-    private val formatter = object : ListScalesResponseFormatter {
+    private val formatter = object : ScaleFormatter {
         override fun format(response: List<Scale>): String {
             return response.mapIndexed { index, scale ->
                 "${index}.[${scale.id}] - ${scale.name}(${scale.unit}):\n" +
@@ -26,7 +26,6 @@ class ActuatorConfiguration {
                         }
             }.joinToString("\n\n")
         }
-
     }
 
     @Bean

@@ -1,6 +1,6 @@
 package coden.alec.app.actuators
 
-import coden.alec.app.formatter.ListScalesResponseFormatter
+import coden.alec.app.formatter.ScaleFormatter
 import coden.alec.app.resources.MessageResource
 import coden.alec.app.util.s
 import coden.alec.core.UseCaseFactory
@@ -16,7 +16,7 @@ class BaseScaleActuator(
     private val useCaseFactory: UseCaseFactory,
     private val display: MessageDisplay,
     private val messages: MessageResource,
-    private val formatter: ListScalesResponseFormatter
+    private val formatter: ScaleFormatter
 ) : ScaleActuator {
 
 
@@ -78,7 +78,7 @@ class BaseScaleActuator(
             )
         ) as CreateScaleResponse
         response.scaleId.onSuccess {
-            display.displayMessage("Added id: $it")
+            display.displayMessage(messages.createdScaleMessage+formatter.formatId(it))
         }.onFailure {
             display.displayError("${messages.errorMessage} ${it.message}")
         }
