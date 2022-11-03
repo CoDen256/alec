@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration
 class MenuConfiguration {
 
     @Bean
-    fun menu(): MenuLayout{
+    fun menu(): MenuLayout{ // deserialize from configuration properties
         return menuLayout(
             "Choose anything from  the main menu", itemLayout("Back"),
             itemLayout(
@@ -32,8 +32,8 @@ class MenuConfiguration {
                 )
             ),
             itemLayout(
-                "Scales", "Scale management",
-                itemLayout("Display all Scales", action = ListScalesCommand),
+                "Scale Management", "Scales are needed define factors",
+                itemLayout("List all Scales", action = ListScalesCommand),
                 itemLayout("Create Scale", action = CreateScaleCommandNoArgs)
             ),
             itemLayout(

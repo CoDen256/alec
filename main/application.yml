@@ -1,7 +1,7 @@
 messages:
   startMessage: "Hello"
-  listScalesEmptyMessage: "Empty"
-  listScalesMessage: "Scales:"
+  listScalesEmptyMessage: "No scales available at the moment"
+  listScalesMessage: "Scales:\n\n%s"
   errorMessage: "Error ocurred:"
   menuBackMessage: "Back"
 
@@ -16,4 +16,4 @@ commands:
 runner:
   bot:
     token: '5402767430:AAEXVe8s8IAow9z9Ip69NCU9JnUaEHIgcrw'
-  active: console
+  active: bot

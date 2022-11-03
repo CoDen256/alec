@@ -1,7 +1,10 @@
 package coden.alec.app.actuators
 
+import coden.alec.app.formatter.ListScalesResponseFormatter
 import coden.alec.app.resources.MessageResource
+import coden.alec.app.util.s
 import coden.alec.core.UseCaseFactory
+import coden.alec.data.Scale
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
@@ -15,6 +18,18 @@ class BaseScaleActuator(
     private val view: MessageDisplay,
     private val messages: MessageResource,
 ) : ScaleActuator {
+
+    private val formatter = object : ListScalesResponseFormatter{
+        override fun format(response: List<Scale>): String {
+            return response.mapIndexed { index, scale ->
+                "${index}.[${scale.id}] - ${scale.name}(${scale.unit}):\n" +
+                        scale.divisions.joinToString("\n") {
+                            "\t${it.value} - ${it.description}"
+                        }
+            }.joinToString("\n\n")
+        }
+
+    }
 
     private val scalePattern = Pattern.compile(
         "" +
@@ -41,7 +56,7 @@ class BaseScaleActuator(
             if (it.isEmpty()) {
                 view.displayMessage(messages.listScalesEmptyMessage)
             } else {
-                view.displayMessage(messages.listScalesMessage + it)
+                view.displayMessage(messages.listScalesMessage.s(formatter.format(it)))
             }
         }.onFailure {
             view.displayError("${messages.errorMessage} ${it.message}")
