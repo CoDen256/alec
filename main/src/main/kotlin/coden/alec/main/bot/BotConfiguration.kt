@@ -23,10 +23,10 @@ import org.springframework.context.annotation.Configuration
 class BotConfiguration {
 
     @Bean
-    fun configurator(observer: ContextObserver,
-                     commandExecutor: CommandExecutor,
-                     menuPresenter: MenuPresenter,
-                     commandNames: CommandNames
+    fun telegramConfigurator(observer: ContextObserver,
+                             commandExecutor: CommandExecutor,
+                             menuPresenter: MenuPresenter,
+                             commandNames: CommandNames
     ): BotDispatcherConfigurator {
         return AlecBotConfigurator(
             observer,

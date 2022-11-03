@@ -1,5 +1,3 @@
-bot.token: '5402767430:AAEXVe8s8IAow9z9Ip69NCU9JnUaEHIgcrw'
-
 messages:
   startMessage: "Hello"
   listScalesEmptyMessage: "Empty"
@@ -14,3 +12,8 @@ commands:
   createScaleCommand: "create_scales"
   textCommand: "text"
   navCommand: "nav"
+
+runner:
+  bot:
+    token: '5402767430:AAEXVe8s8IAow9z9Ip69NCU9JnUaEHIgcrw'
+  active: bot

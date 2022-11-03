@@ -3,6 +3,11 @@ package coden.alec.main.base
 import coden.alec.app.fsm.CreateScaleCommandNoArgs
 import coden.alec.app.fsm.HelpCommand
 import coden.alec.app.fsm.ListScalesCommand
+import coden.display.displays.MenuDisplay
+import coden.display.displays.MessageDisplay
+import coden.display.menu.BaseMenuPresenter
+import coden.display.menu.MenuNavigator
+import coden.display.menu.MenuPresenter
 import coden.menu.ItemLayout.Companion.itemLayout
 import coden.menu.LayoutBasedMenuNavigatorFactory
 import coden.menu.MenuLayout
@@ -49,4 +54,12 @@ class MenuConfiguration {
         return LayoutBasedMenuNavigatorFactory(menuLayout)
     }
 
+    @Bean
+    fun presenter(
+        display: MessageDisplay,
+        menuDisplay: MenuDisplay,
+        menuNavigator: MenuNavigator
+    ): MenuPresenter {
+        return BaseMenuPresenter(display, menuDisplay, menuNavigator)
+    }
 }
