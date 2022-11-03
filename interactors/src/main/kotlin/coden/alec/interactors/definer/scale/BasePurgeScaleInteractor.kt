@@ -1,13 +1,13 @@
 package coden.alec.interactors.definer.scale
 
-import coden.alec.core.PurgeScaleActivator
+import coden.alec.core.PurgeScaleInteractor
 import coden.alec.core.Request
 import coden.alec.core.Response
 import coden.alec.data.ScaleGateway
 
-class PurgeScaleInteractor(
+class BasePurgeScaleInteractor(
     private val gateway: ScaleGateway,
-) : PurgeScaleActivator {
+) : PurgeScaleInteractor {
 
     override fun execute(request: Request) : Response {
         request as PurgeScaleRequest

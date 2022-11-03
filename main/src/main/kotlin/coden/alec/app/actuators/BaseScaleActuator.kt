@@ -105,7 +105,7 @@ class BaseScaleActuator(
     }
 
     override fun displayScaleUnitPrompt(command: Command) {
-        view.displayError("Input the unit")
+        view.displayPrompt("Input the unit")
     }
 
     override fun isValidScaleUnit(command: Command): Boolean {

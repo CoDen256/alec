@@ -2,9 +2,9 @@ package coden.alec.core
 
 interface UseCaseFactory {
 
-    fun listScales(): ListScalesActivator
-    fun createScale(): CreateScaleActivator
-    fun deleteScale(): DeleteScaleActivator
-    fun purgeScale(): PurgeScaleActivator
-    fun updateScale(): UpdateScaleActivator
+    fun listScales(): ListScalesInteractor
+    fun createScale(): CreateScaleInteractor
+    fun deleteScale(): DeleteScaleInteractor
+    fun purgeScale(): PurgeScaleInteractor
+    fun updateScale(): UpdateScaleInteractor
 }

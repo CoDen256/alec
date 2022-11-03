@@ -1,3 +1,3 @@
 package coden.alec.core
 
-interface QueryRatingActivator: Activator
+interface QueryRatingInteractor: Interactor

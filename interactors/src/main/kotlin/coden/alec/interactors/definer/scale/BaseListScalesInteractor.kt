@@ -1,15 +1,14 @@
 package coden.alec.interactors.definer.scale
 
-import coden.alec.core.ListScalesActivator
-import coden.alec.core.ListScalesResponder
+import coden.alec.core.ListScalesInteractor
 import coden.alec.core.Request
 import coden.alec.core.Response
 import coden.alec.data.Scale
 import coden.alec.data.ScaleGateway
 
-class ListScalesInteractor(
+class BaseListScalesInteractor(
     private val gateway: ScaleGateway,
-) : ListScalesActivator {
+) : ListScalesInteractor {
 
     override fun execute(request: Request): Response {
         request as ListScalesRequest

@@ -6,8 +6,8 @@ import coden.alec.app.fsm.*
 import coden.alec.app.resources.MessageResource
 import coden.console.view.ConsoleMessageDisplay
 import coden.alec.core.*
-import coden.alec.interactors.definer.scale.CreateScaleInteractor
-import coden.alec.interactors.definer.scale.ListScalesInteractor
+import coden.alec.interactors.definer.scale.BaseCreateScaleInteractor
+import coden.alec.interactors.definer.scale.BaseListScalesInteractor
 import coden.alec.main.bot.AlecBotProperties
 import coden.alec.main.table.HelpTable
 import coden.alec.main.table.ScaleTable
@@ -29,23 +29,23 @@ class MainTest {
 
         val scalesGateway = ScaleInMemoryGateway()
         val useCaseFactory = object : UseCaseFactory {
-            override fun listScales(): ListScalesActivator {
-                return ListScalesInteractor(scalesGateway)
+            override fun listScales(): coden.alec.core.ListScalesInteractor {
+                return BaseListScalesInteractor(scalesGateway)
             }
 
-            override fun createScale(): CreateScaleActivator {
-                return CreateScaleInteractor(scalesGateway)
+            override fun createScale(): coden.alec.core.CreateScaleInteractor {
+                return BaseCreateScaleInteractor(scalesGateway)
             }
 
-            override fun deleteScale(): DeleteScaleActivator {
+            override fun deleteScale(): DeleteScaleInteractor {
                 TODO("Not yet implemented")
             }
 
-            override fun purgeScale(): PurgeScaleActivator {
+            override fun purgeScale(): PurgeScaleInteractor {
                 TODO("Not yet implemented")
             }
 
-            override fun updateScale(): UpdateScaleActivator {
+            override fun updateScale(): UpdateScaleInteractor {
                 TODO("Not yet implemented")
             }
         }

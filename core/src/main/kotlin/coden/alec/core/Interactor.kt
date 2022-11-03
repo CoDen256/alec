@@ -1,5 +1,5 @@
 package coden.alec.core
 
-interface Activator {
+interface Interactor {
     fun execute(request: Request): Response
 }

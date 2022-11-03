@@ -1,45 +1,38 @@
 package coden.alec.interactors.definer.scale
 
-import coden.alec.core.CreateScaleActivator
+import coden.alec.core.UpdateScaleInteractor
 import coden.alec.core.Request
 import coden.alec.core.Response
 import coden.alec.data.Scale
 import coden.alec.data.ScaleDivision
 import coden.alec.data.ScaleGateway
 
-class CreateScaleInteractor(
+class BaseUpdateScaleInteractor(
     private val gateway: ScaleGateway,
-) : CreateScaleActivator {
+) : UpdateScaleInteractor {
 
     override fun execute(request: Request): Response {
-        request as CreateScaleRequest
-        val newScale = Scale(
+        request as UpdateScaleRequest
+        val updatedScale = Scale(
             name = request.name,
             unit = request.unit,
             deleted = false,
-            id = "scale-${gateway.getScalesCount()}",
+            id = request.id,
             divisions = createDivisions(request.divisions)
         )
-        gateway.addScale(newScale)
-        return CreateScaleResponse(Result.success(newScale.id))
+        gateway.addScale(updatedScale)
+        return UpdateScaleResponse(Result.success(Unit))
     }
 
     private fun createDivisions(divisions: Map<Long, String>): List<ScaleDivision>{
         return divisions.entries.map { ScaleDivision(it.key, it.value) }
     }
-
 }
 
-data class CreateScaleRequest(
-    val name: String,
+data class UpdateScaleRequest(
+    val id: String, val name: String,
     val unit: String,
     val divisions: Map<Long, String>
-): Request
+) : Request
 
-data class CreateScaleResponse(val scaleId: Result<String>): Response
-
-
-
-
-
-
+data class UpdateScaleResponse(val result: Result<Unit>) : Response

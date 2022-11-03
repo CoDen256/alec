@@ -2,8 +2,8 @@ package coden.alec.main.base
 
 import coden.alec.core.*
 import coden.alec.data.ScaleGateway
-import coden.alec.interactors.definer.scale.CreateScaleInteractor
-import coden.alec.interactors.definer.scale.ListScalesInteractor
+import coden.alec.interactors.definer.scale.BaseCreateScaleInteractor
+import coden.alec.interactors.definer.scale.BaseListScalesInteractor
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,23 +19,23 @@ class UseCaseConfiguration {
     @Bean
     fun useCaseFactory(scalesGateway: ScaleGateway): UseCaseFactory {
         return object : UseCaseFactory {
-            override fun listScales(): ListScalesActivator {
-                return ListScalesInteractor(scalesGateway)
+            override fun listScales(): coden.alec.core.ListScalesInteractor {
+                return BaseListScalesInteractor(scalesGateway)
             }
 
-            override fun createScale(): CreateScaleActivator {
-                return CreateScaleInteractor(scalesGateway)
+            override fun createScale(): coden.alec.core.CreateScaleInteractor {
+                return BaseCreateScaleInteractor(scalesGateway)
             }
 
-            override fun deleteScale(): DeleteScaleActivator {
+            override fun deleteScale(): DeleteScaleInteractor {
                 TODO("Not yet implemented")
             }
 
-            override fun purgeScale(): PurgeScaleActivator {
+            override fun purgeScale(): PurgeScaleInteractor {
                 TODO("Not yet implemented")
             }
 
-            override fun updateScale(): UpdateScaleActivator {
+            override fun updateScale(): UpdateScaleInteractor {
                 TODO("Not yet implemented")
             }
         }
