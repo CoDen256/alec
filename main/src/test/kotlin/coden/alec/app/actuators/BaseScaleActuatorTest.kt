@@ -25,7 +25,7 @@ import org.mockito.kotlin.whenever
 class BaseScaleActuatorTest {
 
     @Mock
-    lateinit var useCaseFactory: UseCaseFactory
+    lateinit var useCaseFactory: ScaleUseCaseFactory
 
     @Mock
     lateinit var responder: ScaleResponder

@@ -1,7 +1,7 @@
 package coden.alec.app.actuators
 
 import coden.alec.app.display.ScaleResponder
-import coden.alec.core.UseCaseFactory
+import coden.alec.core.ScaleUseCaseFactory
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
@@ -10,7 +10,7 @@ import coden.fsm.Command
 import java.util.regex.Pattern
 
 class BaseScaleActuator(
-    private val useCaseFactory: UseCaseFactory,
+    private val useCaseFactory: ScaleUseCaseFactory,
     private val responder: ScaleResponder
 ) : ScaleActuator {
 

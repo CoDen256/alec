@@ -1,12 +1,11 @@
 package coden.alec.app.actuators
 
 import coden.alec.app.resources.MessageResource
-import coden.alec.core.UseCaseFactory
+import coden.alec.core.ScaleUseCaseFactory
 import coden.display.displays.MessageDisplay
 import coden.fsm.Command
 
 class BaseHelpActuator(
-    private val useCaseFactory: UseCaseFactory,
     private val view: MessageDisplay,
     private val messages: MessageResource,
 ) : HelpActuator {

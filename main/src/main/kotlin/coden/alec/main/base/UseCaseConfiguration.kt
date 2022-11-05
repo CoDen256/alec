@@ -17,8 +17,8 @@ class UseCaseConfiguration {
     }
 
     @Bean
-    fun useCaseFactory(scalesGateway: ScaleGateway): UseCaseFactory {
-        return object : UseCaseFactory {
+    fun scaleUseCaseFactory(scalesGateway: ScaleGateway): ScaleUseCaseFactory {
+        return object : ScaleUseCaseFactory {
             override fun listScales(): coden.alec.core.ListScalesInteractor {
                 return BaseListScalesInteractor(scalesGateway)
             }

@@ -1,6 +1,6 @@
 package coden.alec.core
 
-interface UseCaseFactory {
+interface ScaleUseCaseFactory {
 
     fun listScales(): ListScalesInteractor
     fun createScale(): CreateScaleInteractor
