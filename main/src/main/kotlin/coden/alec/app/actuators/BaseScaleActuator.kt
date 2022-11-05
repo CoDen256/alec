@@ -24,24 +24,21 @@ class BaseScaleActuator(
     }
 
     override fun isValidScale(command: Command): Boolean {
+        val arguments = command.arguments.getOrThrow()
         return if (name != null && unit != null) {
             true
         } else {
-            return command.arguments.getOrNull()?.let { parser.isValidCreateScaleRequest(it) } ?: false
+            return parser.isValidCreateScaleRequest(arguments)
         }
 
     }
 
     override fun createAndDisplayScale(command: Command) {
-        if (!isValidScale(command)) throw InvalidScaleFormatException(
-            "Invalid scale format: ${
-                command.arguments.getOrNull().orEmpty()
-            }"
-        )
+        val argument = command.arguments.getOrThrow()
+        if (!parser.isValidCreateScaleRequest(argument)) throw InvalidScaleFormatException("Invalid scale format: $argument")
 
-        val input = command.arguments.getOrNull()!!
         val response = useCaseFactory.createScale().execute(
-            parser.parseCreateScaleRequest(input)
+            parser.parseCreateScaleRequest(argument)
         ) as CreateScaleResponse
         responder.respondCreateScale(response)
     }
@@ -56,7 +53,7 @@ class BaseScaleActuator(
     }
 
     override fun isValidScaleName(command: Command): Boolean {
-        return command.arguments.getOrNull()?.let { parser.isValidScaleName(it) } ?: false
+        return parser.isValidScaleName(command.arguments.getOrThrow())
     }
 
     override fun handleScaleName(command: Command) {
@@ -76,7 +73,7 @@ class BaseScaleActuator(
     }
 
     override fun isValidScaleUnit(command: Command): Boolean {
-        return command.arguments.getOrNull()?.let { parser.isValidScaleName(it) } ?: false
+        return parser.isValidScaleUnit(command.arguments.getOrThrow())
 
     }
 
@@ -97,7 +94,7 @@ class BaseScaleActuator(
     }
 
     override fun isValidScaleDivisions(command: Command): Boolean {
-        return command.arguments.getOrNull()?.let { parser.isValidScaleName(it) } ?: false
+        return parser.isValidDivsions(command.arguments.getOrThrow())
 
     }
 

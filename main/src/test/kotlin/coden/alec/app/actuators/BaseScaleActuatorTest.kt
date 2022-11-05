@@ -4,6 +4,7 @@ import coden.alec.app.display.ScaleParser
 import coden.alec.app.display.ScaleResponder
 import coden.alec.app.fsm.CreateScaleCommand
 import coden.alec.app.fsm.ListScalesCommand
+import coden.alec.app.fsm.TextCommand
 import coden.alec.core.*
 import coden.alec.data.Scale
 import coden.alec.data.ScaleDivision
@@ -11,16 +12,16 @@ import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
+import coden.fsm.NoArgException
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 @ExtendWith(MockitoExtension::class)
 class BaseScaleActuatorTest {
@@ -93,8 +94,88 @@ class BaseScaleActuatorTest {
 
     @Test
     fun createScaleInvalidFormat() {
+        whenever(parser.isValidCreateScaleRequest("hustensaft")).thenReturn(false)
+        whenever(parser.isValidCreateScaleRequest("")).thenReturn(false)
 
+        assertThrows<InvalidScaleFormatException> {
+            actuator.createAndDisplayScale(CreateScaleCommand("hustensaft"))
+        }
+
+        assertThrows<InvalidScaleFormatException> {
+            actuator.createAndDisplayScale(CreateScaleCommand(""))
+        }
+
+        assertThrows<InvalidScaleFormatException> {
+            actuator.createAndDisplayScale(TextCommand(""))
+        }
+
+        assertThrows<NoArgException> {
+            actuator.createAndDisplayScale(ListScalesCommand)
+        }
+
+        verify(parser).isValidCreateScaleRequest("hustensaft")
+        verify(parser, times(2)).isValidCreateScaleRequest("")
+        verifyNoMoreInteractions(parser)
+    }
+
+    @Test
+    fun isValidScale() {
+        whenever(parser.isValidCreateScaleRequest("hustensaft")).thenReturn(false)
+        whenever(parser.isValidCreateScaleRequest("h")).thenReturn(true)
+
+        assertFalse(actuator.isValidScale(CreateScaleCommand("hustensaft")))
+        assertFalse(actuator.isValidScale(TextCommand("hustensaft")))
+        assertTrue(actuator.isValidScale(CreateScaleCommand("h")))
+        assertTrue(actuator.isValidScale(TextCommand("h")))
+
+        assertThrows<NoArgException> {
+            actuator.isValidScale(ListScalesCommand)
+        }
+    }
+
+    @Test
+    fun isValidName() {
+        whenever(parser.isValidScaleName("hustensaft")).thenReturn(false)
+        whenever(parser.isValidScaleName("h")).thenReturn(true)
+
+        assertFalse(actuator.isValidScaleName(CreateScaleCommand("hustensaft")))
+        assertFalse(actuator.isValidScaleName(TextCommand("hustensaft")))
+        assertTrue(actuator.isValidScaleName(CreateScaleCommand("h")))
+        assertTrue(actuator.isValidScaleName(TextCommand("h")))
+
+        assertThrows<NoArgException> {
+            actuator.isValidScaleName(ListScalesCommand)
+        }
+    }
+
+    @Test
+    fun isValidUnit() {
+        whenever(parser.isValidScaleUnit("hustensaft")).thenReturn(false)
+        whenever(parser.isValidScaleUnit("h")).thenReturn(true)
+
+        assertFalse(actuator.isValidScaleUnit(CreateScaleCommand("hustensaft")))
+        assertFalse(actuator.isValidScaleUnit(TextCommand("hustensaft")))
+        assertTrue(actuator.isValidScaleUnit(CreateScaleCommand("h")))
+        assertTrue(actuator.isValidScaleUnit(TextCommand("h")))
+
+        assertThrows<NoArgException> {
+            actuator.isValidScaleUnit(ListScalesCommand)
+        }
     }
 
 
+    @Test
+    fun isValidDivisions() {
+        whenever(parser.isValidDivsions("hustensaft")).thenReturn(false)
+        whenever(parser.isValidDivsions("h")).thenReturn(true)
+
+        assertFalse(actuator.isValidScaleDivisions(CreateScaleCommand("hustensaft")))
+        assertFalse(actuator.isValidScaleDivisions(TextCommand("hustensaft")))
+        assertTrue(actuator.isValidScaleDivisions(CreateScaleCommand("h")))
+        assertTrue(actuator.isValidScaleDivisions(TextCommand("h")))
+
+        assertThrows<NoArgException> {
+            actuator.isValidScaleDivisions(ListScalesCommand)
+        }
+    }
 }
