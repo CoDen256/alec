@@ -166,8 +166,8 @@ class BaseScaleActuatorTest {
 
     @Test
     fun isValidDivisions() {
-        whenever(parser.isValidDivsions("hustensaft")).thenReturn(false)
-        whenever(parser.isValidDivsions("h")).thenReturn(true)
+        whenever(parser.isValidDivisions("hustensaft")).thenReturn(false)
+        whenever(parser.isValidDivisions("h")).thenReturn(true)
 
         assertFalse(actuator.isValidScaleDivisions(CreateScaleCommand("hustensaft")))
         assertFalse(actuator.isValidScaleDivisions(TextCommand("hustensaft")))
@@ -177,5 +177,42 @@ class BaseScaleActuatorTest {
         assertThrows<NoArgException> {
             actuator.isValidScaleDivisions(ListScalesCommand)
         }
+    }
+
+    @Test
+    fun handleNameUnitDivisions() {
+        val response = CreateScaleResponse(Result.success("scale-1"))
+        val request = CreateScaleRequest(
+            name = "name",
+            unit = "unit",
+            divisions = mapOf(
+                1L to "div1",
+                2L to "div2",
+                3L to "div3"
+            )
+        )
+        whenever(useCaseFactory.createScale()).thenReturn(createScaleInteractor)
+        whenever(createScaleInteractor.execute(request)).thenReturn(response)
+        whenever(parser.parseCreateScaleRequest("name","unit", "div")).thenReturn(request)
+
+        whenever(parser.isValidScaleName("name")).thenReturn(true)
+        whenever(parser.isValidScaleUnit("unit")).thenReturn(true)
+        whenever(parser.isValidDivisions("div")).thenReturn(true)
+
+        actuator.isValidScaleName(TextCommand("name"))
+        actuator.handleScaleName(TextCommand("name"))
+
+        actuator.isValidScaleUnit(TextCommand("unit"))
+        actuator.handleScaleUnit(CreateScaleCommand("unit")) // just to test that the command doesn't matter
+
+        actuator.isValidScaleDivisions(TextCommand("div"))
+        actuator.handleScaleDivisions(TextCommand("div"))
+
+        actuator.createAndDisplayScale(TextCommand("div"))
+
+        verify(parser, never()).isValidCreateScaleRequest(any())
+        verify(parser).parseCreateScaleRequest("name", "unit", "div")
+        verify(createScaleInteractor).execute(request)
+        verify(responder).respondCreateScale(response)
     }
 }

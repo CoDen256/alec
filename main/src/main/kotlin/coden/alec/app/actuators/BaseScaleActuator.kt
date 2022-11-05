@@ -3,6 +3,7 @@ package coden.alec.app.actuators
 import coden.alec.app.display.ScaleParser
 import coden.alec.app.display.ScaleResponder
 import coden.alec.core.ScaleUseCaseFactory
+import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
@@ -34,13 +35,25 @@ class BaseScaleActuator(
     }
 
     override fun createAndDisplayScale(command: Command) {
+        val request = if (isScaleInputSplit()) parseSplitScaleInput() else
+            parseCompleteScaleInput(command)
+
+        val response = useCaseFactory.createScale().execute(request) as CreateScaleResponse
+        responder.respondCreateScale(response)
+    }
+
+    private fun isScaleInputSplit(): Boolean {
+        return name != null && unit != null && divisions != null
+    }
+
+    private fun parseSplitScaleInput(): CreateScaleRequest {
+        return parser.parseCreateScaleRequest(name!!, unit!!, divisions!!)
+    }
+
+    private fun parseCompleteScaleInput(command: Command): CreateScaleRequest {
         val argument = command.arguments.getOrThrow()
         if (!parser.isValidCreateScaleRequest(argument)) throw InvalidScaleFormatException("Invalid scale format: $argument")
-
-        val response = useCaseFactory.createScale().execute(
-            parser.parseCreateScaleRequest(argument)
-        ) as CreateScaleResponse
-        responder.respondCreateScale(response)
+        return parser.parseCreateScaleRequest(argument)
     }
 
     override fun rejectScale(command: Command) {
@@ -57,11 +70,16 @@ class BaseScaleActuator(
     }
 
     override fun handleScaleName(command: Command) {
-        command.arguments.onSuccess {
-            name = it
-        }.onFailure {
-            rejectScaleName(command)
+        val arguments = command.arguments.getOrThrow()
+        if (parser.isValidScaleName(arguments)){
+            saveName(arguments)
+        }else {
+
         }
+    }
+
+    private fun saveName(arguments: String) {
+        name = arguments
     }
 
     override fun rejectScaleName(command: Command) {
@@ -94,7 +112,7 @@ class BaseScaleActuator(
     }
 
     override fun isValidScaleDivisions(command: Command): Boolean {
-        return parser.isValidDivsions(command.arguments.getOrThrow())
+        return parser.isValidDivisions(command.arguments.getOrThrow())
 
     }
 

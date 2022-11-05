@@ -30,6 +30,10 @@ class BaseScaleParser : ScaleParser {
         TODO("Not yet implemented")
     }
 
+    override fun parseCreateScaleRequest(name: String, unit: String, divisions: String): CreateScaleRequest {
+        TODO("Not yet implemented")
+    }
+
     override fun parseScaleName(input: String): String {
         input.verify("scale name", this::isValidScaleName)
         TODO("Not yet implemented")
@@ -41,7 +45,7 @@ class BaseScaleParser : ScaleParser {
     }
 
     override fun parseScaleDivisions(input: String): Map<String, Long> {
-        input.verify("scale divisions", this::isValidDivsions)
+        input.verify("scale divisions", this::isValidDivisions)
         TODO("Not yet implemented")
     }
 
@@ -57,7 +61,7 @@ class BaseScaleParser : ScaleParser {
         return input.matches(namePattern)
     }
 
-    override fun isValidDivsions(input: String): Boolean {
+    override fun isValidDivisions(input: String): Boolean {
         return input.matches(divisionPattern)
 
     }
