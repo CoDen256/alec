@@ -2,6 +2,15 @@ messages:
   startMessage: "Hello"
   listScalesEmptyMessage: "No scales available at the moment"
   listScalesMessage: "Scales:\n\n%s"
+
+  rejectScaleMessage: ""
+  rejectScaleNameMessage: ""
+  rejectScaleUnitMessage: ""
+  rejectScaleDivisionsMessage: ""
+  scaleNamePrompt: ""
+  scaleUnitPrompt: ""
+  scaleDivisionsPrompt: ""
+
   errorMessage: "Error ocurred:"
   menuBackMessage: "Back"
 

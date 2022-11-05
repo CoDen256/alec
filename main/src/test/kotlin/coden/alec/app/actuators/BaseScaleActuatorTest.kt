@@ -1,9 +1,8 @@
 package coden.alec.app.actuators
 
-import coden.alec.app.formatter.ScaleFormatter
+import coden.alec.app.display.ScaleResponder
 import coden.alec.app.fsm.CreateScaleCommand
 import coden.alec.app.fsm.ListScalesCommand
-import coden.alec.app.resources.MessageResource
 import coden.alec.core.*
 import coden.alec.data.Scale
 import coden.alec.data.ScaleDivision
@@ -11,9 +10,8 @@ import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
-import coden.display.displays.MessageDisplay
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
@@ -26,27 +24,26 @@ import org.mockito.kotlin.whenever
 @ExtendWith(MockitoExtension::class)
 class BaseScaleActuatorTest {
 
-    val resource = MessageResource().apply {
-        listScalesMessage = "listScalesMessage"
-        listScalesEmptyMessage = "listScalesEmptyMessage"
-        errorMessage = "errorMessage"
-        createdScaleMessage = "createdScaleMessage"
-    }
-
     @Mock
     lateinit var useCaseFactory: UseCaseFactory
 
     @Mock
-    lateinit var display: MessageDisplay
-
-    @Mock
-    lateinit var formatter: ScaleFormatter
+    lateinit var responder: ScaleResponder
 
     @Mock
     lateinit var listScalesInteractor: ListScalesInteractor
 
     @Mock
     lateinit var createScaleInteractor: CreateScaleInteractor
+
+    lateinit var actuator: ScaleActuator
+
+    @BeforeEach
+    fun setup() {
+        actuator = BaseScaleActuator(
+            useCaseFactory, responder
+        )
+    }
 
 
     @Test
@@ -55,15 +52,11 @@ class BaseScaleActuatorTest {
         val listScalesResponse = generateResponse()
         whenever(useCaseFactory.listScales()).thenReturn(listScalesInteractor)
         whenever(listScalesInteractor.execute(any())).thenReturn(listScalesResponse)
-        whenever(formatter.format(any<List<Scale>>())).thenReturn("")
 
-        val scaleActuator = actuator()
 
-        scaleActuator.getAndDisplayScales(ListScalesCommand)
+        actuator.getAndDisplayScales(ListScalesCommand)
 
         verify(listScalesInteractor, times(1)).execute(any<ListScalesRequest>())
-        verify(display, times(1)).displayMessage(resource.listScalesMessage)
-
     }
 
     @Test
@@ -73,13 +66,10 @@ class BaseScaleActuatorTest {
         whenever(useCaseFactory.listScales()).thenReturn(listScalesInteractor)
         whenever(listScalesInteractor.execute(any())).thenReturn(listScalesResponse)
 
-        val scaleActuator = actuator()
 
-        scaleActuator.getAndDisplayScales(ListScalesCommand)
+        actuator.getAndDisplayScales(ListScalesCommand)
 
         verify(listScalesInteractor, times(1)).execute(any<ListScalesRequest>())
-        verify(display, times(1)).displayMessage(resource.listScalesEmptyMessage)
-
     }
 
     @Test
@@ -89,12 +79,10 @@ class BaseScaleActuatorTest {
         whenever(useCaseFactory.listScales()).thenReturn(listScalesInteractor)
         whenever(listScalesInteractor.execute(any())).thenReturn(listScalesResponse)
 
-        val scaleActuator = actuator()
 
-        scaleActuator.getAndDisplayScales(ListScalesCommand)
+        actuator.getAndDisplayScales(ListScalesCommand)
 
         verify(listScalesInteractor, times(1)).execute(any<ListScalesRequest>())
-        verify(display, times(1)).displayError(resource.errorMessage + " e")
     }
 
 
@@ -103,10 +91,8 @@ class BaseScaleActuatorTest {
         val response = CreateScaleResponse(Result.success("scale-1"))
         whenever(useCaseFactory.createScale()).thenReturn(createScaleInteractor)
         whenever(createScaleInteractor.execute(any())).thenReturn(response)
-        whenever(formatter.formatId(any())).thenReturn("")
-        val scaleActuator = actuator()
 
-        scaleActuator.createAndDisplayScale(CreateScaleCommand("name\nunit\n1-div1\n2-div2\n3-div3"))
+        actuator.createAndDisplayScale(CreateScaleCommand("name\nunit\n1-div1\n2-div2\n3-div3"))
 
         verify(createScaleInteractor, times(1)).execute(
             CreateScaleRequest(
@@ -119,28 +105,19 @@ class BaseScaleActuatorTest {
                 )
             )
         )
-        verify(display, times(1)).displayMessage(resource.createdScaleMessage)
     }
 
     @Test
     fun createScaleInvalidFormat() {
-        val scaleActuator = actuator()
 
         assertThrows<InvalidScaleFormatException> {
-            scaleActuator.createAndDisplayScale(CreateScaleCommand(""))
+            actuator.createAndDisplayScale(CreateScaleCommand(""))
         }
 
         assertThrows<InvalidScaleFormatException> {
-            scaleActuator.createAndDisplayScale(CreateScaleCommand("name"))
+            actuator.createAndDisplayScale(CreateScaleCommand("name"))
         }
     }
-
-    private fun actuator() = BaseScaleActuator(
-        useCaseFactory,
-        display,
-        resource,
-        formatter
-    )
 
 
     private fun generateResponse() = ListScalesResponse(

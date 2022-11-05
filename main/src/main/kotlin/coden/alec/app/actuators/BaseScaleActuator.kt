@@ -1,22 +1,17 @@
 package coden.alec.app.actuators
 
-import coden.alec.app.formatter.ScaleFormatter
-import coden.alec.app.resources.MessageResource
-import coden.alec.app.util.s
+import coden.alec.app.display.ScaleResponder
 import coden.alec.core.UseCaseFactory
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
-import coden.display.displays.MessageDisplay
 import coden.fsm.Command
 import java.util.regex.Pattern
 
 class BaseScaleActuator(
     private val useCaseFactory: UseCaseFactory,
-    private val display: MessageDisplay,
-    private val messages: MessageResource,
-    private val formatter: ScaleFormatter
+    private val responder: ScaleResponder
 ) : ScaleActuator {
 
     private val scalePattern = Pattern.compile(
@@ -40,15 +35,7 @@ class BaseScaleActuator(
     override fun getAndDisplayScales(command: Command) {
         val listScales = useCaseFactory.listScales()
         val response = listScales.execute(ListScalesRequest()) as ListScalesResponse
-        response.scales.onSuccess {
-            if (it.isEmpty()) {
-                display.displayMessage(messages.listScalesEmptyMessage)
-            } else {
-                display.displayMessage(messages.listScalesMessage.s(formatter.format(it)))
-            }
-        }.onFailure {
-            display.displayError("${messages.errorMessage} ${it.message}")
-        }
+        responder.respondListScales(response)
     }
 
     override fun isValidScale(command: Command): Boolean {
@@ -76,20 +63,16 @@ class BaseScaleActuator(
                 divisions
             )
         ) as CreateScaleResponse
-        response.scaleId.onSuccess {
-            display.displayMessage(messages.createdScaleMessage+formatter.formatId(it))
-        }.onFailure {
-            display.displayError("${messages.errorMessage} ${it.message}")
-        }
+        responder.respondCreateScale(response)
     }
 
     override fun rejectScale(command: Command) {
-        display.displayError("Scale is invalid")
+        responder.respondRejectScale()
     }
 
 
     override fun displayScaleNamePrompt(command: Command) {
-        display.displayPrompt("Input the name of the scale:")
+        responder.respondPromptScaleName()
     }
 
     override fun isValidScaleName(command: Command): Boolean {
@@ -100,16 +83,16 @@ class BaseScaleActuator(
         command.arguments.onSuccess {
             name = it
         }.onFailure {
-            display.displayError("Invalid name format")
+            rejectScaleName(command)
         }
     }
 
     override fun rejectScaleName(command: Command) {
-        display.displayError("Invalid scale name")
+        responder.respondRejectScaleName()
     }
 
     override fun displayScaleUnitPrompt(command: Command) {
-        display.displayPrompt("Input the unit")
+        responder.respondPromptScaleUnit()
     }
 
     override fun isValidScaleUnit(command: Command): Boolean {
@@ -120,16 +103,16 @@ class BaseScaleActuator(
         command.arguments.onSuccess {
             unit = it
         }.onFailure {
-            display.displayError("Invalid name format")
+            rejectScaleUnit(command)
         }
     }
 
     override fun rejectScaleUnit(command: Command) {
-        display.displayError("Invalid format of the unit")
+        responder.respondRejectScaleUnit()
     }
 
     override fun displayScaleDivisionsPrompt(command: Command) {
-        display.displayPrompt("Input the divisions:")
+        responder.respondPromptScaleDivisions()
     }
 
     override fun isValidScaleDivisions(command: Command): Boolean {
@@ -140,12 +123,12 @@ class BaseScaleActuator(
         command.arguments.onSuccess {
             divisions = it
         }.onFailure {
-            display.displayError("Invalid name format")
+            rejectScaleDivisions(command)
         }
     }
 
     override fun rejectScaleDivisions(command: Command) {
-        display.displayError("Invalid division format")
+        responder.respondRejectScaleDivisions()
     }
 
     override fun resetScale(command: Command) {

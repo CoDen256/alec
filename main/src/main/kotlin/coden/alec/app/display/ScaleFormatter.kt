@@ -1,4 +1,4 @@
-package coden.alec.app.formatter
+package coden.alec.app.display
 
 import coden.alec.data.Scale
 
