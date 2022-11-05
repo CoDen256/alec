@@ -4,9 +4,7 @@ import coden.alec.app.actuators.BaseHelpActuator
 import coden.alec.app.actuators.BaseScaleActuator
 import coden.alec.app.actuators.HelpActuator
 import coden.alec.app.actuators.ScaleActuator
-import coden.alec.app.display.BaseScaleResponder
-import coden.alec.app.display.ScaleFormatter
-import coden.alec.app.display.ScaleResponder
+import coden.alec.app.display.*
 import coden.alec.core.ScaleUseCaseFactory
 import coden.alec.data.Scale
 import coden.alec.main.resources.Messages
@@ -42,7 +40,7 @@ class ActuatorConfiguration {
     }
 
     @Bean
-    fun responder(
+    fun scaleResponder(
         messageDisplay: MessageDisplay,
         messages: Messages
     ): ScaleResponder{
@@ -51,15 +49,21 @@ class ActuatorConfiguration {
         )
     }
 
+    @Bean
+    fun scaleParser(): ScaleParser{
+        return BaseScaleParser()
+    }
 
     @Bean
     fun scaleActuator(
         useCaseFactory: ScaleUseCaseFactory,
-        scaleResponder: ScaleResponder
+        scaleResponder: ScaleResponder,
+        scaleParser: ScaleParser
     ): ScaleActuator {
         return BaseScaleActuator(
             useCaseFactory,
-            scaleResponder
+            scaleResponder,
+            scaleParser
         )
     }
 

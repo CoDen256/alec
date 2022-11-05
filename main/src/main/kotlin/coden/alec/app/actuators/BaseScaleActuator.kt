@@ -1,67 +1,47 @@
 package coden.alec.app.actuators
 
+import coden.alec.app.display.ScaleParser
 import coden.alec.app.display.ScaleResponder
 import coden.alec.core.ScaleUseCaseFactory
-import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
 import coden.fsm.Command
-import java.util.regex.Pattern
 
 class BaseScaleActuator(
     private val useCaseFactory: ScaleUseCaseFactory,
-    private val responder: ScaleResponder
+    private val responder: ScaleResponder,
+    private val parser: ScaleParser
 ) : ScaleActuator {
-
-    private val scalePattern = Pattern.compile(
-        "" +
-                "[A-Za-z0-9_-]{1,10}" +
-                "\n[A-Za-z/-]{1,10}" +
-                "(\n\\d+-[A-Za-z0-9_-]+)+"
-    )
-
-    private val namePattern = Pattern.compile("\\w+")
-
-    private val divisionPattern = Pattern.compile(
-        "\\d+-[A-Za-z0-9_-]+" +
-                "(\n\\d+-[A-Za-z0-9_-]+)*"
-    )
 
     private var name: String? = null
     private var unit: String? = null
     private var divisions: String? = null
 
     override fun getAndDisplayScales(command: Command) {
-        val listScales = useCaseFactory.listScales()
-        val response = listScales.execute(ListScalesRequest()) as ListScalesResponse
+        val response = useCaseFactory.listScales().execute(ListScalesRequest()) as ListScalesResponse
         responder.respondListScales(response)
     }
 
     override fun isValidScale(command: Command): Boolean {
-        return if (name != null && unit != null){
+        return if (name != null && unit != null) {
             true
-        }else {
-            command.arguments.getOrNull()?.matches(scalePattern.toRegex()) ?: false
+        } else {
+            return command.arguments.getOrNull()?.let { parser.isValidCreateScaleRequest(it) } ?: false
         }
 
     }
 
     override fun createAndDisplayScale(command: Command) {
-        if (!isValidScale(command)) throw InvalidScaleFormatException("Invalid scale format: ${command.arguments.getOrNull().orEmpty()}")
-        val (name, unit, divisionString) = collectArgs(command.arguments.getOrThrow())
-        val divisions = HashMap<Long, String>()
-        for (arg in divisionString.split("\n")) {
-            val division = arg.split("-")
-            divisions[division[0].toLong()] = division[1]
-        }
-        val createScale = useCaseFactory.createScale()
-        val response = createScale.execute(
-            CreateScaleRequest(
-                name = name,
-                unit = unit,
-                divisions
-            )
+        if (!isValidScale(command)) throw InvalidScaleFormatException(
+            "Invalid scale format: ${
+                command.arguments.getOrNull().orEmpty()
+            }"
+        )
+
+        val input = command.arguments.getOrNull()!!
+        val response = useCaseFactory.createScale().execute(
+            parser.parseCreateScaleRequest(input)
         ) as CreateScaleResponse
         responder.respondCreateScale(response)
     }
@@ -76,7 +56,7 @@ class BaseScaleActuator(
     }
 
     override fun isValidScaleName(command: Command): Boolean {
-        return command.arguments.getOrNull()?.matches(namePattern.toRegex()) ?: false
+        return command.arguments.getOrNull()?.let { parser.isValidScaleName(it) } ?: false
     }
 
     override fun handleScaleName(command: Command) {
@@ -96,7 +76,8 @@ class BaseScaleActuator(
     }
 
     override fun isValidScaleUnit(command: Command): Boolean {
-        return command.arguments.getOrNull()?.matches(namePattern.toRegex()) ?: false
+        return command.arguments.getOrNull()?.let { parser.isValidScaleName(it) } ?: false
+
     }
 
     override fun handleScaleUnit(command: Command) {
@@ -116,7 +97,8 @@ class BaseScaleActuator(
     }
 
     override fun isValidScaleDivisions(command: Command): Boolean {
-        return command.arguments.getOrNull()?.matches(divisionPattern.toRegex()) ?: false
+        return command.arguments.getOrNull()?.let { parser.isValidScaleName(it) } ?: false
+
     }
 
     override fun handleScaleDivisions(command: Command) {
@@ -135,13 +117,5 @@ class BaseScaleActuator(
         name = null
         unit = null
         divisions = null
-    }
-
-    private fun collectArgs(args: String): Triple<String, String, String> {
-        if (name != null && unit != null && divisions != null) {
-            return Triple(name!!, unit!!, divisions!!)
-        }
-        val split = args.split("\n", limit = 3)
-        return Triple(split[0], split[1], split[2])
     }
 }
