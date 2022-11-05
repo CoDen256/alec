@@ -19,8 +19,6 @@ class BaseScaleActuator(
     private val formatter: ScaleFormatter
 ) : ScaleActuator {
 
-
-
     private val scalePattern = Pattern.compile(
         "" +
                 "[A-Za-z0-9_-]{1,10}" +
@@ -63,7 +61,8 @@ class BaseScaleActuator(
     }
 
     override fun createAndDisplayScale(command: Command) {
-        val (name, unit, divisionString) = collectArgs(command)
+        if (!isValidScale(command)) throw InvalidScaleFormatException("Invalid scale format: ${command.arguments.getOrNull().orEmpty()}")
+        val (name, unit, divisionString) = collectArgs(command.arguments.getOrThrow())
         val divisions = HashMap<Long, String>()
         for (arg in divisionString.split("\n")) {
             val division = arg.split("-")
@@ -155,11 +154,11 @@ class BaseScaleActuator(
         divisions = null
     }
 
-    private fun collectArgs(command: Command): Triple<String, String, String> {
+    private fun collectArgs(args: String): Triple<String, String, String> {
         if (name != null && unit != null && divisions != null) {
             return Triple(name!!, unit!!, divisions!!)
         }
-        val split = command.arguments.getOrThrow().split("\n", limit = 3)
+        val split = args.split("\n", limit = 3)
         return Triple(split[0], split[1], split[2])
     }
 }

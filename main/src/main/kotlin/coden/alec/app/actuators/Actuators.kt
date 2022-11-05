@@ -1,6 +1,7 @@
 package coden.alec.app.actuators
 
 import coden.fsm.Command
+import java.util.StringJoiner
 
 
 interface HelpActuator {
@@ -34,5 +35,4 @@ interface ScaleActuator {
 }
 
 
-
-
+class InvalidScaleFormatException(msg: String) : RuntimeException(msg)
