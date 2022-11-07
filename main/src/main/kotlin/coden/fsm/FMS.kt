@@ -8,24 +8,26 @@ interface Command {
     val arguments: Result<String>
 }
 
-abstract class BaseCommand(arguments: String? = null): Command {
+abstract class BaseCommand(arguments: String? = null) : Command {
     override val arguments: Result<String> = arguments?.let {
         Result.success(it)
     } ?: Result.failure(NoArgException())
 
     override fun toString(): String {
-        return this.javaClass.simpleName + arguments.map {"($it)"}.getOrDefault("")
+        return this.javaClass.simpleName + arguments.map { "($it)" }.getOrDefault("")
     }
 }
 
-class NoArgException: RuntimeException("No command argument")
+class NoArgException(msg: String) : RuntimeException(msg) {
+    constructor() : this("No command argument")
+}
 
 data class FSM(val start: State, val table: FSMTable)
 
-open class FSMTable(private val entries: List<Entry>): ArrayList<Entry>(entries) {
+open class FSMTable(private val entries: List<Entry>) : ArrayList<Entry>(entries) {
     constructor(vararg entries: Entry) : this(arrayListOf(*entries))
 
-    operator fun plus (table: FSMTable): FSMTable{
+    operator fun plus(table: FSMTable): FSMTable {
         return FSMTable(this.entries + table.entries)
     }
 }

@@ -8,6 +8,8 @@ import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
 import coden.fsm.Command
+import coden.fsm.NoArgException
+import java.lang.IllegalArgumentException
 
 class BaseScaleActuator(
     private val useCaseFactory: ScaleUseCaseFactory,
@@ -15,9 +17,27 @@ class BaseScaleActuator(
     private val parser: ScaleParser
 ) : ScaleActuator {
 
-    private var name: String? = null
-    private var unit: String? = null
-    private var divisions: String? = null
+    class ScaleCreationgState(
+        private var name: String? = null,
+        private var unit: String? = null,
+        private var divisions: String? = null
+    ){
+        val currentName: Result<String> = name?.let {Result.success(it)} ?: Result.failure(NoArgException("No name provided"))
+
+        fun setName(name: String){
+            this.name = name
+        }
+        fun setUnit(unit: String){
+            this.unit = unit
+        }
+        fun setDivisions(divisions: String){
+            this.divisions = divisions
+        }
+    }
+
+    var name: String? = null
+    var unit: String? = null
+    var divisions: String? = null
 
     override fun getAndDisplayScales(command: Command) {
         val response = useCaseFactory.listScales().execute(ListScalesRequest()) as ListScalesResponse
@@ -70,12 +90,7 @@ class BaseScaleActuator(
     }
 
     override fun handleScaleName(command: Command) {
-        val arguments = command.arguments.getOrThrow()
-        if (parser.isValidScaleName(arguments)){
-            saveName(arguments)
-        }else {
-
-        }
+        saveName(command.arguments.getOrThrow())
     }
 
     private fun saveName(arguments: String) {

@@ -179,6 +179,8 @@ class BaseScaleActuatorTest {
         }
     }
 
+
+
     @Test
     fun handleNameUnitDivisions() {
         val response = CreateScaleResponse(Result.success("scale-1"))
