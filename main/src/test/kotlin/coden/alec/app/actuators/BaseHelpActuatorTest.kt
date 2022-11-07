@@ -28,7 +28,7 @@ class BaseHelpActuatorTest{
         BaseHelpActuator(
             display,
             resource,
-        ).displayHelp(HelpCommand)
+        ).displayHelp()
 
         verify(display, times(1)).displayMessage(resource.startMessage)
     }

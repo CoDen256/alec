@@ -8,6 +8,6 @@ import coden.fsm.FSMTable
 
 
 class HelpTable(help: HelpActuator) : FSMTable(
-    entry(Start, HelpCommand) { help.displayHelp(it); Start },
+    entry(Start, HelpCommand) { help.displayHelp(); Start },
 
     )

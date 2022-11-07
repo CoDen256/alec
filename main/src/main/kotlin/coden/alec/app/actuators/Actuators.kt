@@ -1,37 +1,37 @@
 package coden.alec.app.actuators
 
-import coden.fsm.Command
-import java.util.StringJoiner
-
 
 interface HelpActuator {
-    fun displayHelp(command: Command)
+    fun displayHelp()
 }
 
 
 interface ScaleActuator {
-    fun getAndDisplayScales(command: Command)
+    fun getAndDisplayScales()
 
-    fun isValidScale(command: Command): Boolean
-    fun createAndDisplayScale(command: Command)
-    fun rejectScale(command: Command)
+    fun isValidScale(input: String): Boolean
+    fun createAndDisplayScale(input: String)
+    fun rejectScale()
 
-    fun displayScaleNamePrompt(command: Command)
-    fun isValidScaleName(command: Command): Boolean
-    fun handleScaleName(command: Command)
-    fun rejectScaleName(command: Command)
+    fun displayScaleNamePrompt()
+    fun isValidScaleName(input: String): Boolean
+    fun handleScaleName(input: String)
+    fun rejectScaleName()
 
-    fun displayScaleUnitPrompt(command: Command)
-    fun isValidScaleUnit(command: Command): Boolean
-    fun handleScaleUnit(command: Command)
-    fun rejectScaleUnit(command: Command)
+    fun displayScaleUnitPrompt()
+    fun isValidScaleUnit(input: String): Boolean
+    fun handleScaleUnit(input: String)
+    fun rejectScaleUnit()
 
-    fun displayScaleDivisionsPrompt(command: Command)
-    fun isValidScaleDivisions(command: Command): Boolean
-    fun handleScaleDivisions(command: Command)
-    fun rejectScaleDivisions(command: Command)
+    fun displayScaleDivisionsPrompt()
+    fun isValidScaleDivisions(input: String): Boolean
+    fun handleScaleDivisions(input: String)
+    fun rejectScaleDivisions()
 
-    fun resetScale(command: Command)
+    fun isValidScaleFromPreviousInput(input: String): Boolean //TODO rewrite to contain only Result<Unit>
+    fun createFromPreviousInputAndDisplayScale()
+
+    fun resetScale()
 }
 
 

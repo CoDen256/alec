@@ -4,73 +4,69 @@ import coden.alec.app.actuators.ScaleActuator
 import coden.alec.app.fsm.*
 import coden.fsm.Entry.Companion.entry
 import coden.fsm.FSMTable
+import coden.fsm.requireArgument
 
 class ScaleTable(scale: ScaleActuator) : FSMTable(
-    entry(Start, ListScalesCommand) { scale.getAndDisplayScales(it); Start },
+    entry(Start, ListScalesCommand) { scale.getAndDisplayScales(); Start },
 
-    entry(Start, CreateScaleCommand::class) {
+    entry(Start, CreateScaleCommand::class, requireArgument {
         when {
             scale.isValidScale(it) -> {
                 scale.createAndDisplayScale(it); Start
             }
 
             else -> {
-                scale.rejectScale(it); Start
+                scale.rejectScale(); Start
             }
         }
-    },
+    }),
 
-    entry(Start, CreateScaleCommandNoArgs) { scale.displayScaleNamePrompt(it); WaitScaleName },
+    entry(Start, CreateScaleCommandNoArgs) { scale.displayScaleNamePrompt(); WaitScaleName },
 
-    entry(WaitScaleName, TextCommand::class) {
+    entry(WaitScaleName, TextCommand::class, requireArgument {
         when {
             scale.isValidScaleName(it) -> {
                 scale.handleScaleName(it)
-                scale.displayScaleUnitPrompt(it)
+                scale.displayScaleUnitPrompt()
                 WaitScaleUnit
             }
 
             else -> {
-                scale.rejectScaleName(it)
-                scale.displayScaleNamePrompt(it)
+                scale.rejectScaleName()
+                scale.displayScaleNamePrompt()
                 WaitScaleName
             }
         }
-    },
-    entry(WaitScaleUnit, TextCommand::class) {
+    }),
+    entry(WaitScaleUnit, TextCommand::class, requireArgument {
         when {
             scale.isValidScaleUnit(it) -> {
                 scale.handleScaleUnit(it)
-                scale.displayScaleDivisionsPrompt(it)
+                scale.displayScaleDivisionsPrompt()
                 WaitScaleDivision
             }
 
             else -> {
-                scale.rejectScaleUnit(it)
-                scale.displayScaleUnitPrompt(it)
+                scale.rejectScaleUnit()
+                scale.displayScaleUnitPrompt()
                 WaitScaleUnit
             }
         }
-    },
+    }),
 
-    entry(WaitScaleDivision, TextCommand::class) {
-        when {
-            !scale.isValidScaleDivisions(it) -> {
-                scale.rejectScaleDivisions(it)
-                scale.displayScaleDivisionsPrompt(it)
-                WaitScaleDivision
-            }
-
-            !scale.isValidScale(it) -> {
-                scale.rejectScale(it)
-                Start
-            }
-
-            else -> {
-                scale.handleScaleDivisions(it)
-                scale.createAndDisplayScale(it)
-                Start
-            }
+    entry(WaitScaleDivision, TextCommand::class, requireArgument {
+        if (!scale.isValidScaleDivisions(it)){
+            scale.rejectScaleDivisions()
+            scale.displayScaleDivisionsPrompt()
+            return@requireArgument WaitScaleDivision
         }
-    },
+        scale.handleScaleDivisions(it)
+
+        if(!scale.isValidScaleFromPreviousInput(it)){
+            scale.rejectScale()
+            return@requireArgument Start
+        }
+        scale.createFromPreviousInputAndDisplayScale()
+        Start
+    }),
 )

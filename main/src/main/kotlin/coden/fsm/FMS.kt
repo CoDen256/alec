@@ -67,5 +67,12 @@ data class Entry(
             output: State,
             action: (Command) -> Unit,
         ): Entry = entry(input, command) { action(it); output }
+
+    }
+}
+
+fun requireArgument(action: (String) -> State): (Command) -> State{
+    return {
+        action(it.arguments.getOrThrow())
     }
 }

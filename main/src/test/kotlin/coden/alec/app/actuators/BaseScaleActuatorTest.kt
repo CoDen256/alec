@@ -60,7 +60,7 @@ class BaseScaleActuatorTest {
         whenever(useCaseFactory.listScales()).thenReturn(listScalesInteractor)
         whenever(listScalesInteractor.execute(any())).thenReturn(response)
 
-        actuator.getAndDisplayScales(ListScalesCommand)
+        actuator.getAndDisplayScales()
 
         verify(listScalesInteractor).execute(any<ListScalesRequest>())
         verify(responder).respondListScales(response)
@@ -84,7 +84,7 @@ class BaseScaleActuatorTest {
         whenever(parser.parseCreateScaleRequest("hustensaft")).thenReturn(request)
         whenever(createScaleInteractor.execute(any())).thenReturn(response)
 
-        actuator.createAndDisplayScale(CreateScaleCommand("hustensaft"))
+        actuator.createAndDisplayScale("hustensaft")
 
         verify(parser).isValidCreateScaleRequest("hustensaft")
         verify(parser).parseCreateScaleRequest("hustensaft")
@@ -98,20 +98,17 @@ class BaseScaleActuatorTest {
         whenever(parser.isValidCreateScaleRequest("")).thenReturn(false)
 
         assertThrows<InvalidScaleFormatException> {
-            actuator.createAndDisplayScale(CreateScaleCommand("hustensaft"))
+            actuator.createAndDisplayScale("hustensaft")
         }
 
         assertThrows<InvalidScaleFormatException> {
-            actuator.createAndDisplayScale(CreateScaleCommand(""))
+            actuator.createAndDisplayScale("")
         }
 
         assertThrows<InvalidScaleFormatException> {
-            actuator.createAndDisplayScale(TextCommand(""))
+            actuator.createAndDisplayScale("")
         }
 
-        assertThrows<NoArgException> {
-            actuator.createAndDisplayScale(ListScalesCommand)
-        }
 
         verify(parser).isValidCreateScaleRequest("hustensaft")
         verify(parser, times(2)).isValidCreateScaleRequest("")
@@ -123,14 +120,10 @@ class BaseScaleActuatorTest {
         whenever(parser.isValidCreateScaleRequest("hustensaft")).thenReturn(false)
         whenever(parser.isValidCreateScaleRequest("h")).thenReturn(true)
 
-        assertFalse(actuator.isValidScale(CreateScaleCommand("hustensaft")))
-        assertFalse(actuator.isValidScale(TextCommand("hustensaft")))
-        assertTrue(actuator.isValidScale(CreateScaleCommand("h")))
-        assertTrue(actuator.isValidScale(TextCommand("h")))
-
-        assertThrows<NoArgException> {
-            actuator.isValidScale(ListScalesCommand)
-        }
+        assertFalse(actuator.isValidScale("hustensaft"))
+        assertFalse(actuator.isValidScale("hustensaft"))
+        assertTrue(actuator.isValidScale("h"))
+        assertTrue(actuator.isValidScale("h"))
     }
 
     @Test
@@ -138,14 +131,11 @@ class BaseScaleActuatorTest {
         whenever(parser.isValidScaleName("hustensaft")).thenReturn(false)
         whenever(parser.isValidScaleName("h")).thenReturn(true)
 
-        assertFalse(actuator.isValidScaleName(CreateScaleCommand("hustensaft")))
-        assertFalse(actuator.isValidScaleName(TextCommand("hustensaft")))
-        assertTrue(actuator.isValidScaleName(CreateScaleCommand("h")))
-        assertTrue(actuator.isValidScaleName(TextCommand("h")))
+        assertFalse(actuator.isValidScaleName("hustensaft"))
+        assertFalse(actuator.isValidScaleName("hustensaft"))
+        assertTrue(actuator.isValidScaleName("h"))
+        assertTrue(actuator.isValidScaleName("h"))
 
-        assertThrows<NoArgException> {
-            actuator.isValidScaleName(ListScalesCommand)
-        }
     }
 
     @Test
@@ -153,14 +143,10 @@ class BaseScaleActuatorTest {
         whenever(parser.isValidScaleUnit("hustensaft")).thenReturn(false)
         whenever(parser.isValidScaleUnit("h")).thenReturn(true)
 
-        assertFalse(actuator.isValidScaleUnit(CreateScaleCommand("hustensaft")))
-        assertFalse(actuator.isValidScaleUnit(TextCommand("hustensaft")))
-        assertTrue(actuator.isValidScaleUnit(CreateScaleCommand("h")))
-        assertTrue(actuator.isValidScaleUnit(TextCommand("h")))
-
-        assertThrows<NoArgException> {
-            actuator.isValidScaleUnit(ListScalesCommand)
-        }
+        assertFalse(actuator.isValidScaleUnit("hustensaft"))
+        assertFalse(actuator.isValidScaleUnit("hustensaft"))
+        assertTrue(actuator.isValidScaleUnit("h"))
+        assertTrue(actuator.isValidScaleUnit("h"))
     }
 
 
@@ -169,14 +155,10 @@ class BaseScaleActuatorTest {
         whenever(parser.isValidDivisions("hustensaft")).thenReturn(false)
         whenever(parser.isValidDivisions("h")).thenReturn(true)
 
-        assertFalse(actuator.isValidScaleDivisions(CreateScaleCommand("hustensaft")))
-        assertFalse(actuator.isValidScaleDivisions(TextCommand("hustensaft")))
-        assertTrue(actuator.isValidScaleDivisions(CreateScaleCommand("h")))
-        assertTrue(actuator.isValidScaleDivisions(TextCommand("h")))
-
-        assertThrows<NoArgException> {
-            actuator.isValidScaleDivisions(ListScalesCommand)
-        }
+        assertFalse(actuator.isValidScaleDivisions("hustensaft"))
+        assertFalse(actuator.isValidScaleDivisions("hustensaft"))
+        assertTrue(actuator.isValidScaleDivisions("h"))
+        assertTrue(actuator.isValidScaleDivisions("h"))
     }
 
 
@@ -201,16 +183,16 @@ class BaseScaleActuatorTest {
         whenever(parser.isValidScaleUnit("unit")).thenReturn(true)
         whenever(parser.isValidDivisions("div")).thenReturn(true)
 
-        actuator.isValidScaleName(TextCommand("name"))
-        actuator.handleScaleName(TextCommand("name"))
+        actuator.isValidScaleName("name")
+        actuator.handleScaleName("name")
 
-        actuator.isValidScaleUnit(TextCommand("unit"))
-        actuator.handleScaleUnit(CreateScaleCommand("unit")) // just to test that the command doesn't matter
+        actuator.isValidScaleUnit("unit")
+        actuator.handleScaleUnit("unit")
 
-        actuator.isValidScaleDivisions(TextCommand("div"))
-        actuator.handleScaleDivisions(TextCommand("div"))
+        actuator.isValidScaleDivisions("div")
+        actuator.handleScaleDivisions("div")
 
-        actuator.createAndDisplayScale(TextCommand("div"))
+        actuator.createAndDisplayScale("div")
 
         verify(parser, never()).isValidCreateScaleRequest(any())
         verify(parser).parseCreateScaleRequest("name", "unit", "div")
