@@ -2,22 +2,12 @@ package coden.alec.app.actuators
 
 import coden.alec.app.display.ScaleParser
 import coden.alec.app.display.ScaleResponder
-import coden.alec.app.fsm.CreateScaleCommand
-import coden.alec.app.fsm.ListScalesCommand
-import coden.alec.app.fsm.TextCommand
 import coden.alec.core.*
-import coden.alec.data.Scale
-import coden.alec.data.ScaleDivision
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
-import coden.alec.interactors.definer.scale.ListScalesRequest
-import coden.alec.interactors.definer.scale.ListScalesResponse
-import coden.fsm.NoArgException
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
@@ -69,38 +59,28 @@ class BaseScaleActuatorTest {
 
 
     @Test
-    fun isValidScale() {
-        whenever(parser.isValidCreateScaleRequest("hustensaft")).thenReturn(false)
-        whenever(parser.isValidCreateScaleRequest("h")).thenReturn(true)
+    fun createScale() {
+        val response = Result.success(CreateScaleResponse("scale-1"))
+        val request = CreateScaleRequest(
+            name = "name",
+            unit = "unit",
+            divisions = mapOf(
+                1L to "div1",
+                2L to "div2",
+                3L to "div3"
+            )
+        )
+        whenever(useCaseFactory.createScale()).thenReturn(createScaleInteractor)
+        whenever(parser.parseCreateScaleRequest("hustensaft")).thenReturn(request)
+        whenever(createScaleInteractor.execute(any())).thenReturn(response)
 
-        assertFalse(actuator.isValidScale("hustensaft"))
-        assertFalse(actuator.isValidScale("hustensaft"))
-        assertTrue(actuator.isValidScale("h"))
-        assertTrue(actuator.isValidScale("h"))
+        val result = actuator.createScale("hustensaft")
+
+        verify(parser).parseCreateScaleRequest("hustensaft")
+        verify(createScaleInteractor).execute(request)
+        assertTrue(result.isSuccess)
+        assertEquals(response.getOrThrow(), result.getOrThrow())
     }
-
-//    @Test
-//    fun createAndDisplayScale() {
-//        val response = CreateScaleResponse(Result.success("scale-1"))
-//        val request = CreateScaleRequest(
-//            name = "name",
-//            unit = "unit",
-//            divisions = mapOf(
-//                1L to "div1",
-//                2L to "div2",
-//                3L to "div3"
-//            )
-//        )
-//        whenever(useCaseFactory.createScale()).thenReturn(createScaleInteractor)
-//        whenever(parser.parseCreateScaleRequest("hustensaft")).thenReturn(request)
-//        whenever(createScaleInteractor.execute(any())).thenReturn(response)
-//
-//        actuator.createAndDisplayScale("hustensaft")
-//
-//        verify(parser).parseCreateScaleRequest("hustensaft")
-//        verify(createScaleInteractor).execute(request)
-//        verify(responder).respondCreateScale(response)
-//    }
 
     @Test
     fun rejectScale() {
@@ -111,9 +91,6 @@ class BaseScaleActuatorTest {
         verify(responder).respondRejectScale()
     }
 
-    @Test
-    internal fun displayPrompt() {
-    }
 
 //    @Test
 //    fun createScaleInvalidFormat() {

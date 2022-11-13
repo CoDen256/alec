@@ -11,7 +11,6 @@ interface HelpActuator {
 interface ScaleActuator {
     fun getAndDisplayScales()
 
-    fun isValidScale(input: String): Boolean
     fun createScale(input: String): Result<CreateScaleResponse>
     fun displayScale(response: CreateScaleResponse)
 

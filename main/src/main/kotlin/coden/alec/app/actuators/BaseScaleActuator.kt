@@ -52,9 +52,6 @@ class BaseScaleActuator(
         responder.respondListScales(response.getOrThrow())
     }
 
-    override fun isValidScale(input: String): Boolean {
-        return parser.isValidCreateScaleRequest(input)
-    }
 
     override fun createScale(input: String): Result<CreateScaleResponse> {
         return useCaseFactory.createScale().execute(parser.parseCreateScaleRequest(input)) as Result<CreateScaleResponse>
