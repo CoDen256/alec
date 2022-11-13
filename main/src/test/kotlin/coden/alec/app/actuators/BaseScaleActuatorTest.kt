@@ -68,6 +68,17 @@ class BaseScaleActuatorTest {
 
 
     @Test
+    fun isValidScale() {
+        whenever(parser.isValidCreateScaleRequest("hustensaft")).thenReturn(false)
+        whenever(parser.isValidCreateScaleRequest("h")).thenReturn(true)
+
+        assertFalse(actuator.isValidScale("hustensaft"))
+        assertFalse(actuator.isValidScale("hustensaft"))
+        assertTrue(actuator.isValidScale("h"))
+        assertTrue(actuator.isValidScale("h"))
+    }
+
+    @Test
     fun createAndDisplayScale() {
         val response = CreateScaleResponse(Result.success("scale-1"))
         val request = CreateScaleRequest(
@@ -80,22 +91,32 @@ class BaseScaleActuatorTest {
             )
         )
         whenever(useCaseFactory.createScale()).thenReturn(createScaleInteractor)
-        whenever(parser.isValidCreateScaleRequest("hustensaft")).thenReturn(true)
         whenever(parser.parseCreateScaleRequest("hustensaft")).thenReturn(request)
         whenever(createScaleInteractor.execute(any())).thenReturn(response)
 
         actuator.createAndDisplayScale("hustensaft")
 
-        verify(parser).isValidCreateScaleRequest("hustensaft")
         verify(parser).parseCreateScaleRequest("hustensaft")
         verify(createScaleInteractor).execute(request)
         verify(responder).respondCreateScale(response)
     }
 
     @Test
+    fun rejectScale() {
+        actuator.rejectScale()
+        actuator.rejectScaleName()
+        actuator.rejectScaleDivisions()
+        actuator.rejectScaleUnit()
+        verify(responder).respondRejectScale()
+    }
+
+    @Test
+    internal fun displayPrompt() {
+    }
+
+    @Test
     fun createScaleInvalidFormat() {
-        whenever(parser.isValidCreateScaleRequest("hustensaft")).thenReturn(false)
-        whenever(parser.isValidCreateScaleRequest("")).thenReturn(false)
+        whenever(parser.parseCreateScaleRequest(any())).thenThrow(InvalidScaleFormatException::class.java)
 
         assertThrows<InvalidScaleFormatException> {
             actuator.createAndDisplayScale("hustensaft")
@@ -105,26 +126,11 @@ class BaseScaleActuatorTest {
             actuator.createAndDisplayScale("")
         }
 
-        assertThrows<InvalidScaleFormatException> {
-            actuator.createAndDisplayScale("")
-        }
-
-
-        verify(parser).isValidCreateScaleRequest("hustensaft")
-        verify(parser, times(2)).isValidCreateScaleRequest("")
+        verify(parser, times(2)).parseCreateScaleRequest(any())
         verifyNoMoreInteractions(parser)
     }
 
-    @Test
-    fun isValidScale() {
-        whenever(parser.isValidCreateScaleRequest("hustensaft")).thenReturn(false)
-        whenever(parser.isValidCreateScaleRequest("h")).thenReturn(true)
 
-        assertFalse(actuator.isValidScale("hustensaft"))
-        assertFalse(actuator.isValidScale("hustensaft"))
-        assertTrue(actuator.isValidScale("h"))
-        assertTrue(actuator.isValidScale("h"))
-    }
 
     @Test
     fun isValidName() {

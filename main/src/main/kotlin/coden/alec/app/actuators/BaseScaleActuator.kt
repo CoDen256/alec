@@ -46,7 +46,7 @@ class BaseScaleActuator(
         }
     }
 
-    val state = ScaleCreatingState()
+    private val state = ScaleCreatingState()
 
     override fun getAndDisplayScales() {
         val response = useCaseFactory.listScales().execute(ListScalesRequest()) as ListScalesResponse
@@ -136,7 +136,7 @@ class BaseScaleActuator(
         )
     }
 
-    override fun resetScale() {
+    override fun resetPreviousInputScale() {
         state.clear()
     }
 }

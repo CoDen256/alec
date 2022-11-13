@@ -31,7 +31,7 @@ interface ScaleActuator {
     fun isValidScaleFromPreviousInput(input: String): Boolean //TODO rewrite to contain only Result<Unit>
     fun createFromPreviousInputAndDisplayScale()
 
-    fun resetScale()
+    fun resetPreviousInputScale()
 }
 
 

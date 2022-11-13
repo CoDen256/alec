@@ -64,9 +64,11 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
 
         if(!scale.isValidScaleFromPreviousInput(it)){
             scale.rejectScale()
+            scale.resetPreviousInputScale()
             return@requireArgument Start
         }
         scale.createFromPreviousInputAndDisplayScale()
+        scale.resetPreviousInputScale()
         Start
     }),
 )
