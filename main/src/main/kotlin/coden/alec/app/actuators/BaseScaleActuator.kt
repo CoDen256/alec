@@ -1,7 +1,6 @@
 package coden.alec.app.actuators
 
 import coden.alec.app.display.CreateScaleRequestBuilder
-import coden.alec.app.display.ParsedScaleRequest
 import coden.alec.app.display.ScaleParser
 import coden.alec.app.display.ScaleResponder
 import coden.alec.core.ScaleUseCaseFactory
@@ -25,13 +24,7 @@ class BaseScaleActuator(
         return useCaseFactory.listScales().execute(ListScalesRequest()) as Result<ListScalesResponse>
     }
 
-    override fun createScale(request: ParsedScaleRequest): Result<CreateScaleResponse> {
-        return useCaseFactory.createScale().execute(
-            CreateScaleRequest(
-                name = request.parsedName,
-                unit = request.parsedUnit,
-                divisions = request.parsedDivisions
-            )
-        ) as Result<CreateScaleResponse>
+    override fun createScale(request: CreateScaleRequest): Result<CreateScaleResponse> {
+        return useCaseFactory.createScale().execute(request) as Result<CreateScaleResponse>
     }
 }

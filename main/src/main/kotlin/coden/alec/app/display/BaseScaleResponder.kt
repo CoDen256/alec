@@ -48,20 +48,4 @@ class BaseScaleResponder(
         display.displayPrompt(messages.scaleDivisionsPrompt)
 
     }
-
-    override fun respondRejectScale() {
-        display.displayError(messages.rejectScaleMessage)
-    }
-
-    override fun respondRejectScaleName() {
-        display.displayError(messages.rejectScaleNameMessage)
-    }
-
-    override fun respondRejectScaleUnit() {
-        display.displayError(messages.rejectScaleUnitMessage)
-    }
-
-    override fun respondRejectScaleDivisions() {
-        display.displayError(messages.rejectScaleDivisionsMessage)
-    }
 }

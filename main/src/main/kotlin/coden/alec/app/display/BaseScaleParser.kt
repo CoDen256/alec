@@ -19,7 +19,7 @@ class BaseScaleParser : ScaleParser {
                 "(\n\\d+-[A-Za-z0-9_-]+)*"
     )
 
-    override fun parseCreateScaleRequest(input: String): CreateScaleRequest {
+    override fun parseCreateScaleRequest(input: String): Result<CreateScaleRequest> {
         input.verify("scale", this::isValidCreateScaleRequest)
 //        val (name, unit, divisionString) = collectArgs(command.arguments.getOrThrow())
 //        val divisions = HashMap<Long, String>()
@@ -30,26 +30,23 @@ class BaseScaleParser : ScaleParser {
         TODO("Not yet implemented")
     }
 
-    override fun parseCreateScaleRequest(name: String, unit: String, divisions: String): CreateScaleRequest {
-        TODO("Not yet implemented")
-    }
 
     override fun parseScaleName(input: String): Result<String> {
         input.verify("scale name", this::isValidScaleName)
         TODO("Not yet implemented")
     }
 
-    override fun parseScaleUnit(input: String): String {
+    override fun parseScaleUnit(input: String): Result<String> {
         input.verify("scale unit", this::isValidScaleUnit)
         TODO("Not yet implemented")
     }
 
-    override fun parseScaleDivisions(input: String): Map<String, Long> {
+    override fun parseScaleDivisions(input: String): Result<Map<Long, String>> {
         input.verify("scale divisions", this::isValidDivisions)
         TODO("Not yet implemented")
     }
 
-    override fun isValidCreateScaleRequest(input: String): Boolean {
+    private fun isValidCreateScaleRequest(input: String): Boolean {
         return input.matches(scalePattern)
     }
 
@@ -57,11 +54,11 @@ class BaseScaleParser : ScaleParser {
         return input.matches(namePattern)
     }
 
-    override fun isValidScaleUnit(input: String): Boolean {
+    private fun isValidScaleUnit(input: String): Boolean {
         return input.matches(namePattern)
     }
 
-    override fun isValidDivisions(input: String): Boolean {
+    private  fun isValidDivisions(input: String): Boolean {
         return input.matches(divisionPattern)
 
     }

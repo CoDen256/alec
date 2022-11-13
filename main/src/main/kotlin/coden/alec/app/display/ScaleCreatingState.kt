@@ -1,5 +1,6 @@
 package coden.alec.app.display
 
+import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.fsm.NoArgException
 
 class ScaleCreatingState(
@@ -26,8 +27,8 @@ class ScaleCreatingState(
         this.divisions = parsedDivision
     }
 
-    override fun build(): ParsedScaleRequest {
-        return ParsedScaleRequest(
+    override fun build(): CreateScaleRequest {
+        return CreateScaleRequest(
             currentName.getOrThrow(),
             currentUnit.getOrThrow(),
             currentDivisions.getOrThrow()

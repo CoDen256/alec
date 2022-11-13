@@ -1,9 +1,9 @@
 package coden.alec.app.actuators
 
 import coden.alec.app.display.CreateScaleRequestBuilder
-import coden.alec.app.display.ParsedScaleRequest
 import coden.alec.app.display.ScaleParser
 import coden.alec.app.display.ScaleResponder
+import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesResponse
 
@@ -15,7 +15,7 @@ interface HelpActuator {
 
 interface ScaleActuator: ScaleResponder, ScaleParser, CreateScaleRequestBuilder {
     fun listScales(): Result<ListScalesResponse>
-    fun createScale(request: ParsedScaleRequest): Result<CreateScaleResponse>
+    fun createScale(request: CreateScaleRequest): Result<CreateScaleResponse>
 }
 
 open class UserException(msg: String): RuntimeException(msg)
