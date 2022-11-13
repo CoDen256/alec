@@ -2,7 +2,7 @@ package coden.alec.main.table
 
 import coden.alec.app.actuators.ScaleActuator
 import coden.alec.app.fsm.*
-import coden.alec.app.util.get
+import coden.alec.app.util.unpack
 import coden.fsm.Entry.Companion.entry
 import coden.fsm.FSMTable
 import coden.fsm.requireArgument
@@ -11,29 +11,22 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
     entry(Start, ListScalesCommand) { scale.getAndDisplayScales(); Start },
 
     entry(Start, CreateScaleCommand::class, requireArgument { arg ->
-        scale.createScale(arg).get(
-            {scale.displayScale(it); Start},
-            {scale.onError(it); Start},
-            {scale.onInternalError(it); Start }
+        scale.createScale(arg).unpack(
+            { scale.respondCreateScale(it); Start },
+            { scale.onUserError(it); Start },
+            { scale.onInternalError(it); Start }
         )
     }),
 
     entry(Start, CreateScaleCommandNoArgs) { scale.displayScaleNamePrompt(); WaitScaleName },
 
-    entry(WaitScaleName, TextCommand::class, requireArgument {
-        when {
-            scale.isValidScaleName(it) -> {
-                scale.handleScaleName(it)
-                scale.displayScaleUnitPrompt()
-                WaitScaleUnit
-            }
+    entry(WaitScaleName, TextCommand::class, requireArgument { arg ->
+        scale.parseScaleName(arg).unpack(
+            { scale.handleScaleName(it); scale.displayScaleUnitPrompt(); WaitScaleUnit },
+            { scale.onUserError(it); WaitScaleName },
+            { scale.onInternalError(it); scale.resetPreviousInputScale(); Start }
+        )
 
-            else -> {
-                scale.rejectScaleName()
-                scale.displayScaleNamePrompt()
-                WaitScaleName
-            }
-        }
     }),
     entry(WaitScaleUnit, TextCommand::class, requireArgument {
         when {

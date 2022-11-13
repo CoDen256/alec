@@ -12,7 +12,7 @@ class BaseScaleActuator(
     private val useCaseFactory: ScaleUseCaseFactory,
     private val responder: ScaleResponder,
     private val parser: ScaleParser
-) : ScaleActuator {
+) : ScaleActuator, ScaleA {
 
     class ScaleCreatingState(
         private var name: String? = null,
@@ -65,11 +65,11 @@ class BaseScaleActuator(
         responder.respondRejectScale()
     }
 
-    override fun onError(throwable: Throwable) {
+    override fun onUserError(throwable: UserException) {
         responder.respondError(throwable)
     }
 
-    override fun onInternalError(throwable: Throwable) {
+    override fun onInternalError(throwable: InternalException) {
         responder.respondInternalError(throwable)
     }
 
@@ -77,18 +77,10 @@ class BaseScaleActuator(
         responder.respondPromptScaleName()
     }
 
-    override fun isValidScaleName(input: String): Boolean {
-        return parser.isValidScaleName(input)
+    override fun parseScaleName(input: String): Result<String> {
+        return parser.parseScaleName(input)
     }
 
-    override fun handleScaleName(input: String) {
-        state.setName(input)
-    }
-
-
-    override fun rejectScaleName() {
-        responder.respondRejectScaleName()
-    }
 
     override fun displayScaleUnitPrompt() {
         responder.respondPromptScaleUnit()

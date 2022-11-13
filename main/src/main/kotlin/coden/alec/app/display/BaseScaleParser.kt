@@ -34,7 +34,7 @@ class BaseScaleParser : ScaleParser {
         TODO("Not yet implemented")
     }
 
-    override fun parseScaleName(input: String): String {
+    override fun parseScaleName(input: String): Result<String> {
         input.verify("scale name", this::isValidScaleName)
         TODO("Not yet implemented")
     }
@@ -53,7 +53,7 @@ class BaseScaleParser : ScaleParser {
         return input.matches(scalePattern)
     }
 
-    override fun isValidScaleName(input: String): Boolean {
+    private fun isValidScaleName(input: String): Boolean {
         return input.matches(namePattern)
     }
 

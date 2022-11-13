@@ -91,6 +91,13 @@ class BaseScaleActuatorTest {
         verify(responder).respondRejectScale()
     }
 
+    @Test
+     fun handleScaleName() {
+        whenever(parser.parseScaleName(" name" )).thenReturn("name")
+
+        val result = actuator.parseScaleName("name")
+        assertEquals("name", result.getOrThrow())
+    }
 
 //    @Test
 //    fun createScaleInvalidFormat() {
