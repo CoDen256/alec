@@ -12,7 +12,7 @@ class BaseScaleResponder(
     private val formatter: ScaleFormatter
 ) : ScaleResponder {
 
-    override fun respondError(it: Throwable) {
+    override fun respondUserError(it: Throwable) {
         display.displayError("${messages.errorMessage} ${it.message}")
 
     }

@@ -30,8 +30,6 @@ interface ScaleActuator: ScaleResponder, ScaleParser {
     fun createFromPreviousInputAndDisplayScale()
 
     fun rejectScale()
-    fun onUserError(throwable: UserException)
-    fun onInternalError(throwable: InternalException)
     fun resetPreviousInputScale()
 }
 

@@ -85,17 +85,16 @@ class BaseScaleActuatorTest {
     @Test
     fun rejectScale() {
         actuator.rejectScale()
-        actuator.rejectScaleName()
         actuator.rejectScaleDivisions()
         actuator.rejectScaleUnit()
         verify(responder).respondRejectScale()
     }
 
     @Test
-     fun handleScaleName() {
-        whenever(parser.parseScaleName(" name" )).thenReturn("name")
+     fun parseScaleName() {
+        whenever(parser.parseScaleName(" name " )).thenReturn(Result.success("name"))
 
-        val result = actuator.parseScaleName("name")
+        val result = actuator.parseScaleName(" name ")
         assertEquals("name", result.getOrThrow())
     }
 
@@ -115,19 +114,6 @@ class BaseScaleActuatorTest {
 //        verifyNoMoreInteractions(parser)
 //    }
 
-
-
-    @Test
-    fun isValidName() {
-        whenever(parser.isValidScaleName("hustensaft")).thenReturn(false)
-        whenever(parser.isValidScaleName("h")).thenReturn(true)
-
-        assertFalse(actuator.isValidScaleName("hustensaft"))
-        assertFalse(actuator.isValidScaleName("hustensaft"))
-        assertTrue(actuator.isValidScaleName("h"))
-        assertTrue(actuator.isValidScaleName("h"))
-
-    }
 
     @Test
     fun isValidUnit() {

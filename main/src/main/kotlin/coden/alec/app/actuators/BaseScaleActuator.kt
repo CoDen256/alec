@@ -12,7 +12,7 @@ class BaseScaleActuator(
     private val useCaseFactory: ScaleUseCaseFactory,
     private val responder: ScaleResponder,
     private val parser: ScaleParser
-) : ScaleActuator, ScaleA {
+) : ScaleActuator, ScaleResponder by responder, ScaleParser by parser {
 
     class ScaleCreatingState(
         private var name: String? = null,
@@ -57,24 +57,18 @@ class BaseScaleActuator(
         return useCaseFactory.createScale().execute(parser.parseCreateScaleRequest(input)) as Result<CreateScaleResponse>
     }
 
-    override fun displayScale(response: CreateScaleResponse) {
-        responder.respondCreateScale(response)
-    }
 
     override fun rejectScale() {
         responder.respondRejectScale()
     }
 
-    override fun onUserError(throwable: UserException) {
-        responder.respondError(throwable)
-    }
-
-    override fun onInternalError(throwable: InternalException) {
-        responder.respondInternalError(throwable)
-    }
 
     override fun displayScaleNamePrompt() {
         responder.respondPromptScaleName()
+    }
+
+    override fun handleScaleName(parsedName: String) {
+        TODO("Not yet implemented")
     }
 
     override fun parseScaleName(input: String): Result<String> {
@@ -115,10 +109,9 @@ class BaseScaleActuator(
     }
 
     override fun isValidScaleFromPreviousInput(input: String): Boolean {
-        val name = state.currentName.getOrNull() ?: return false
         val unit = state.currentUnit.getOrNull() ?: return false
         val divisions = state.currentDivisions.getOrNull() ?: return false
-        return isValidScaleName(name) && isValidScaleUnit(unit) && isValidScaleDivisions(divisions)
+        return  isValidScaleUnit(unit) && isValidScaleDivisions(divisions)
     }
 
     override fun createFromPreviousInputAndDisplayScale() {

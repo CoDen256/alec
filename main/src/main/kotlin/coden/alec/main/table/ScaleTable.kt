@@ -13,8 +13,8 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
     entry(Start, CreateScaleCommand::class, requireArgument { arg ->
         scale.createScale(arg).unpack(
             { scale.respondCreateScale(it); Start },
-            { scale.onUserError(it); Start },
-            { scale.onInternalError(it); Start }
+            { scale.respondUserError(it); Start },
+            { scale.respondInternalError(it); Start }
         )
     }),
 
@@ -23,8 +23,8 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
     entry(WaitScaleName, TextCommand::class, requireArgument { arg ->
         scale.parseScaleName(arg).unpack(
             { scale.handleScaleName(it); scale.displayScaleUnitPrompt(); WaitScaleUnit },
-            { scale.onUserError(it); WaitScaleName },
-            { scale.onInternalError(it); scale.resetPreviousInputScale(); Start }
+            { scale.respondUserError(it); WaitScaleName },
+            { scale.respondInternalError(it); scale.resetPreviousInputScale(); Start }
         )
 
     }),
