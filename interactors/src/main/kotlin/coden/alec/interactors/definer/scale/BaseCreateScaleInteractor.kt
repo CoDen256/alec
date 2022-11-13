@@ -11,7 +11,7 @@ class BaseCreateScaleInteractor(
     private val gateway: ScaleGateway,
 ) : CreateScaleInteractor {
 
-    override fun execute(request: Request): Response {
+    override fun execute(request: Request): Result<Response> {
         request as CreateScaleRequest
         val newScale = Scale(
             name = request.name,
@@ -21,7 +21,7 @@ class BaseCreateScaleInteractor(
             divisions = createDivisions(request.divisions)
         )
         gateway.addScale(newScale)
-        return CreateScaleResponse(Result.success(newScale.id))
+        return Result.success(CreateScaleResponse(newScale.id))
     }
 
     private fun createDivisions(divisions: Map<Long, String>): List<ScaleDivision>{
@@ -36,7 +36,7 @@ data class CreateScaleRequest(
     val divisions: Map<Long, String>
 ): Request
 
-data class CreateScaleResponse(val scaleId: Result<String>): Response
+data class CreateScaleResponse(val scaleId: String): Response
 
 
 

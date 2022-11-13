@@ -11,24 +11,28 @@ class BaseScaleResponder(
     private val messages: MessageResource,
     private val formatter: ScaleFormatter
 ) : ScaleResponder {
+
+    override fun respondError(it: Throwable) {
+        display.displayError("${messages.errorMessage} ${it.message}")
+
+    }
+
+    override fun respondInternalError(it: Throwable) {
+        display.displayError("INTERNAL! ${messages.errorMessage} ${it.message}")
+
+    }
     override fun respondListScales(response: ListScalesResponse) {
-        response.scales.onSuccess {
-            if (it.isEmpty()) {
-                display.displayMessage(messages.listScalesEmptyMessage)
-            } else {
-                display.displayMessage(messages.listScalesMessage.sub(formatter.format(it)))
-            }
-        }.onFailure {
-            display.displayError("${messages.errorMessage} ${it.message}")
+        val scales = response.scales
+        if (scales.isEmpty()) {
+            display.displayMessage(messages.listScalesEmptyMessage)
+        } else {
+            display.displayMessage(messages.listScalesMessage.sub(formatter.format(scales)))
         }
     }
 
     override fun respondCreateScale(response: CreateScaleResponse) {
-        response.scaleId.onSuccess {
-            display.displayMessage(messages.createdScaleMessage+formatter.formatId(it))
-        }.onFailure {
-            display.displayError("${messages.errorMessage} ${it.message}")
-        }
+        val scaleId = response.scaleId
+        display.displayMessage(messages.createdScaleMessage + formatter.formatId(scaleId))
     }
 
     override fun respondPromptScaleName() {

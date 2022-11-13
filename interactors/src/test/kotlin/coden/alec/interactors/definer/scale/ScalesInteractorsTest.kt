@@ -31,11 +31,12 @@ class ScalesInteractorsTest {
 
         val interactor = BaseListScalesInteractor(gateway)
 
-        val response = interactor.execute(ListScalesRequest()) as ListScalesResponse
-        response.scales.onFailure { fail() }
-        response.scales.onSuccess {
-            assertEquals(1, it.size)
-            val scale = it.first()
+        val response = interactor.execute(ListScalesRequest()) as Result<ListScalesResponse>
+        response.onFailure { fail() }
+        response.onSuccess {
+            val scales = it.scales
+            assertEquals(1, scales.size)
+            val scale =  scales.first()
             assertEquals("0", scale.id)
             assertEquals("first", scale.name)
             assertEquals("unit", scale.unit)
@@ -56,11 +57,11 @@ class ScalesInteractorsTest {
             name = "scale",
             unit = "unit",
             divisions = mapOf(1L to "first", 2L to "second")
-        )) as CreateScaleResponse
+        )) as Result<CreateScaleResponse>
 
-        response.scaleId.onFailure { fail() }
-        response.scaleId.onSuccess {
-            assertEquals("scale-3", it)
+        response.onFailure { fail() }
+        response.onSuccess {
+            assertEquals("scale-3", it.scaleId)
         }
 
         verify(gateway, times(1)).getScalesCount()

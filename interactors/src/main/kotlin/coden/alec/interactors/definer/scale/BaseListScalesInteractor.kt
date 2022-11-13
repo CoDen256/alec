@@ -10,16 +10,16 @@ class BaseListScalesInteractor(
     private val gateway: ScaleGateway,
 ) : ListScalesInteractor {
 
-    override fun execute(request: Request): Response {
+    override fun execute(request: Request): Result<Response> {
         request as ListScalesRequest
         val scales = gateway.getScales()
-        return ListScalesResponse(Result.success(scales))
+        return Result.success(ListScalesResponse(scales))
     }
 }
 
 class ListScalesRequest: Request
 
-data class ListScalesResponse(val scales: Result<List<Scale>>): Response
+data class ListScalesResponse(val scales: List<Scale>): Response
 
 
 

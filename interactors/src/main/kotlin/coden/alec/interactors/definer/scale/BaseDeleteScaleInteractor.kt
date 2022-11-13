@@ -9,10 +9,10 @@ class BaseDeleteScaleInteractor(
     private val gateway: ScaleGateway,
 ) : DeleteScaleInteractor {
 
-    override fun execute(request: Request): Response {
+    override fun execute(request: Request): Result<Response> {
         request as DeleteScaleRequest
         gateway.updateScaleSetDeleted(request.id, true)
-        return DeleteScaleResponse(Result.success(Unit))
+        return Result.success(DeleteScaleResponse())
     }
 
 }
@@ -21,4 +21,4 @@ data class DeleteScaleRequest(
     val id: String
 ): Request
 
-data class DeleteScaleResponse(val result: Result<Unit>): Response
+class DeleteScaleResponse: Response

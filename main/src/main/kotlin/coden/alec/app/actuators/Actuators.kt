@@ -1,5 +1,7 @@
 package coden.alec.app.actuators
 
+import coden.alec.interactors.definer.scale.CreateScaleResponse
+
 
 interface HelpActuator {
     fun displayHelp()
@@ -10,8 +12,8 @@ interface ScaleActuator {
     fun getAndDisplayScales()
 
     fun isValidScale(input: String): Boolean
-    fun createAndDisplayScale(input: String)
-    fun rejectScale()
+    fun createScale(input: String): Result<CreateScaleResponse>
+    fun displayScale(response: CreateScaleResponse)
 
     fun displayScaleNamePrompt()
     fun isValidScaleName(input: String): Boolean
@@ -31,8 +33,12 @@ interface ScaleActuator {
     fun isValidScaleFromPreviousInput(input: String): Boolean //TODO rewrite to contain only Result<Unit>
     fun createFromPreviousInputAndDisplayScale()
 
+    fun rejectScale()
+    fun onError(throwable: Throwable)
+    fun onInternalError(throwable: Throwable)
     fun resetPreviousInputScale()
 }
 
-
-class InvalidScaleFormatException(msg: String) : RuntimeException(msg)
+open class UserException(msg: String): RuntimeException(msg)
+open class InternalError(msg: String): RuntimeException(msg)
+class InvalidScaleFormatException(msg: String) : UserException(msg)

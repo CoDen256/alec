@@ -2,6 +2,7 @@ package coden.alec.main.table
 
 import coden.alec.app.actuators.ScaleActuator
 import coden.alec.app.fsm.*
+import coden.alec.app.util.get
 import coden.fsm.Entry.Companion.entry
 import coden.fsm.FSMTable
 import coden.fsm.requireArgument
@@ -9,16 +10,12 @@ import coden.fsm.requireArgument
 class ScaleTable(scale: ScaleActuator) : FSMTable(
     entry(Start, ListScalesCommand) { scale.getAndDisplayScales(); Start },
 
-    entry(Start, CreateScaleCommand::class, requireArgument {
-        when {
-            scale.isValidScale(it) -> {
-                scale.createAndDisplayScale(it); Start
-            }
-
-            else -> {
-                scale.rejectScale(); Start
-            }
-        }
+    entry(Start, CreateScaleCommand::class, requireArgument { arg ->
+        scale.createScale(arg).get(
+            {scale.displayScale(it); Start},
+            {scale.onError(it); Start},
+            {scale.onInternalError(it); Start }
+        )
     }),
 
     entry(Start, CreateScaleCommandNoArgs) { scale.displayScaleNamePrompt(); WaitScaleName },
@@ -55,14 +52,14 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
     }),
 
     entry(WaitScaleDivision, TextCommand::class, requireArgument {
-        if (!scale.isValidScaleDivisions(it)){
+        if (!scale.isValidScaleDivisions(it)) {
             scale.rejectScaleDivisions()
             scale.displayScaleDivisionsPrompt()
             return@requireArgument WaitScaleDivision
         }
         scale.handleScaleDivisions(it)
 
-        if(!scale.isValidScaleFromPreviousInput(it)){
+        if (!scale.isValidScaleFromPreviousInput(it)) {
             scale.rejectScale()
             scale.resetPreviousInputScale()
             return@requireArgument Start

@@ -3,7 +3,6 @@ package coden.alec.app.actuators
 import coden.alec.app.display.ScaleParser
 import coden.alec.app.display.ScaleResponder
 import coden.alec.core.ScaleUseCaseFactory
-import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesRequest
 import coden.alec.interactors.definer.scale.ListScalesResponse
@@ -49,25 +48,32 @@ class BaseScaleActuator(
     private val state = ScaleCreatingState()
 
     override fun getAndDisplayScales() {
-        val response = useCaseFactory.listScales().execute(ListScalesRequest()) as ListScalesResponse
-        responder.respondListScales(response)
+        val response = useCaseFactory.listScales().execute(ListScalesRequest()) as Result<ListScalesResponse>
+        responder.respondListScales(response.getOrThrow())
     }
 
     override fun isValidScale(input: String): Boolean {
         return parser.isValidCreateScaleRequest(input)
     }
 
-    override fun createAndDisplayScale(input: String) {
-        respondToRequest(parser.parseCreateScaleRequest(input))
+    override fun createScale(input: String): Result<CreateScaleResponse> {
+        return useCaseFactory.createScale().execute(parser.parseCreateScaleRequest(input)) as Result<CreateScaleResponse>
     }
 
-    private fun respondToRequest(request: CreateScaleRequest) {
-        val response = useCaseFactory.createScale().execute(request) as CreateScaleResponse
+    override fun displayScale(response: CreateScaleResponse) {
         responder.respondCreateScale(response)
     }
 
     override fun rejectScale() {
         responder.respondRejectScale()
+    }
+
+    override fun onError(throwable: Throwable) {
+        responder.respondError(throwable)
+    }
+
+    override fun onInternalError(throwable: Throwable) {
+        responder.respondInternalError(throwable)
     }
 
     override fun displayScaleNamePrompt() {
@@ -127,13 +133,13 @@ class BaseScaleActuator(
     }
 
     override fun createFromPreviousInputAndDisplayScale() {
-        respondToRequest(
+        useCaseFactory.createScale().execute(
             parser.parseCreateScaleRequest(
                 state.currentName.getOrThrow(),
                 state.currentUnit.getOrThrow(),
                 state.currentDivisions.getOrThrow()
             )
-        )
+        ) as Result<CreateScaleResponse>
     }
 
     override fun resetPreviousInputScale() {

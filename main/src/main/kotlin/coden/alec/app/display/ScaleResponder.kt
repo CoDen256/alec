@@ -4,6 +4,8 @@ import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesResponse
 
 interface ScaleResponder {
+    fun respondError(it: Throwable)
+    fun respondInternalError(it: Throwable)
     fun respondListScales(response: ListScalesResponse)
     fun respondCreateScale(response: CreateScaleResponse)
 

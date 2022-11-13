@@ -9,13 +9,13 @@ class BasePurgeScaleInteractor(
     private val gateway: ScaleGateway,
 ) : PurgeScaleInteractor {
 
-    override fun execute(request: Request) : Response {
+    override fun execute(request: Request) : Result<Response> {
         request as PurgeScaleRequest
         gateway.deleteScale(request.id)
-        return PurgeScaleResponse(Result.success(Unit))
+        return Result.success(PurgeScaleResponse())
     }
 }
 
 data class PurgeScaleRequest (val id: String): Request
 
-data class PurgeScaleResponse(val result: Result<Unit>): Response
+class PurgeScaleResponse: Response

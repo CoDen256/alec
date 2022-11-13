@@ -11,7 +11,7 @@ class BaseUpdateScaleInteractor(
     private val gateway: ScaleGateway,
 ) : UpdateScaleInteractor {
 
-    override fun execute(request: Request): Response {
+    override fun execute(request: Request): Result<Response> {
         request as UpdateScaleRequest
         val updatedScale = Scale(
             name = request.name,
@@ -21,7 +21,7 @@ class BaseUpdateScaleInteractor(
             divisions = createDivisions(request.divisions)
         )
         gateway.addScale(updatedScale)
-        return UpdateScaleResponse(Result.success(Unit))
+        return Result.success(UpdateScaleResponse())
     }
 
     private fun createDivisions(divisions: Map<Long, String>): List<ScaleDivision>{
@@ -35,4 +35,4 @@ data class UpdateScaleRequest(
     val divisions: Map<Long, String>
 ) : Request
 
-data class UpdateScaleResponse(val result: Result<Unit>) : Response
+class UpdateScaleResponse : Response
