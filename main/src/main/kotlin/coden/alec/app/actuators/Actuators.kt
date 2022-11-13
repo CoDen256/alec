@@ -1,8 +1,11 @@
 package coden.alec.app.actuators
 
+import coden.alec.app.display.CreateScaleRequestBuilder
+import coden.alec.app.display.ParsedScaleRequest
 import coden.alec.app.display.ScaleParser
 import coden.alec.app.display.ScaleResponder
 import coden.alec.interactors.definer.scale.CreateScaleResponse
+import coden.alec.interactors.definer.scale.ListScalesResponse
 
 
 interface HelpActuator {
@@ -10,27 +13,9 @@ interface HelpActuator {
 }
 
 
-interface ScaleActuator: ScaleResponder, ScaleParser {
-    fun getAndDisplayScales()
-
-    fun createScale(input: String): Result<CreateScaleResponse>
-    fun displayScaleNamePrompt()
-    fun handleScaleName(parsedName: String)
-
-    fun displayScaleUnitPrompt()
-    fun handleScaleUnit(input: String)
-    fun rejectScaleUnit()
-
-    fun displayScaleDivisionsPrompt()
-    fun isValidScaleDivisions(input: String): Boolean
-    fun handleScaleDivisions(input: String)
-    fun rejectScaleDivisions()
-
-    fun isValidScaleFromPreviousInput(input: String): Boolean //TODO rewrite to contain only Result<Unit>
-    fun createFromPreviousInputAndDisplayScale()
-
-    fun rejectScale()
-    fun resetPreviousInputScale()
+interface ScaleActuator: ScaleResponder, ScaleParser, CreateScaleRequestBuilder {
+    fun listScales(): Result<ListScalesResponse>
+    fun createScale(request: ParsedScaleRequest): Result<CreateScaleResponse>
 }
 
 open class UserException(msg: String): RuntimeException(msg)

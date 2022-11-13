@@ -1,15 +1,14 @@
 package coden.alec.app.display
 
-import coden.alec.interactors.definer.scale.CreateScaleRequest
-
 interface ScaleParser {
-    fun parseCreateScaleRequest(input: String): CreateScaleRequest
-    fun parseCreateScaleRequest(name: String, unit: String, divisions: String): CreateScaleRequest
+    fun parseCreateScaleRequest(input: String): Result<ParsedScaleRequest>
     fun parseScaleName(input: String): Result<String>
-    fun parseScaleUnit(input: String): String
-    fun parseScaleDivisions(input: String): Map<String, Long>
-
-    fun isValidCreateScaleRequest(input: String): Boolean
-    fun isValidScaleUnit(input: String): Boolean
-    fun isValidDivisions(input: String): Boolean
+    fun parseScaleUnit(input: String): Result<String>
+    fun parseScaleDivisions(input: String): Result<Map<Long, String>>
 }
+
+data class ParsedScaleRequest(
+    val parsedName: String,
+    val parsedUnit: String,
+    val parsedDivisions: Map<Long, String>
+)

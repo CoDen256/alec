@@ -8,57 +8,53 @@ import coden.fsm.FSMTable
 import coden.fsm.requireArgument
 
 class ScaleTable(scale: ScaleActuator) : FSMTable(
-    entry(Start, ListScalesCommand) { scale.getAndDisplayScales(); Start },
+    entry(Start, ListScalesCommand) { scale.listScales(); Start },
 
     entry(Start, CreateScaleCommand::class, requireArgument { arg ->
-        scale.createScale(arg).unpack(
-            { scale.respondCreateScale(it); Start },
+        scale.parseCreateScaleRequest(arg).unpack(
+            {
+                scale.createScale(it).unpack(
+                    { r -> scale.respondCreateScale(r); Start },
+                    { t -> scale.respondUserError(t); Start },
+                    { t -> scale.respondInternalError(t); Start }
+                )
+            },
             { scale.respondUserError(it); Start },
             { scale.respondInternalError(it); Start }
         )
     }),
 
-    entry(Start, CreateScaleCommandNoArgs) { scale.displayScaleNamePrompt(); WaitScaleName },
+    entry(Start, CreateScaleCommandNoArgs) { scale.respondPromptScaleName(); WaitScaleName },
 
     entry(WaitScaleName, TextCommand::class, requireArgument { arg ->
         scale.parseScaleName(arg).unpack(
-            { scale.handleScaleName(it); scale.displayScaleUnitPrompt(); WaitScaleUnit },
+            { scale.setName(it); scale.respondPromptScaleUnit(); WaitScaleUnit },
             { scale.respondUserError(it); WaitScaleName },
-            { scale.respondInternalError(it); scale.resetPreviousInputScale(); Start }
+            { scale.respondInternalError(it); scale.reset(); Start }
         )
 
     }),
-    entry(WaitScaleUnit, TextCommand::class, requireArgument {
-        when {
-            scale.isValidScaleUnit(it) -> {
-                scale.handleScaleUnit(it)
-                scale.displayScaleDivisionsPrompt()
-                WaitScaleDivision
-            }
+    entry(WaitScaleUnit, TextCommand::class, requireArgument { arg ->
+        scale.parseScaleUnit(arg).unpack(
+            { scale.setUnit(it); scale.respondPromptScaleDivisions(); WaitScaleDivision },
+            { scale.respondUserError(it); WaitScaleUnit },
+            { scale.respondInternalError(it); scale.reset(); Start }
+        )
 
-            else -> {
-                scale.rejectScaleUnit()
-                scale.displayScaleUnitPrompt()
-                WaitScaleUnit
-            }
-        }
     }),
 
-    entry(WaitScaleDivision, TextCommand::class, requireArgument {
-        if (!scale.isValidScaleDivisions(it)) {
-            scale.rejectScaleDivisions()
-            scale.displayScaleDivisionsPrompt()
-            return@requireArgument WaitScaleDivision
-        }
-        scale.handleScaleDivisions(it)
-
-        if (!scale.isValidScaleFromPreviousInput(it)) {
-            scale.rejectScale()
-            scale.resetPreviousInputScale()
-            return@requireArgument Start
-        }
-        scale.createFromPreviousInputAndDisplayScale()
-        scale.resetPreviousInputScale()
-        Start
+    entry(WaitScaleDivision, TextCommand::class, requireArgument { arg ->
+        scale.parseScaleDivisions(arg).unpack(
+            {
+                scale.setDivisions(it)
+                scale.createScale(scale.build()).unpack(
+                    { r -> scale.respondCreateScale(r); Start },
+                    { t -> scale.respondUserError(t); Start },
+                    { t -> scale.respondInternalError(t); Start }
+                )
+            },
+            { scale.respondUserError(it); WaitScaleDivision },
+            { scale.respondInternalError(it); scale.reset(); Start }
+        )
     }),
 )
