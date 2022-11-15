@@ -1,7 +1,7 @@
 package coden.alec.app.config.scale
 
-import coden.alec.app.actuators.InvalidScaleFormatException
-import coden.alec.app.actuators.InvalidScalePropertyFormatException
+import coden.alec.app.actuators.scale.InvalidScaleFormatException
+import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.actuators.scale.ScaleFormatter
 import coden.alec.app.actuators.scale.ScaleResponder
 import coden.alec.app.resources.MessageResource

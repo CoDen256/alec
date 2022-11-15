@@ -1,6 +1,6 @@
 package coden.alec.app.config.scale
 
-import coden.alec.app.actuators.InvalidScalePropertyFormatException
+import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.actuators.scale.ScaleParser
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import java.util.regex.Pattern

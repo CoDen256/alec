@@ -32,7 +32,7 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
             .state { WaitScaleUnit }
             .onErrors(
                 handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); WaitScaleName },
-                handle<Throwable> { scale.respondInternalError(it); Start }
+                handle<Throwable> { scale.respondInternalError(it); scale.reset(); Start }
         )
 
     }),
@@ -43,7 +43,7 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
             .state { WaitScaleDivision }
             .onErrors(
                 handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); WaitScaleUnit },
-                handle<Throwable> { scale.respondInternalError(it); Start }
+                handle<Throwable> { scale.respondInternalError(it); scale.reset(); Start }
             )
 
     }),
@@ -56,7 +56,7 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
             .state { Start }
             .onErrors(
                 handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); WaitScaleUnit },
-                handle<Throwable> { scale.respondInternalError(it); Start }
+                handle<Throwable> { scale.respondInternalError(it); scale.reset(); Start }
             )
     }),
 )

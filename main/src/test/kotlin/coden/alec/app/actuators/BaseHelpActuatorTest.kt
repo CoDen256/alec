@@ -13,10 +13,9 @@ import org.mockito.kotlin.verify
 
 @ExtendWith(MockitoExtension::class)
 class BaseHelpActuatorTest{
-    val resource=  MessageResource().apply {
+    private val resource=  MessageResource().apply {
         startMessage = "startMessage"
     }
-
 
     @Mock
     lateinit var display: MessageDisplay

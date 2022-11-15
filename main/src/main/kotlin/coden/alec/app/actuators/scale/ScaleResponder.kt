@@ -1,7 +1,5 @@
 package coden.alec.app.actuators.scale
 
-import coden.alec.app.actuators.InvalidScaleFormatException
-import coden.alec.app.actuators.InvalidScalePropertyFormatException
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesResponse
 
