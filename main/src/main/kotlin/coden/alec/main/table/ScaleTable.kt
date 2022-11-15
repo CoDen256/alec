@@ -10,7 +10,14 @@ import coden.fsm.*
 import coden.fsm.Entry.Companion.entry
 
 class ScaleTable(scale: ScaleActuator) : FSMTable(
-    entry(Start, ListScalesCommand) { scale.listScales(); Start },
+    entry(Start, ListScalesCommand) {
+        scale.listScales()
+            .then { scale.respondListScales(it) }
+            .state { Start }
+            .onErrors(
+                handle<Throwable> { scale.respondInternalError(it); Start }
+            )
+    },
 
     entry(Start, CreateScaleCommand::class, requireArgument { arg ->
         scale.parseCreateScaleRequest(arg)
@@ -33,7 +40,7 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
             .onErrors(
                 handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); WaitScaleName },
                 handle<Throwable> { scale.respondInternalError(it); scale.reset(); Start }
-        )
+            )
 
     }),
     entry(WaitScaleUnit, TextCommand::class, requireArgument { arg ->
@@ -52,7 +59,7 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
             .then { scale.setDivisions(it) }
             .map { scale.build() }
             .flatMap { scale.createScale(it) }
-            .then { scale.respondCreateScale(it)  }
+            .then { scale.respondCreateScale(it) }
             .state { Start }
             .onErrors(
                 handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); WaitScaleUnit },
