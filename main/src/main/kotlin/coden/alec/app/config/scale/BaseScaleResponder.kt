@@ -50,11 +50,9 @@ class BaseScaleResponder(
 
     override fun respondPromptScaleUnit() {
         display.displayPrompt(messages.scaleUnitPrompt)
-
     }
 
     override fun respondPromptScaleDivisions() {
         display.displayPrompt(messages.scaleDivisionsPrompt)
-
     }
 }

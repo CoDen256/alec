@@ -2,4 +2,23 @@ package coden.alec.app.config.scale
 
 import org.junit.jupiter.api.Assertions.*
 
-internal class BaseScaleParserTest
+import org.junit.jupiter.api.Test
+
+class BaseScaleParserTest {
+
+    @Test
+    fun parseCreateScaleRequest() {
+    }
+
+    @Test
+    fun parseScaleName() {
+    }
+
+    @Test
+    fun parseScaleUnit() {
+    }
+
+    @Test
+    fun parseScaleDivisions() {
+    }
+}
