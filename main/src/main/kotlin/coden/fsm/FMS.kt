@@ -11,7 +11,7 @@ interface Command {
 abstract class BaseCommand(arguments: String? = null) : Command {
     override val arguments: Result<String> = arguments?.let {
         Result.success(it)
-    } ?: Result.failure(NoArgException())
+    } ?: Result.failure(NoArgException("No command argument for ${this.javaClass.simpleName}"))
 
     override fun toString(): String {
         return this.javaClass.simpleName + arguments.map { "($it)" }.getOrDefault("")

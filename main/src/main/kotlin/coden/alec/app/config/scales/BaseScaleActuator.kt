@@ -1,8 +1,9 @@
-package coden.alec.app.actuators
+package coden.alec.app.config.scales
 
-import coden.alec.app.display.CreateScaleRequestBuilder
-import coden.alec.app.display.ScaleParser
-import coden.alec.app.display.ScaleResponder
+import coden.alec.app.actuators.ScaleActuator
+import coden.alec.app.actuators.CreateScaleRequestBuilder
+import coden.alec.app.actuators.ScaleParser
+import coden.alec.app.actuators.ScaleResponder
 import coden.alec.core.ScaleUseCaseFactory
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse

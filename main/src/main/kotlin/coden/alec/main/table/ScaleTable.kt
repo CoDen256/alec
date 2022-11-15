@@ -2,7 +2,7 @@ package coden.alec.main.table
 
 import coden.alec.app.actuators.ScaleActuator
 import coden.alec.app.fsm.*
-import coden.alec.app.util.unpack
+import coden.alec.app.util.get
 import coden.fsm.Entry.Companion.entry
 import coden.fsm.FSMTable
 import coden.fsm.requireArgument
@@ -11,9 +11,9 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
     entry(Start, ListScalesCommand) { scale.listScales(); Start },
 
     entry(Start, CreateScaleCommand::class, requireArgument { arg ->
-        scale.parseCreateScaleRequest(arg).unpack(
+        scale.parseCreateScaleRequest(arg).get(
             {
-                scale.createScale(it).unpack(
+                scale.createScale(it).get(
                     { r -> scale.respondCreateScale(r); Start },
                     { t -> scale.respondUserError(t); Start },
                     { t -> scale.respondInternalError(t); Start }
@@ -27,7 +27,7 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
     entry(Start, CreateScaleCommandNoArgs) { scale.respondPromptScaleName(); WaitScaleName },
 
     entry(WaitScaleName, TextCommand::class, requireArgument { arg ->
-        scale.parseScaleName(arg).unpack(
+        scale.parseScaleName(arg).get(
             { scale.setName(it); scale.respondPromptScaleUnit(); WaitScaleUnit },
             { scale.respondUserError(it); WaitScaleName },
             { scale.respondInternalError(it); scale.reset(); Start }
@@ -35,7 +35,7 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
 
     }),
     entry(WaitScaleUnit, TextCommand::class, requireArgument { arg ->
-        scale.parseScaleUnit(arg).unpack(
+        scale.parseScaleUnit(arg).get(
             { scale.setUnit(it); scale.respondPromptScaleDivisions(); WaitScaleDivision },
             { scale.respondUserError(it); WaitScaleUnit },
             { scale.respondInternalError(it); scale.reset(); Start }
@@ -44,10 +44,10 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
     }),
 
     entry(WaitScaleDivision, TextCommand::class, requireArgument { arg ->
-        scale.parseScaleDivisions(arg).unpack(
+        scale.parseScaleDivisions(arg).get(
             {
                 scale.setDivisions(it)
-                scale.createScale(scale.build()).unpack(
+                scale.createScale(scale.build()).get(
                     { r -> scale.respondCreateScale(r); Start },
                     { t -> scale.respondUserError(t); Start },
                     { t -> scale.respondInternalError(t); Start }

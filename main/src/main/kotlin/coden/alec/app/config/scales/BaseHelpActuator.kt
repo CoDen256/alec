@@ -1,5 +1,6 @@
-package coden.alec.app.actuators
+package coden.alec.app.config.scales
 
+import coden.alec.app.actuators.HelpActuator
 import coden.alec.app.resources.MessageResource
 import coden.display.displays.MessageDisplay
 

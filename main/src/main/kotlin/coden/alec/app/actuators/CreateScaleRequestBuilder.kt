@@ -1,4 +1,4 @@
-package coden.alec.app.display
+package coden.alec.app.actuators
 
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 
@@ -9,8 +9,4 @@ interface CreateScaleRequestBuilder {
 
     fun build(): CreateScaleRequest
     fun reset()
-
-    val currentName: Result<String>
-    val currentUnit: Result<String>
-    val currentDivisions: Result<Map<Long, String>>
 }

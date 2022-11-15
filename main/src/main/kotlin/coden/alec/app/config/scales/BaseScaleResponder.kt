@@ -1,5 +1,7 @@
-package coden.alec.app.display
+package coden.alec.app.config.scales
 
+import coden.alec.app.actuators.ScaleFormatter
+import coden.alec.app.actuators.ScaleResponder
 import coden.alec.app.resources.MessageResource
 import coden.alec.app.util.sub
 import coden.alec.interactors.definer.scale.CreateScaleResponse
@@ -14,7 +16,6 @@ class BaseScaleResponder(
 
     override fun respondUserError(it: Throwable) {
         display.displayError("${messages.errorMessage} ${it.message}")
-
     }
 
     override fun respondInternalError(it: Throwable) {

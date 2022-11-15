@@ -11,7 +11,7 @@ fun String.sub(vararg vars: String ): String{
     return result
 }
 
- inline fun <R, T> Result<T>.unpack(
+ inline fun <R, T> Result<T>.get(
      onSuccess: (T) -> R,
      onUserException: (UserException) -> R = {throw IllegalStateException("User Exception is thrown and cannot be handled $it")},
      onInternalError: (InternalException) -> R = {throw IllegalStateException("Internal Error is thrown and cannot be handled $it")},
@@ -24,3 +24,4 @@ fun String.sub(vararg vars: String ): String{
         }
     }
 }
+
