@@ -132,12 +132,12 @@ class TestStateExecutor(fsm: FSM): StateBasedCommandExecutor(fsm){
     }
 }
 
-object A: State
-object B: State
-object C: State
-object D: State
+internal object A: State
+internal object B: State
+internal object C: State
+internal object D: State
 
-object Start: BaseCommand()
-object Help: BaseCommand()
-object Back: BaseCommand()
-class Text(text: String) : BaseCommand(text)
+internal object Start: BaseCommand()
+internal object Help: BaseCommand()
+internal object Back: BaseCommand()
+internal class Text(text: String) : BaseCommand(text)

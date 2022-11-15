@@ -16,12 +16,12 @@ class FSMVerifierTest{
         fun act(arg: String)
     }
 
-    object Start: State
-    object A: State
-    object B: State
+    internal object Start: State
+    internal object A: State
+    internal object B: State
 
-    object C1: BaseCommand()
-    object C2: BaseCommand()
+    internal object C1: BaseCommand()
+    internal object C2: BaseCommand()
 
 
 
