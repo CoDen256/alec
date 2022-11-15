@@ -1,8 +1,8 @@
 package coden.alec.main.table
 
-import coden.alec.app.actuators.InvalidScaleFormatException
-import coden.alec.app.actuators.InvalidScalePropertyFormatException
 import coden.alec.app.actuators.ScaleActuator
+import coden.alec.app.actuators.scale.InvalidScaleFormatException
+import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.fsm.*
 import coden.alec.app.util.flatMap
 import coden.alec.app.util.then

@@ -7,3 +7,4 @@ interface ScaleFormatter {
     fun format(scale: Scale): String = scale.toString()
     fun formatId(scaleId: String): String = scaleId
 }
+

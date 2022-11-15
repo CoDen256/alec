@@ -3,9 +3,7 @@ package coden.alec.app.actuators
 import coden.alec.app.actuators.scale.CreateScaleRequestBuilder
 import coden.alec.app.actuators.scale.ScaleParser
 import coden.alec.app.actuators.scale.ScaleResponder
-import coden.alec.interactors.definer.scale.CreateScaleRequest
-import coden.alec.interactors.definer.scale.CreateScaleResponse
-import coden.alec.interactors.definer.scale.ListScalesResponse
+import coden.alec.app.actuators.scale.ScaleUseCaseInvoker
 
 
 interface HelpActuator {
@@ -13,11 +11,17 @@ interface HelpActuator {
 }
 
 
-interface ScaleActuator: ScaleResponder, ScaleParser, CreateScaleRequestBuilder {
-    fun listScales(): Result<ListScalesResponse>
-    fun createScale(request: CreateScaleRequest): Result<CreateScaleResponse>
-}
+interface ScaleActuator: ScaleResponder, ScaleParser, CreateScaleRequestBuilder, ScaleUseCaseInvoker
+class BaseScaleActuator(
+    private val responder: ScaleResponder,
+    private val parser: ScaleParser,
+    private val builder: CreateScaleRequestBuilder,
+    private val useCaseInvoker: ScaleUseCaseInvoker
+) : ScaleActuator,
+    ScaleUseCaseInvoker by useCaseInvoker,
+    ScaleResponder by responder,
+    ScaleParser by parser,
+    CreateScaleRequestBuilder by builder
+
 
 open class UserException(msg: String? = null): RuntimeException(msg)
-class InvalidScaleFormatException(val value: String) : UserException()
-class InvalidScalePropertyFormatException(val property: String, val value: String) : UserException()

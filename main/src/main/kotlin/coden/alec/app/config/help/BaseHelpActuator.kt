@@ -1,4 +1,4 @@
-package coden.alec.app.config.scale
+package coden.alec.app.config.help
 
 import coden.alec.app.actuators.HelpActuator
 import coden.alec.app.resources.MessageResource

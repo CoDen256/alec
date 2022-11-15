@@ -1,5 +1,6 @@
 package coden.alec.app.actuators.scale
 
+import coden.alec.app.actuators.UserException
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 
 interface ScaleParser {
@@ -8,3 +9,6 @@ interface ScaleParser {
     fun parseScaleUnit(input: String): Result<String>
     fun parseScaleDivisions(input: String): Result<Map<Long, String>>
 }
+
+class InvalidScaleFormatException(val value: String) : UserException()
+class InvalidScalePropertyFormatException(val property: String, val value: String) : UserException()
