@@ -1,6 +1,6 @@
-package coden.alec.app.config.scales
+package coden.alec.app.config.scale
 
-import coden.alec.app.actuators.CreateScaleRequestBuilder
+import coden.alec.app.actuators.scale.CreateScaleRequestBuilder
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 
 class BaseCreateScaleRequestBuilder: CreateScaleRequestBuilder {

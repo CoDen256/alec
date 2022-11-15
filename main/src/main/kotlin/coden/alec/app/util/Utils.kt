@@ -10,9 +10,13 @@ fun String.sub(vararg vars: String ): String{
     return result
 }
 
- inline fun <R, T> Result<T>.flatMap(transform: (value: T) -> Result<R>): Result<R> {
+ inline fun <R, T> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
     return fold(
         {transform(it)},
         {Result.failure(it)}
     )
+}
+
+inline fun <T> Result<T>.then(apply: (T) -> Unit): Result<T>{
+    return map { apply(it); it }
 }

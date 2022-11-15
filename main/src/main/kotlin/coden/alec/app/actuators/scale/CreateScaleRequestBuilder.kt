@@ -1,4 +1,4 @@
-package coden.alec.app.actuators
+package coden.alec.app.actuators.scale
 
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 

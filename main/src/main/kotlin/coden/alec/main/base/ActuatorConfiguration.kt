@@ -1,6 +1,7 @@
 package coden.alec.main.base
 
 import coden.alec.app.actuators.*
+import coden.alec.app.actuators.scale.ScaleFormatter
 import coden.alec.data.Scale
 import coden.alec.main.resources.Messages
 import org.springframework.boot.context.properties.EnableConfigurationProperties

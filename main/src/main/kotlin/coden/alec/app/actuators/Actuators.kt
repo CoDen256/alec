@@ -1,5 +1,8 @@
 package coden.alec.app.actuators
 
+import coden.alec.app.actuators.scale.CreateScaleRequestBuilder
+import coden.alec.app.actuators.scale.ScaleParser
+import coden.alec.app.actuators.scale.ScaleResponder
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesResponse
@@ -15,6 +18,6 @@ interface ScaleActuator: ScaleResponder, ScaleParser, CreateScaleRequestBuilder 
     fun createScale(request: CreateScaleRequest): Result<CreateScaleResponse>
 }
 
-open class UserException(msg: String): RuntimeException(msg)
-open class InternalException(msg: String): RuntimeException(msg)
-class InvalidScaleFormatException(msg: String) : UserException(msg)
+open class UserException(msg: String? = null): RuntimeException(msg)
+class InvalidScaleFormatException(val value: String) : UserException()
+class InvalidScalePropertyFormatException(val property: String, val value: String) : UserException()

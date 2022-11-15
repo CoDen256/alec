@@ -8,9 +8,7 @@ open class MessageResource {
 
     lateinit var createdScaleMessage: String
     lateinit var rejectScaleMessage: String
-    lateinit var rejectScaleNameMessage: String
-    lateinit var rejectScaleUnitMessage: String
-    lateinit var rejectScaleDivisionsMessage: String
+    lateinit var rejectScalePropertyMessage: String
     lateinit var scaleNamePrompt: String
     lateinit var scaleUnitPrompt: String
     lateinit var scaleDivisionsPrompt: String

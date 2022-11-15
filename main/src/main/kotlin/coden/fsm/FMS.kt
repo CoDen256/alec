@@ -77,17 +77,29 @@ fun requireArgument(action: (String) -> State): (Command) -> State{
     }
 }
 
-inline fun <T> Result<T>.get(
+fun <T> Result<T>.state(state: State): Result<State>{
+    return map { state }
+}
+
+fun <T> Result<T>.state(state: () -> State): Result<State>{
+    return map { state() }
+}
+
+ fun Result<State>.onErrors(
+    vararg handlers: ExceptionHandler<Throwable, State>
+): State {
+    return mapToState({it}, *handlers)
+}
+
+inline fun <T> Result<T>.mapToState(
     onSuccess: (T) -> State,
     vararg handlers: ExceptionHandler<Throwable, State>
 ): State {
-    return fold(onSuccess) {
-        for (handler in handlers) {
-            if (handler.canHandle(it)){
-                return handler.handle(it)
-            }
-        }
-        throw IllegalStateException("No handler for $it")
+    return fold(onSuccess) { t ->
+        handlers
+            .firstOrNull { it.canHandle(t) }
+            ?.handle(t)
+            ?: throw IllegalStateException("No exception handler for ${t.javaClass.simpleName}")
     }
 }
 

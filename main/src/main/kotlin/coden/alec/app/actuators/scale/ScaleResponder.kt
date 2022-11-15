@@ -1,10 +1,13 @@
-package coden.alec.app.actuators
+package coden.alec.app.actuators.scale
 
+import coden.alec.app.actuators.InvalidScaleFormatException
+import coden.alec.app.actuators.InvalidScalePropertyFormatException
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesResponse
 
 interface ScaleResponder {
-    fun respondUserError(it: Throwable)
+    fun respondInvalidScaleFormat(it: InvalidScaleFormatException)
+    fun respondInvalidScalePropertyFormat(it: InvalidScalePropertyFormatException)
     fun respondInternalError(it: Throwable)
 
     fun respondListScales(response: ListScalesResponse)

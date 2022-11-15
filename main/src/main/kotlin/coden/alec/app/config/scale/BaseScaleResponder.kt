@@ -1,7 +1,9 @@
-package coden.alec.app.config.scales
+package coden.alec.app.config.scale
 
-import coden.alec.app.actuators.ScaleFormatter
-import coden.alec.app.actuators.ScaleResponder
+import coden.alec.app.actuators.InvalidScaleFormatException
+import coden.alec.app.actuators.InvalidScalePropertyFormatException
+import coden.alec.app.actuators.scale.ScaleFormatter
+import coden.alec.app.actuators.scale.ScaleResponder
 import coden.alec.app.resources.MessageResource
 import coden.alec.app.util.sub
 import coden.alec.interactors.definer.scale.CreateScaleResponse
@@ -14,12 +16,18 @@ class BaseScaleResponder(
     private val formatter: ScaleFormatter
 ) : ScaleResponder {
 
-    override fun respondUserError(it: Throwable) {
-        display.displayError("${messages.errorMessage} ${it.message}")
+    override fun respondInvalidScaleFormat(it: InvalidScaleFormatException) {
+        display.displayError(messages.rejectScaleMessage.sub(it.value))
+    }
+
+    override fun respondInvalidScalePropertyFormat(it: InvalidScalePropertyFormatException) {
+        display.displayError(messages.rejectScalePropertyMessage.sub(
+            it.property, it.value
+        ))
     }
 
     override fun respondInternalError(it: Throwable) {
-        display.displayError("INTERNAL! ${messages.errorMessage} ${it.message}")
+        display.displayError("${messages.errorMessage}:\n${it.javaClass.simpleName}:${it.message}")
 
     }
     override fun respondListScales(response: ListScalesResponse) {

@@ -1,6 +1,7 @@
-package coden.alec.app.config.scales
+package coden.alec.app.config.scale
 
-import coden.alec.app.actuators.ScaleParser
+import coden.alec.app.actuators.InvalidScalePropertyFormatException
+import coden.alec.app.actuators.scale.ScaleParser
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import java.util.regex.Pattern
 
@@ -65,7 +66,7 @@ class BaseScaleParser : ScaleParser {
     }
 
     private fun String.verify(name: String, check: (String) -> Boolean): String {
-        if (!check(this)) throw InvalidScaleFormatException(name)
+        if (!check(this)) throw InvalidScalePropertyFormatException(name, this)
         return this
     }
 
@@ -78,6 +79,4 @@ class BaseScaleParser : ScaleParser {
 //        val split = args.split("\n", limit = 3)
 //        return Triple(split[0], split[1], split[2])
 //    }
-
-    class InvalidScaleFormatException(val property: String) : RuntimeException()
 }

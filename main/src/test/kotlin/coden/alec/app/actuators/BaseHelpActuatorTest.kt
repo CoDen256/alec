@@ -1,6 +1,6 @@
 package coden.alec.app.actuators
 
-import coden.alec.app.config.scales.BaseHelpActuator
+import coden.alec.app.config.scale.BaseHelpActuator
 import coden.alec.app.resources.MessageResource
 import coden.display.displays.MessageDisplay
 import org.junit.jupiter.api.Assertions.*

@@ -1,14 +1,8 @@
 package coden.alec.app.actuators
 
-import coden.alec.app.config.scales.BaseScaleActuator
 import coden.alec.core.*
-import coden.alec.interactors.definer.scale.CreateScaleRequest
-import coden.alec.interactors.definer.scale.CreateScaleResponse
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
 
