@@ -76,3 +76,35 @@ fun requireArgument(action: (String) -> State): (Command) -> State{
         action(it.arguments.getOrThrow())
     }
 }
+
+inline fun <T> Result<T>.get(
+    onSuccess: (T) -> State,
+    vararg handlers: ExceptionHandler<Throwable, State>
+): State {
+    return fold(onSuccess) {
+        for (handler in handlers) {
+            if (handler.canHandle(it)){
+                return handler.handle(it)
+            }
+        }
+        throw IllegalStateException("No handler for $it")
+    }
+}
+
+interface ExceptionHandler<T: Throwable, R>{
+    fun canHandle(throwable: T): Boolean
+    fun handle(throwable: T): R
+}
+
+inline fun <reified T: Throwable> handle(crossinline handler: (T) -> State): ExceptionHandler<Throwable, State>{
+    return object: ExceptionHandler<Throwable, State>{
+        override fun canHandle(throwable: Throwable): Boolean {
+            return throwable is T
+        }
+
+        override fun handle(throwable: Throwable): State {
+            return handler(throwable as T)
+        }
+
+    }
+}

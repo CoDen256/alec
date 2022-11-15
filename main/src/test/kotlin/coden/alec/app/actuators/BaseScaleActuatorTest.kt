@@ -15,127 +15,127 @@ import org.mockito.kotlin.*
 @ExtendWith(MockitoExtension::class)
 class BaseScaleActuatorTest {
 
-    @Mock
-    lateinit var useCaseFactory: ScaleUseCaseFactory
-
-    @Mock
-    lateinit var responder: ScaleResponder
-
-    @Mock
-    lateinit var parser: ScaleParser
-
-    @Mock
-    lateinit var listScalesInteractor: ListScalesInteractor
-
-    @Mock
-    lateinit var createScaleInteractor: CreateScaleInteractor
-
-    private lateinit var actuator: ScaleActuator
-
-    @BeforeEach
-    fun setup() {
-        actuator = BaseScaleActuator(
-            useCaseFactory, responder, parser
-        )
-    }
-
-
+//    @Mock
+//    lateinit var useCaseFactory: ScaleUseCaseFactory
+//
+//    @Mock
+//    lateinit var responder: ScaleResponder
+//
+//    @Mock
+//    lateinit var parser: ScaleParser
+//
+//    @Mock
+//    lateinit var listScalesInteractor: ListScalesInteractor
+//
+//    @Mock
+//    lateinit var createScaleInteractor: CreateScaleInteractor
+//
+//    private lateinit var actuator: ScaleActuator
+//
+//    @BeforeEach
+////    fun setup() {
+////        actuator = BaseScaleActuator(
+////            useCaseFactory, responder, parser
+////        )
+////    }
+//
+//
+////    @Test
+////    fun getAndDisplayScales() {
+////        val response = ListScalesResponse(
+////            Result.success(listOf(Scale("scale-0", "scale", "unit", false, listOf(ScaleDivision(1, "one"))))
+////            )
+////        )
+////        whenever(useCaseFactory.listScales()).thenReturn(listScalesInteractor)
+////        whenever(listScalesInteractor.execute(any())).thenReturn(response)
+////
+////        actuator.getAndDisplayScales()
+////
+////        verify(listScalesInteractor).execute(any<ListScalesRequest>())
+////        verify(responder).respondListScales(response)
+////    }
+//
+//
+//
 //    @Test
-//    fun getAndDisplayScales() {
-//        val response = ListScalesResponse(
-//            Result.success(listOf(Scale("scale-0", "scale", "unit", false, listOf(ScaleDivision(1, "one"))))
+//    fun createScale() {
+//        val response = Result.success(CreateScaleResponse("scale-1"))
+//        val request = CreateScaleRequest(
+//            name = "name",
+//            unit = "unit",
+//            divisions = mapOf(
+//                1L to "div1",
+//                2L to "div2",
+//                3L to "div3"
 //            )
 //        )
-//        whenever(useCaseFactory.listScales()).thenReturn(listScalesInteractor)
-//        whenever(listScalesInteractor.execute(any())).thenReturn(response)
+//        whenever(useCaseFactory.createScale()).thenReturn(createScaleInteractor)
+//        whenever(parser.parseCreateScaleRequest("hustensaft")).thenReturn(request)
+//        whenever(createScaleInteractor.execute(any())).thenReturn(response)
 //
-//        actuator.getAndDisplayScales()
+//        val result = actuator.createScale("hustensaft")
 //
-//        verify(listScalesInteractor).execute(any<ListScalesRequest>())
-//        verify(responder).respondListScales(response)
+//        verify(parser).parseCreateScaleRequest("hustensaft")
+//        verify(createScaleInteractor).execute(request)
+//        assertTrue(result.isSuccess)
+//        assertEquals(response.getOrThrow(), result.getOrThrow())
 //    }
-
-
-
-    @Test
-    fun createScale() {
-        val response = Result.success(CreateScaleResponse("scale-1"))
-        val request = CreateScaleRequest(
-            name = "name",
-            unit = "unit",
-            divisions = mapOf(
-                1L to "div1",
-                2L to "div2",
-                3L to "div3"
-            )
-        )
-        whenever(useCaseFactory.createScale()).thenReturn(createScaleInteractor)
-        whenever(parser.parseCreateScaleRequest("hustensaft")).thenReturn(request)
-        whenever(createScaleInteractor.execute(any())).thenReturn(response)
-
-        val result = actuator.createScale("hustensaft")
-
-        verify(parser).parseCreateScaleRequest("hustensaft")
-        verify(createScaleInteractor).execute(request)
-        assertTrue(result.isSuccess)
-        assertEquals(response.getOrThrow(), result.getOrThrow())
-    }
-
-    @Test
-    fun rejectScale() {
-        actuator.rejectScale()
-        actuator.rejectScaleDivisions()
-        actuator.rejectScaleUnit()
-        verify(responder).respondRejectScale()
-    }
-
-    @Test
-     fun parseScaleName() {
-        whenever(parser.parseScaleName(" name " )).thenReturn(Result.success("name"))
-
-        val result = actuator.parseScaleName(" name ")
-        assertEquals("name", result.getOrThrow())
-    }
-
+//
 //    @Test
-//    fun createScaleInvalidFormat() {
-//        whenever(parser.parseCreateScaleRequest(any())).thenThrow(InvalidScaleFormatException::class.java)
-//
-//        assertThrows<InvalidScaleFormatException> {
-//            actuator.createAndDisplayScale("hustensaft")
-//        }
-//
-//        assertThrows<InvalidScaleFormatException> {
-//            actuator.createAndDisplayScale("")
-//        }
-//
-//        verify(parser, times(2)).parseCreateScaleRequest(any())
-//        verifyNoMoreInteractions(parser)
+//    fun rejectScale() {
+//        actuator.rejectScale()
+//        actuator.rejectScaleDivisions()
+//        actuator.rejectScaleUnit()
+//        verify(responder).respondRejectScale()
 //    }
-
-
-    @Test
-    fun isValidUnit() {
-        whenever(parser.isValidScaleUnit("hustensaft")).thenReturn(false)
-        whenever(parser.isValidScaleUnit("h")).thenReturn(true)
-
-        assertFalse(actuator.isValidScaleUnit("hustensaft"))
-        assertFalse(actuator.isValidScaleUnit("hustensaft"))
-        assertTrue(actuator.isValidScaleUnit("h"))
-        assertTrue(actuator.isValidScaleUnit("h"))
-    }
-
-
-    @Test
-    fun isValidDivisions() {
-        whenever(parser.isValidDivisions("hustensaft")).thenReturn(false)
-        whenever(parser.isValidDivisions("h")).thenReturn(true)
-
-        assertFalse(actuator.isValidScaleDivisions("hustensaft"))
-        assertFalse(actuator.isValidScaleDivisions("hustensaft"))
-        assertTrue(actuator.isValidScaleDivisions("h"))
-        assertTrue(actuator.isValidScaleDivisions("h"))
-    }
+//
+//    @Test
+//     fun parseScaleName() {
+//        whenever(parser.parseScaleName(" name " )).thenReturn(Result.success("name"))
+//
+//        val result = actuator.parseScaleName(" name ")
+//        assertEquals("name", result.getOrThrow())
+//    }
+//
+////    @Test
+////    fun createScaleInvalidFormat() {
+////        whenever(parser.parseCreateScaleRequest(any())).thenThrow(InvalidScaleFormatException::class.java)
+////
+////        assertThrows<InvalidScaleFormatException> {
+////            actuator.createAndDisplayScale("hustensaft")
+////        }
+////
+////        assertThrows<InvalidScaleFormatException> {
+////            actuator.createAndDisplayScale("")
+////        }
+////
+////        verify(parser, times(2)).parseCreateScaleRequest(any())
+////        verifyNoMoreInteractions(parser)
+////    }
+//
+//
+//    @Test
+//    fun isValidUnit() {
+//        whenever(parser.isValidScaleUnit("hustensaft")).thenReturn(false)
+//        whenever(parser.isValidScaleUnit("h")).thenReturn(true)
+//
+//        assertFalse(actuator.isValidScaleUnit("hustensaft"))
+//        assertFalse(actuator.isValidScaleUnit("hustensaft"))
+//        assertTrue(actuator.isValidScaleUnit("h"))
+//        assertTrue(actuator.isValidScaleUnit("h"))
+//    }
+//
+//
+//    @Test
+//    fun isValidDivisions() {
+//        whenever(parser.isValidDivisions("hustensaft")).thenReturn(false)
+//        whenever(parser.isValidDivisions("h")).thenReturn(true)
+//
+//        assertFalse(actuator.isValidScaleDivisions("hustensaft"))
+//        assertFalse(actuator.isValidScaleDivisions("hustensaft"))
+//        assertTrue(actuator.isValidScaleDivisions("h"))
+//        assertTrue(actuator.isValidScaleDivisions("h"))
+//    }
 
 
 
