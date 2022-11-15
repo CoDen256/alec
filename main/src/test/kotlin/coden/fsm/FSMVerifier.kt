@@ -2,6 +2,7 @@ package coden.fsm
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.mockito.Mockito
+import org.mockito.verification.VerificationMode
 
 class FSMVerifier(table: FSMTable, start: State) {
 
@@ -19,6 +20,11 @@ class FSMVerifier(table: FSMTable, start: State) {
 
     fun <T> verify(mock: T, verification: T.() -> Unit) = apply {
         verification(Mockito.verify(mock)!!)
+        Mockito.reset(mock)
+    }
+
+    fun <T> verify(mock: T, mode: VerificationMode, verification: T.() -> Unit) = apply {
+        verification(Mockito.verify(mock, mode)!!)
         Mockito.reset(mock)
     }
 }

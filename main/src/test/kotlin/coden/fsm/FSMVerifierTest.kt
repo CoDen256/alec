@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.times
 
 @ExtendWith(MockitoExtension::class)
 class FSMVerifierTest{
@@ -31,7 +30,7 @@ class FSMVerifierTest{
         val verifier = FSMVerifier(FSMTable(
             Entry.entry(Start, C1, A) {actuator.act("1")},
             Entry.entry(A, C1, B) {actuator.act("2")},
-            Entry.entry(B, C1, Start) {actuator.act("3")},
+            Entry.entry(B, C1, Start) {actuator.act("3"); actuator.act("3")},
             Entry.entry(A, C2, Start) {actuator.act("4")},
             Entry.entry(B, C2, A) {actuator.act("5")},
         ), Start)
@@ -41,31 +40,26 @@ class FSMVerifierTest{
             .verifyState(Start)
 
             .submit(C1)
-            .and { verify(actuator).act("1") }
-            .and { reset(actuator) }
+            .verify(actuator) { act("1") }
             .verifyState(A)
 
 
             .submit(C1)
-            .and { verify(actuator).act("2") }
-            .and { reset(actuator) }
+            .verify(actuator) { act("2") }
             .verifyState(B)
 
 
             .submit(C1)
-            .and { verify(actuator).act("3") }
-            .and { reset(actuator) }
+            .verify(actuator, times(2)) { act("3") }
             .verifyState(Start)
 
 
             .submit(C1)
-            .and { verify(actuator).act("1") }
-            .and { reset(actuator) }
+            .verify(actuator) { act("1") }
             .verifyState(A)
 
             .submit(C2)
-            .and { verify(actuator).act("4") }
-            .and { reset(actuator) }
+            .verify(actuator) { act("4") }
             .verifyState(Start)
 
     }
