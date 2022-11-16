@@ -1,32 +1,34 @@
 package coden.alec.app.config.scale
 
+import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.actuators.scale.ScaleParser
+import coden.alec.app.util.flatMap
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import java.lang.IllegalArgumentException
 import java.util.regex.Pattern
 
 class BaseScaleParser : ScaleParser {
 
-    private val scalePattern = Pattern.compile(
-        "" +
-                "[A-Za-z0-9_-]{1,10}" +
-                "\n[A-Za-z/-]{1,10}" +
-                "(\n\\d+-[A-Za-z0-9_-]+)+"
-    )
-
     private val whitespaceReplacement = Pattern.compile("\\s", Pattern.MULTILINE).toRegex()
 
 
     override fun parseCreateScaleRequest(input: String): Result<CreateScaleRequest> {
-        input.verify("scale", this::isValidCreateScaleRequest)
-//        val (name, unit, divisionString) = collectArgs(command.arguments.getOrThrow())
-//        val divisions = HashMap<Long, String>()
-//        for (arg in divisionString.split("\n")) {
-//            val division = arg.split("-")
-//            divisions[division[0].toLong()] = division[1]
-//        }
-        TODO("Not yet implemented")
+        return Result.success(input)
+            .mapCatching { parseScaleRequest(it) }
+            .recoverCatching { throw InvalidScaleFormatException(input) }
+    }
+
+    private fun parseScaleRequest(it: String): CreateScaleRequest {
+        val split = it.split("\n", limit = 3)
+        val name = split[0]
+        val unit = split[1]
+        val divisions = split[2]
+        return CreateScaleRequest(
+            parseScaleName(name).getOrThrow(),
+            parseScaleUnit(unit).getOrThrow(),
+            parseScaleDivisions(divisions).getOrThrow()
+        )
     }
 
 
@@ -61,10 +63,6 @@ class BaseScaleParser : ScaleParser {
         if (input.count {  it == '-' } != 1) throw IllegalArgumentException()
     }
 
-    private fun isValidCreateScaleRequest(input: String): Boolean {
-        return input.matches(scalePattern)
-    }
-
     private fun isValidScaleName(input: String): Boolean {
         return isValidName(input)
     }
@@ -80,14 +78,4 @@ class BaseScaleParser : ScaleParser {
         if (!check(this)) return Result.failure(InvalidScalePropertyFormatException(name, this))
         return Result.success(this)
     }
-
-    private fun String.matches(pattern: Pattern) = this.matches(pattern.toRegex())
-
-//    private fun collectArgs(args: String): Triple<String, String, String> {
-//        if (name != null && unit != null && divisions != null) {
-//            return Triple(name!!, unit!!, divisions!!)
-//        }
-//        val split = args.split("\n", limit = 3)
-//        return Triple(split[0], split[1], split[2])
-//    }
 }
