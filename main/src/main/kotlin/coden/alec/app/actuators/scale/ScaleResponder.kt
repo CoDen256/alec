@@ -4,9 +4,9 @@ import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesResponse
 
 interface ScaleResponder {
-    fun respondInvalidScaleFormat(it: InvalidScaleFormatException)
-    fun respondInvalidScalePropertyFormat(it: InvalidScalePropertyFormatException)
-    fun respondInternalError(it: Throwable)
+    fun respondInvalidScaleFormat(throwable: InvalidScaleFormatException)
+    fun respondInvalidScalePropertyFormat(throwable: InvalidScalePropertyFormatException)
+    fun respondInternalError(throwable: Throwable)
 
     fun respondListScales(response: ListScalesResponse)
     fun respondCreateScale(response: CreateScaleResponse)

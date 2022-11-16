@@ -1,17 +1,17 @@
 messages:
-  startMessage: "Hello"
+  startMessage: "Hello and welcome to ALEC Bot (Analytical Load-Emotion-Correlation)"
   listScalesEmptyMessage: "No scales available at the moment"
-  listScalesMessage: "Scales:\n\n%s"
+  listScalesMessage: "Scales:\n\n{scales}"
 
-  rejectScaleMessage: "Scale is invalid"
-  rejectScaleNameMessage: "Scale name is invalid"
-  rejectScaleUnitMessage: "Unit is invalid"
-  rejectScaleDivisionsMessage: "Scale division is invalid"
-  scaleNamePrompt: "Input name"
-  scaleUnitPrompt: "Input unit"
-  scaleDivisionsPrompt: "Input divisions"
+  rejectScaleMessage: "Scale format is invalid."
+  rejectScalePropertyMessage: "Scale {prop} format is invalid."
+  scaleNamePrompt: "Input a name of the new scale."
+  scaleUnitPrompt: "Input a unit of the new scale."
+  scaleDivisionsPrompt: "Input list of divisions for the new scale."
 
-  errorMessage: "Error ocurred:"
+  createdScaleMessage : "A scale successfully created with id {id}"
+
+  errorMessage: "Unexpected error occurred:\n{name}:{message}"
   menuBackMessage: "Back"
 
 commands:

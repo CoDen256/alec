@@ -7,6 +7,11 @@ import org.junit.jupiter.api.Test
 class UtilsKtTest {
 
     @Test
+     fun format() {
+        assertEquals("Scales: \n\n1", "Scales: \n\n{scales}".format("scales" to  "1"))
+    }
+
+    @Test
     fun flatMapSuccessSuccess() {
         val result = Result.success(1).flatMap {
             Result.success(it + 2)
