@@ -7,6 +7,7 @@ import coden.bot.BotDispatcherConfigurator
 import coden.bot.config.CallbackQueryCapturingHandler
 import coden.bot.config.MessageCapturingHandler
 import coden.bot.context.ContextObserver
+import coden.bot.util.arguments
 import coden.fsm.CommandExecutor
 import com.github.kotlintelegrambot.dispatcher.Dispatcher
 import com.github.kotlintelegrambot.dispatcher.callbackQuery
@@ -42,7 +43,7 @@ class AlecBotConfigurator(
             if (args.isEmpty()) {
                 commandExecutor.submit(CreateScaleCommandNoArgs)
             } else {
-                commandExecutor.submit(CreateScaleCommand(message.text!!))
+                commandExecutor.submit(CreateScaleCommand(arguments()))
             }
         }
 

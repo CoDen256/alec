@@ -3,9 +3,7 @@ package coden.alec.app.config.scale
 import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.actuators.scale.ScaleParser
-import coden.alec.app.util.flatMap
 import coden.alec.interactors.definer.scale.CreateScaleRequest
-import java.lang.IllegalArgumentException
 import java.util.regex.Pattern
 
 class BaseScaleParser : ScaleParser {

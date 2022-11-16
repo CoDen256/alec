@@ -5,13 +5,13 @@ import coden.alec.data.Scale
 
 class BaseScaleFormatter : ScaleFormatter {
     override fun format(response: List<Scale>): String {
-        return response.mapIndexed { index, scale ->
-            "${index}.${format(scale)}"
-        }.joinToString("\n\n")
+        return response.joinToString("\n\n") { scale ->
+            format(scale)
+        }
     }
 
     override fun format(scale: Scale): String {
-        return "[${scale.id}] - ${scale.name}(${scale.unit}):\n" +
+        return "[${scale.id}] - ${scale.name}\n (${scale.unit})\n" +
                 scale.divisions.joinToString("\n") { "\t${it.value} - ${it.description}" }
     }
 }
