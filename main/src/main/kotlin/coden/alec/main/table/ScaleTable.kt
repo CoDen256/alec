@@ -80,6 +80,19 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> {
                     handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); Start},
                     handle<Throwable> { respondInternalError(it); Start }
                 )
+        }),
+
+
+        entry(Start, DeleteScaleCommandNoArgs) {respondPromptScaleId(); WaitScaleIdForDelete},
+        entry(WaitScaleIdForDelete, TextCommand::class, requireArgument { arg ->
+            parseDeleteScaleRequest(arg)
+                .flatMap { deleteScale(it) }
+                .then { respondDeleteScale(it) }
+                .state { Start }
+                .onErrors(
+                    handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); respondPromptScaleId(); WaitScaleIdForDelete},
+                    handle<Throwable> { respondInternalError(it); Start }
+                )
         })
     )
 }

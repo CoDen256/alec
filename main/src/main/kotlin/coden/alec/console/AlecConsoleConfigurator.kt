@@ -38,6 +38,15 @@ class AlecConsoleConfigurator(
                 commandExecutor.submit(CreateScaleCommand(args))
             }
         }
+
+        command(commandNames.deleteScaleCommand){
+            if (args.isEmpty()){
+                commandExecutor.submit(DeleteScaleCommandNoArgs)
+            }else {
+                commandExecutor.submit(DeleteScaleCommand(args))
+            }
+        }
+
         command(commandNames.textCommand){
             commandExecutor.submit(TextCommand(args))
         }

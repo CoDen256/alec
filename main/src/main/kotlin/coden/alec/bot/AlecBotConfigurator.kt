@@ -47,6 +47,14 @@ class AlecBotConfigurator(
             }
         }
 
+        command(commandNamesResource.deleteScaleCommand){
+            if (args.isEmpty()){
+                commandExecutor.submit(DeleteScaleCommandNoArgs)
+            }else {
+                commandExecutor.submit(DeleteScaleCommand(arguments()))
+            }
+        }
+
         text {
             if (text.startsWith("/")) return@text
             commandExecutor.submit(TextCommand(text))

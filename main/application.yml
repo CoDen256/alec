@@ -21,7 +21,10 @@ commands:
   startCommand: "start"
   helpCommand: "help"
   listScalesCommand: "list_scales"
-  createScaleCommand: "create_scales"
+  createScaleCommand: "create_scale"
+  deleteScaleCommand: "delete_scale"
+  purgeScaleCommand: "purge_scale"
+  update_scale: "update_scale"
   textCommand: "text"
   navCommand: "nav"
 

@@ -245,6 +245,57 @@ class ScaleTableTest{
             .verifyState(Start)
     }
 
+    @Test
+    fun deleteScaleByIdWithoutArgs() {
+        val request = genDeleteRequest()
+        val response = genDeleteResponse()
+        val userError = ScaleDoesNotExistException("scale-0")
+
+        whenever(actuator.parseDeleteScaleRequest("scale-0"))
+            .thenReturn(Result.success(request))
+            .thenReturn(Result.success(request))
+            .thenReturn(Result.success(request))
+
+        whenever(actuator.deleteScale(request))
+            .thenReturn(Result.success(response))
+            .thenReturn(Result.failure(userError))
+            .thenReturn(Result.success(response))
+
+
+
+        verifier
+            //  scale id exists
+            .submit(DeleteScaleCommandNoArgs)
+            .verify(actuator) {respondPromptScaleId()}
+            .verifyState(WaitScaleIdForDelete)
+
+            .submit(TextCommand("scale-0"))
+            .verify(actuator) {parseDeleteScaleRequest("scale-0")}
+            .verify(actuator) {deleteScale(request)}
+            .verify(actuator) {respondDeleteScale(response)}
+            .verifyState(Start)
+
+             // Second round
+            .submit(DeleteScaleCommandNoArgs)
+            .verify(actuator) {respondPromptScaleId()}
+            .verifyState(WaitScaleIdForDelete)
+
+                // scale id does not exist
+            .submit(TextCommand("scale-0"))
+            .verify(actuator) {parseDeleteScaleRequest("scale-0")}
+            .verify(actuator) {deleteScale(request)}
+            .verify(actuator) {respondScaleDoesNotExist(userError)}
+            .verify(actuator) {respondPromptScaleId()}
+            .verifyState(WaitScaleIdForDelete)
+
+                // scale id exists trying again
+            .submit(TextCommand("scale-0"))
+            .verify(actuator) {parseDeleteScaleRequest("scale-0")}
+            .verify(actuator) {deleteScale(request)}
+            .verify(actuator) {respondDeleteScale(response)}
+            .verifyState(Start)
+    }
+
     private fun genCreateResponse() = CreateScaleResponse("scale-0")
     private fun genDeleteResponse() = DeleteScaleResponse()
 
