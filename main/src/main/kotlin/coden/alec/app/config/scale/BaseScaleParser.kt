@@ -3,6 +3,7 @@ package coden.alec.app.config.scale
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.actuators.scale.ScaleParser
 import coden.alec.interactors.definer.scale.CreateScaleRequest
+import java.lang.IllegalArgumentException
 import java.util.regex.Pattern
 
 class BaseScaleParser : ScaleParser {
@@ -16,10 +17,6 @@ class BaseScaleParser : ScaleParser {
 
     private val whitespaceReplacement = Pattern.compile("\\s", Pattern.MULTILINE).toRegex()
 
-    private val divisionPattern = Pattern.compile(
-        "\\d+-[A-Za-z0-9_-]+" +
-                "(\n\\d+-[A-Za-z0-9_-]+)*"
-    )
 
     override fun parseCreateScaleRequest(input: String): Result<CreateScaleRequest> {
         input.verify("scale", this::isValidCreateScaleRequest)
@@ -48,8 +45,20 @@ class BaseScaleParser : ScaleParser {
     private fun parseName(it: String) = it.trim().replace(whitespaceReplacement, " ")
 
     override fun parseScaleDivisions(input: String): Result<Map<Long, String>> {
-        input.verify("scale divisions", this::isValidDivisions)
-        TODO("Not yet implemented")
+        return Result.success(input)
+            .mapCatching { parseDivisions(it) }
+            .recoverCatching { throw InvalidScalePropertyFormatException("scale divisions", input) }
+    }
+
+    private fun parseDivisions(it: String): Map<Long, String> =
+        it.split("\n")
+            .map { verifyDivision(it); it }
+            .map { l -> l.split("-", limit = 2) }
+            .associate { parseName(it[0]).toLong() to parseName(it[1].trim())
+        }
+
+    private fun verifyDivision(input: String){
+        if (input.count {  it == '-' } != 1) throw IllegalArgumentException()
     }
 
     private fun isValidCreateScaleRequest(input: String): Boolean {
@@ -66,10 +75,6 @@ class BaseScaleParser : ScaleParser {
 
     private fun isValidName(input: String) = input.isNotBlank()
 
-    private  fun isValidDivisions(input: String): Boolean {
-        return input.matches(divisionPattern)
-
-    }
 
     private fun String.verify(name: String, check: (String) -> Boolean): Result<String> {
         if (!check(this)) return Result.failure(InvalidScalePropertyFormatException(name, this))
