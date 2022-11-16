@@ -4,10 +4,8 @@ import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import org.junit.jupiter.api.Assertions.*
 
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import java.util.InvalidPropertiesFormatException
 
 class BaseScaleParserTest {
 
@@ -37,20 +35,19 @@ class BaseScaleParserTest {
         ignoreLeadingAndTrailingWhitespace = false
     )
     @ParameterizedTest
-    fun parseScaleName(input: String, expected: String) {
-        val name = sut.parseScaleName(input)
-        if (expected == "<invalid>") {
-            assertTrue(name.isFailure)
-            assertTrue(name.exceptionOrNull() is InvalidScalePropertyFormatException)
-        }
-        else{
-            assertTrue(name.isSuccess)
-            assertEquals(expected, name.getOrThrow())
-        }
+    fun parseScaleNameAndScaleUnit(input: String, expected: String) {
+        verifNameParsedCorrectly(sut.parseScaleName(input), expected)
+        verifNameParsedCorrectly(sut.parseScaleUnit(input), expected)
     }
 
-    @Test
-    fun parseScaleUnit() {
+    private fun verifNameParsedCorrectly(parseName: Result<String>, expected: String) {
+        if (expected == "<invalid>") {
+            assertTrue(parseName.isFailure)
+            assertTrue(parseName.exceptionOrNull() is InvalidScalePropertyFormatException)
+        } else {
+            assertTrue(parseName.isSuccess)
+            assertEquals(expected, parseName.getOrThrow())
+        }
     }
 
     @Test

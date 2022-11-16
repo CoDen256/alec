@@ -35,14 +35,17 @@ class BaseScaleParser : ScaleParser {
 
     override fun parseScaleName(input: String): Result<String> {
         return input.verify("scale name", this::isValidScaleName).map {
-                it.trim().replace(whitespaceReplacement, " ")
+            parseName(it)
             }
     }
 
     override fun parseScaleUnit(input: String): Result<String> {
-        input.verify("scale unit", this::isValidScaleUnit)
-        TODO("Not yet implemented")
+        return input.verify("scale unit", this::isValidScaleUnit).map {
+            parseName(it)
+        }
     }
+
+    private fun parseName(it: String) = it.trim().replace(whitespaceReplacement, " ")
 
     override fun parseScaleDivisions(input: String): Result<Map<Long, String>> {
         input.verify("scale divisions", this::isValidDivisions)
@@ -54,12 +57,14 @@ class BaseScaleParser : ScaleParser {
     }
 
     private fun isValidScaleName(input: String): Boolean {
-        return input.isNotBlank()
+        return isValidName(input)
     }
 
     private fun isValidScaleUnit(input: String): Boolean {
-        return input.isNotBlank()
+        return isValidName(input)
     }
+
+    private fun isValidName(input: String) = input.isNotBlank()
 
     private  fun isValidDivisions(input: String): Boolean {
         return input.matches(divisionPattern)
