@@ -31,7 +31,7 @@ internal class BaseScaleResponderTest {
 
     @Test
     fun respondInvalidScaleFormat() {
-        whenever()
+//        whenever()
         
         responder.respondInvalidScaleFormat(InvalidScaleFormatException(""))
     }

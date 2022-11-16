@@ -14,7 +14,7 @@ class BaseScaleParser : ScaleParser {
                 "(\n\\d+-[A-Za-z0-9_-]+)+"
     )
 
-    private val namePattern = Pattern.compile("\\w+")
+    private val whitespaceReplacement = Pattern.compile("\\s", Pattern.MULTILINE).toRegex()
 
     private val divisionPattern = Pattern.compile(
         "\\d+-[A-Za-z0-9_-]+" +
@@ -34,8 +34,9 @@ class BaseScaleParser : ScaleParser {
 
 
     override fun parseScaleName(input: String): Result<String> {
-        input.verify("scale name", this::isValidScaleName)
-        TODO("Not yet implemented")
+        return input.verify("scale name", this::isValidScaleName).map {
+                it.trim().replace(whitespaceReplacement, " ")
+            }
     }
 
     override fun parseScaleUnit(input: String): Result<String> {
@@ -53,11 +54,11 @@ class BaseScaleParser : ScaleParser {
     }
 
     private fun isValidScaleName(input: String): Boolean {
-        return input.matches(namePattern)
+        return input.isNotBlank()
     }
 
     private fun isValidScaleUnit(input: String): Boolean {
-        return input.matches(namePattern)
+        return input.isNotBlank()
     }
 
     private  fun isValidDivisions(input: String): Boolean {
@@ -65,9 +66,9 @@ class BaseScaleParser : ScaleParser {
 
     }
 
-    private fun String.verify(name: String, check: (String) -> Boolean): String {
-        if (!check(this)) throw InvalidScalePropertyFormatException(name, this)
-        return this
+    private fun String.verify(name: String, check: (String) -> Boolean): Result<String> {
+        if (!check(this)) return Result.failure(InvalidScalePropertyFormatException(name, this))
+        return Result.success(this)
     }
 
     private fun String.matches(pattern: Pattern) = this.matches(pattern.toRegex())
