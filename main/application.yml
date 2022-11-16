@@ -24,7 +24,7 @@ commands:
   createScaleCommand: "create_scale"
   deleteScaleCommand: "delete_scale"
   purgeScaleCommand: "purge_scale"
-  update_scale: "update_scale"
+  updateScaleCommand: "update_scale"
   textCommand: "text"
   navCommand: "nav"
 

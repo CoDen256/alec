@@ -2,8 +2,7 @@ package coden.alec.main.base
 
 import coden.alec.core.*
 import coden.alec.data.ScaleGateway
-import coden.alec.interactors.definer.scale.BaseCreateScaleInteractor
-import coden.alec.interactors.definer.scale.BaseListScalesInteractor
+import coden.alec.interactors.definer.scale.*
 import gateway.memory.ScaleInMemoryGateway
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -28,15 +27,15 @@ class UseCaseConfiguration {
             }
 
             override fun deleteScale(): DeleteScaleInteractor {
-                TODO("Not yet implemented")
+                return BaseDeleteScaleInteractor(scalesGateway)
             }
 
             override fun purgeScale(): PurgeScaleInteractor {
-                TODO("Not yet implemented")
+                return BasePurgeScaleInteractor(scalesGateway)
             }
 
             override fun updateScale(): UpdateScaleInteractor {
-                TODO("Not yet implemented")
+                return BaseUpdateScaleInteractor(scalesGateway)
             }
         }
     }
