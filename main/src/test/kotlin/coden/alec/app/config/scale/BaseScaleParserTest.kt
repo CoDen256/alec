@@ -3,6 +3,7 @@ package coden.alec.app.config.scale
 import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.interactors.definer.scale.CreateScaleRequest
+import coden.alec.interactors.definer.scale.DeleteScaleRequest
 import org.junit.jupiter.api.Assertions.*
 
 import org.junit.jupiter.params.ParameterizedTest
@@ -11,6 +12,17 @@ import org.junit.jupiter.params.provider.CsvSource
 class BaseScaleParserTest {
 
     private val parser = BaseScaleParser()
+
+    @CsvSource(
+        "' scale  - 123',scale-123",
+        "'\t s c a l e \t-\n123',scale-123",
+        delimiter = ',',
+        ignoreLeadingAndTrailingWhitespace = false
+    )
+    @ParameterizedTest
+    fun parseScaleId(input: String, expected: String) {
+        verifyPropertyParsedCorrectly(parser.parseDeleteScaleRequest(input), DeleteScaleRequest(expected))
+    }
 
     @CsvSource(
         "'name\nunit\n1-div',name;unit;{1:div}",

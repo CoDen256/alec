@@ -11,14 +11,18 @@ class BaseDeleteScaleInteractor(
 
     override fun execute(request: Request): Result<Response> {
         request as DeleteScaleRequest
-        gateway.updateScaleSetDeleted(request.id, true)
-        return Result.success(DeleteScaleResponse())
+        return gateway.getScaleById(request.id)
+            .map {
+                gateway.updateScaleSetDeleted(request.id, true)
+            }.map {
+                DeleteScaleResponse()
+            }
     }
 
 }
 
 data class DeleteScaleRequest(
     val id: String
-): Request
+) : Request
 
-class DeleteScaleResponse: Response
+class DeleteScaleResponse : Response

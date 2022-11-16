@@ -4,6 +4,7 @@ import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.actuators.scale.ScaleParser
 import coden.alec.interactors.definer.scale.CreateScaleRequest
+import coden.alec.interactors.definer.scale.DeleteScaleRequest
 import java.util.regex.Pattern
 
 class BaseScaleParser : ScaleParser {
@@ -48,6 +49,10 @@ class BaseScaleParser : ScaleParser {
         return Result.success(input)
             .mapCatching { parseDivisions(it) }
             .recoverCatching { throw InvalidScalePropertyFormatException("scale divisions", input) }
+    }
+
+    override fun parseDeleteScaleRequest(input: String): Result<DeleteScaleRequest> {
+        return Result.success(DeleteScaleRequest(input.replace(whitespaceReplacement, "")))
     }
 
     private fun parseDivisions(it: String): Map<Long, String> =

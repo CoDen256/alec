@@ -14,7 +14,7 @@ import org.mockito.kotlin.verify
 @ExtendWith(MockitoExtension::class)
 class BaseHelpActuatorTest{
     private val resource=  MessageResource().apply {
-        startMessage = "startMessage"
+        start = "startMessage"
     }
 
     @Mock
@@ -28,6 +28,6 @@ class BaseHelpActuatorTest{
             resource,
         ).displayHelp()
 
-        verify(display, times(1)).displayMessage(resource.startMessage)
+        verify(display, times(1)).displayMessage(resource.start)
     }
 }

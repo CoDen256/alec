@@ -4,9 +4,8 @@ import coden.alec.app.actuators.ScaleActuator
 import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.fsm.*
-import coden.alec.interactors.definer.scale.CreateScaleRequest
-import coden.alec.interactors.definer.scale.CreateScaleResponse
-import coden.alec.interactors.definer.scale.ListScalesResponse
+import coden.alec.data.ScaleDoesNotExistException
+import coden.alec.interactors.definer.scale.*
 import coden.fsm.FSMVerifier
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,8 +50,8 @@ class ScaleTableTest{
     }
     @Test
      fun createScalesWithArgs() {
-        val request = genRequest()
-        val response = genResponse()
+        val request = genCreateRequest()
+        val response = genCreateResponse()
         val error = IllegalStateException()
         val userError = InvalidScaleFormatException("")
         whenever(actuator.parseCreateScaleRequest("scale"))
@@ -92,8 +91,8 @@ class ScaleTableTest{
 
     @Test
     fun createScaleWithoutArgs() {
-        val request = genRequest()
-        val response = genResponse()
+        val request = genCreateRequest()
+        val response = genCreateResponse()
         val userError = InvalidScalePropertyFormatException("", "")
 
         whenever(actuator.parseScaleName("name"))
@@ -168,7 +167,7 @@ class ScaleTableTest{
 
     @Test
     fun createScaleWithoutArgsWithErrors(){
-        val request = genRequest()
+        val request = genCreateRequest()
         val error = IllegalStateException()
 
         whenever(actuator.parseScaleName("name"))
@@ -216,9 +215,42 @@ class ScaleTableTest{
 
     }
 
-    private fun genResponse() = CreateScaleResponse("scale-0")
+    @Test
+    fun deleteScaleByIdWithArgs() {
+        val request = genDeleteRequest()
+        val response = genDeleteResponse()
+        val userError = ScaleDoesNotExistException("scale-0")
 
-    private fun genRequest() = CreateScaleRequest(
+        whenever(actuator.parseDeleteScaleRequest("scale-0"))
+            .thenReturn(Result.success(request))
+            .thenReturn(Result.success(request))
+
+        whenever(actuator.deleteScale(request))
+            .thenReturn(Result.success(response))
+            .thenReturn(Result.failure(userError))
+
+
+        verifier
+            .submit(DeleteScaleCommand("scale-0"))
+            .verify(actuator) {parseDeleteScaleRequest("scale-0")}
+            .verify(actuator) {deleteScale(request)}
+            .verify(actuator) {respondDeleteScale(response)}
+            .verifyState(Start)
+
+
+            .submit(DeleteScaleCommand("scale-0"))
+            .verify(actuator) {parseDeleteScaleRequest("scale-0")}
+            .verify(actuator) {deleteScale(request)}
+            .verify(actuator) {respondScaleDoesNotExist(userError)}
+            .verifyState(Start)
+    }
+
+    private fun genCreateResponse() = CreateScaleResponse("scale-0")
+    private fun genDeleteResponse() = DeleteScaleResponse()
+
+    private fun genCreateRequest() = CreateScaleRequest(
         "scale", "unit", mapOf(1L to "some")
     )
+
+    private fun genDeleteRequest() = DeleteScaleRequest("scale-0")
 }

@@ -1,18 +1,21 @@
 messages:
-  startMessage: "Hello and welcome to ALEC Bot (Analytical Load-Emotion-Correlation)"
-  listScalesEmptyMessage: "No scales available at the moment"
-  listScalesMessage: "Scales:\n\n{scales}"
+  start: "Hello and welcome to ALEC Bot (Analytical Load-Emotion-Correlation)"
+  listScalesEmpty: "No scales available at the moment"
+  listScales: "Scales:\n\n{scales}"
 
-  rejectScaleMessage: "Scale format is invalid."
-  rejectScalePropertyMessage: "Scale {prop} format is invalid."
-  scaleNamePrompt: "Input a name of the new scale."
-  scaleUnitPrompt: "Input a unit of the new scale."
-  scaleDivisionsPrompt: "Input list of divisions for the new scale."
+  createdScale : "A scale successfully created with id {id}"
+  rejectScale: "The given scale format is invalid."
+  rejectScaleProperty: "The given scale {prop} format is invalid."
+  scaleNamePrompt: "Input a name of the new scale..."
+  scaleUnitPrompt: "Input a unit of the new scale..."
+  scaleDivisionsPrompt: "Input list of divisions for the new scale..."
 
-  createdScaleMessage : "A scale successfully created with id {id}"
+  scaleIdPrompt: "Input the scale id you want to delete"
+  deletedScale: "The scale was marked as deleted"
+  scaleDoesNotExist: "Scale does not exist for id {id}"
 
-  errorMessage: "Unexpected error occurred:\n{name}:{message}"
-  menuBackMessage: "Back"
+  error: "Unexpected error occurred:\n{name}:{message}"
+  menuBack: "Back"
 
 commands:
   startCommand: "start"

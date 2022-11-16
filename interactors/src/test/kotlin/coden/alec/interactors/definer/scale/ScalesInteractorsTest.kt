@@ -2,6 +2,7 @@ package coden.alec.interactors.definer.scale
 
 import coden.alec.data.Scale
 import coden.alec.data.ScaleDivision
+import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.data.ScaleGateway
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -71,4 +72,34 @@ class ScalesInteractorsTest {
         )))
     }
 
+    @Test
+    fun deleteScales() {
+        val interactor = BaseDeleteScaleInteractor(gateway)
+
+        val response = interactor.execute(DeleteScaleRequest("scale-0")) as Result<DeleteScaleResponse>
+
+
+        response.onFailure { fail() }
+        response.onSuccess {
+            assertTrue(true)
+        }
+
+        verify(gateway, times(1)).updateScaleSetDeleted("scale-0", true)
+    }
+
+    @Test
+    fun deleteScalesDoesNotExist() {
+        val interactor = BaseDeleteScaleInteractor(gateway)
+
+        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.failure(ScaleDoesNotExistException("scale-0")))
+        val response = interactor.execute(DeleteScaleRequest("scale-0")) as Result<DeleteScaleResponse>
+
+
+        response.onFailure { assertTrue(it is ScaleDoesNotExistException) }
+        response.onSuccess {
+            fail()
+        }
+
+        verify(gateway).getScaleById("scale-0")
+    }
 }

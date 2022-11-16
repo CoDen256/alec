@@ -1,5 +1,7 @@
 package coden.alec.data
 
+import java.lang.RuntimeException
+
 data class Scale (
     val id: String,
     val name: String,
@@ -16,9 +18,11 @@ data class ScaleDivision (
 
 interface ScaleGateway{
     fun getScales(): List<Scale>
+    fun getScaleById(scaleId: String): Result<Scale>
     fun getScalesCount(): Int
     fun addScale(scale: Scale)
     fun updateScaleSetDeleted(scaleId: String, deleted: Boolean)
     fun deleteScale(scaleId: String)
 }
 
+class ScaleDoesNotExistException(val scaleId: String): RuntimeException()

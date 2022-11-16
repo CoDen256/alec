@@ -7,6 +7,7 @@ import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.fsm.*
 import coden.alec.app.util.flatMap
 import coden.alec.app.util.then
+import coden.alec.data.ScaleDoesNotExistException
 import coden.fsm.*
 import coden.fsm.Entry.Companion.entry
 
@@ -69,5 +70,16 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> {
                     handle<Throwable> { respondInternalError(it); reset(); Start }
                 )
         }),
+
+        entry(Start, DeleteScaleCommand::class, requireArgument {  arg ->
+            parseDeleteScaleRequest(arg)
+                .flatMap{ deleteScale(it) }
+                .then { respondDeleteScale(it) }
+                .state { Start }
+                .onErrors(
+                    handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); Start},
+                    handle<Throwable> { respondInternalError(it); Start }
+                )
+        })
     )
 }

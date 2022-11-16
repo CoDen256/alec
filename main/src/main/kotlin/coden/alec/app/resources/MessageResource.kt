@@ -1,20 +1,23 @@
 package coden.alec.app.resources
 
 open class MessageResource {
-    lateinit var startMessage: String
+    lateinit var start: String
 
-    lateinit var listScalesMessage: String
-    lateinit var listScalesEmptyMessage: String
+    lateinit var listScales: String
+    lateinit var listScalesEmpty: String
 
-    lateinit var createdScaleMessage: String
-    lateinit var rejectScaleMessage: String
-    lateinit var rejectScalePropertyMessage: String
+    lateinit var createdScale: String
+    lateinit var rejectScale: String
+    lateinit var rejectScaleProperty: String
     lateinit var scaleNamePrompt: String
     lateinit var scaleUnitPrompt: String
     lateinit var scaleDivisionsPrompt: String
 
+    lateinit var scaleIdPrompt: String
+    lateinit var deletedScale: String
+    lateinit var scaleDoesNotExist: String
 
-    lateinit var menuBackMessage: String
-    lateinit var errorMessage: String
+    lateinit var menuBack: String
+    lateinit var error: String
 
 }

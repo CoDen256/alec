@@ -6,3 +6,4 @@ object Start: State
 object WaitScaleName: State
 object WaitScaleUnit: State
 object WaitScaleDivision: State
+object WaitScaleIdForDelete: State

@@ -1,7 +1,9 @@
 package gateway.memory
 
 import coden.alec.data.Scale
+import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.data.ScaleGateway
+import java.lang.IllegalArgumentException
 
 class ScaleInMemoryGateway: ScaleGateway {
 
@@ -10,6 +12,13 @@ class ScaleInMemoryGateway: ScaleGateway {
     override fun getScales(): List<Scale> {
         return scales
     }
+
+    override fun getScaleById(scaleId: String): Result<Scale> {
+        return scales.firstOrNull { it.id == scaleId }?.let {
+            Result.success(it)
+        }   ?: Result.failure(ScaleDoesNotExistException(scaleId))
+    }
+
 
     override fun getScalesCount(): Int {
         return scales.size

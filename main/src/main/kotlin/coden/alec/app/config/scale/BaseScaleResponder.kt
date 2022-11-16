@@ -6,7 +6,9 @@ import coden.alec.app.actuators.scale.ScaleFormatter
 import coden.alec.app.actuators.scale.ScaleResponder
 import coden.alec.app.resources.MessageResource
 import coden.alec.app.util.inline
+import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.interactors.definer.scale.CreateScaleResponse
+import coden.alec.interactors.definer.scale.DeleteScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesResponse
 import coden.display.displays.MessageDisplay
 
@@ -17,18 +19,24 @@ class BaseScaleResponder(
 ) : ScaleResponder {
 
     override fun respondInvalidScaleFormat(throwable: InvalidScaleFormatException) {
-        display.displayError(messages.rejectScaleMessage.inline("value" to throwable.value))
+        display.displayError(messages.rejectScale.inline("value" to throwable.value))
     }
 
     override fun respondInvalidScalePropertyFormat(throwable: InvalidScalePropertyFormatException) {
-        display.displayError(messages.rejectScalePropertyMessage.inline(
+        display.displayError(messages.rejectScaleProperty.inline(
             "prop" to throwable.property,
             "value" to throwable.value
         ))
     }
 
+    override fun respondScaleDoesNotExist(throwable: ScaleDoesNotExistException) {
+        display.displayError(messages.scaleDoesNotExist.inline(
+            "id" to throwable.scaleId
+        ))
+    }
+
     override fun respondInternalError(throwable: Throwable) {
-        display.displayError(messages.errorMessage.inline(
+        display.displayError(messages.error.inline(
             "name" to throwable.javaClass.simpleName,
             "message" to throwable.message
         ))
@@ -36,14 +44,18 @@ class BaseScaleResponder(
     override fun respondListScales(response: ListScalesResponse) {
         val scales = response.scales
         if (scales.isEmpty()) {
-            display.displayMessage(messages.listScalesEmptyMessage)
+            display.displayMessage(messages.listScalesEmpty)
         } else {
-            display.displayMessage(messages.listScalesMessage.inline("scales" to formatter.format(scales)))
+            display.displayMessage(messages.listScales.inline("scales" to formatter.format(scales)))
         }
     }
 
     override fun respondCreateScale(response: CreateScaleResponse) {
-        display.displayMessage(messages.createdScaleMessage.inline("id" to response.scaleId))
+        display.displayMessage(messages.createdScale.inline("id" to response.scaleId))
+    }
+
+    override fun respondDeleteScale(response: DeleteScaleResponse) {
+        display.displayMessage(messages.deletedScale)
     }
 
     override fun respondPromptScaleName() {
@@ -56,5 +68,9 @@ class BaseScaleResponder(
 
     override fun respondPromptScaleDivisions() {
         display.displayPrompt(messages.scaleDivisionsPrompt)
+    }
+
+    override fun respondPromptScaleId() {
+        display.displayPrompt(messages.scaleIdPrompt)
     }
 }

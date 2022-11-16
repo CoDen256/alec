@@ -9,6 +9,6 @@ class BaseHelpActuator(
     private val messages: MessageResource,
 ) : HelpActuator {
     override fun displayHelp() {
-        view.displayMessage(messages.startMessage)
+        view.displayMessage(messages.start)
     }
 }

@@ -1,5 +1,7 @@
 package coden.alec.core
 
+import java.lang.RuntimeException
+
 interface CreateFactorInteractor: Interactor
 interface DeleteFactorInteractor: Interactor
 interface PurgeFactorInteractor: Interactor
