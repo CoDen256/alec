@@ -2,13 +2,11 @@ package coden.alec.main.base.actuators
 
 import coden.alec.app.actuators.*
 import coden.alec.app.actuators.scale.*
-import coden.alec.app.config.scale.BaseScaleFormatter
-import coden.alec.app.config.scale.BaseScaleParser
-import coden.alec.app.config.scale.BaseScaleResponder
-import coden.alec.app.config.scale.BaseScaleUseCaseInvoker
+import coden.alec.app.config.scale.*
 import coden.alec.core.ScaleUseCaseFactory
 import coden.alec.main.resources.Messages
 import coden.display.displays.MessageDisplay
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -44,11 +42,16 @@ class ScaleActuatorConfiguration {
     }
 
     @Bean
+    fun scaleRequestBuilder(): CreateScaleRequestBuilder {
+        return BaseCreateScaleRequestBuilder()
+    }
+
+    @Bean
     fun scaleActuator(
-        scaleResponder: ScaleResponder,
-        scaleParser: ScaleParser,
-        scaleUseCaseInvoker: ScaleUseCaseInvoker,
-        scaleRequestBuilder: CreateScaleRequestBuilder
+         scaleResponder: ScaleResponder,
+         scaleParser: ScaleParser,
+         scaleUseCaseInvoker: ScaleUseCaseInvoker,
+         scaleRequestBuilder: CreateScaleRequestBuilder
     ): ScaleActuator {
         return BaseScaleActuator(scaleResponder, scaleParser, scaleRequestBuilder, scaleUseCaseInvoker)
     }

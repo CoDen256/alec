@@ -38,7 +38,7 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
             .then { scale.respondPromptScaleUnit() }
             .state { WaitScaleUnit }
             .onErrors(
-                handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); WaitScaleName },
+                handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); scale.respondPromptScaleName(); WaitScaleName },
                 handle<Throwable> { scale.respondInternalError(it); scale.reset(); Start }
             )
 
@@ -49,7 +49,7 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
             .then { scale.respondPromptScaleDivisions() }
             .state { WaitScaleDivision }
             .onErrors(
-                handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); WaitScaleUnit },
+                handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); scale.respondPromptScaleUnit(); WaitScaleUnit },
                 handle<Throwable> { scale.respondInternalError(it); scale.reset(); Start }
             )
 
@@ -62,7 +62,7 @@ class ScaleTable(scale: ScaleActuator) : FSMTable(
             .then { scale.respondCreateScale(it) }
             .state { Start }
             .onErrors(
-                handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); WaitScaleUnit },
+                handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); scale.respondPromptScaleDivisions(); WaitScaleDivision },
                 handle<Throwable> { scale.respondInternalError(it); scale.reset(); Start }
             )
     }),
