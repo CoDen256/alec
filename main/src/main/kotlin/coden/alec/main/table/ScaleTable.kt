@@ -1,5 +1,6 @@
 package coden.alec.main.table
 
+import coden.alec.app.actuators.FSMTableBuilder
 import coden.alec.app.actuators.ScaleActuator
 import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
@@ -9,61 +10,64 @@ import coden.alec.app.util.then
 import coden.fsm.*
 import coden.fsm.Entry.Companion.entry
 
-class ScaleTable(scale: ScaleActuator) : FSMTable(
-    entry(Start, ListScalesCommand) {
-        scale.listScales()
-            .then { scale.respondListScales(it) }
-            .state { Start }
-            .onErrors(
-                handle<Throwable> { scale.respondInternalError(it); Start }
-            )
-    },
+class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> {
+    override fun ScaleActuator.buildTable() = FSMTable(
+        entry(Start, ListScalesCommand) {
+            listScales()
+                .then { respondListScales(it) }
+                .state { Start }
+                .onErrors(
+                    handle<Throwable> { respondInternalError(it); Start }
+                )
+        },
 
-    entry(Start, CreateScaleCommand::class, requireArgument { arg ->
-        scale.parseCreateScaleRequest(arg)
-            .flatMap { scale.createScale(it) }
-            .then { scale.respondCreateScale(it) }
-            .state { Start }
-            .onErrors(
-                handle<InvalidScaleFormatException> { scale.respondInvalidScaleFormat(it); Start },
-                handle<Throwable> { scale.respondInternalError(it); Start }
-            )
-    }),
+        entry(Start, CreateScaleCommand::class, requireArgument { arg ->
+            parseCreateScaleRequest(arg)
+                .flatMap { createScale(it) }
+                .then { respondCreateScale(it) }
+                .state { Start }
+                .onErrors(
+                    handle<InvalidScaleFormatException> { respondInvalidScaleFormat(it); Start },
+                    handle<Throwable> { respondInternalError(it); Start }
+                )
+        }),
 
-    entry(Start, CreateScaleCommandNoArgs) { scale.respondPromptScaleName(); WaitScaleName },
+        entry(Start, CreateScaleCommandNoArgs) { respondPromptScaleName(); WaitScaleName },
 
-    entry(WaitScaleName, TextCommand::class, requireArgument { arg ->
-        scale.parseScaleName(arg)
-            .then { scale.setName(it) }
-            .then { scale.respondPromptScaleUnit() }
-            .state { WaitScaleUnit }
-            .onErrors(
-                handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); scale.respondPromptScaleName(); WaitScaleName },
-                handle<Throwable> { scale.respondInternalError(it); scale.reset(); Start }
-            )
+        entry(WaitScaleName, TextCommand::class, requireArgument { arg ->
+            parseScaleName(arg)
+                .then { setName(it) }
+                .then { respondPromptScaleUnit() }
+                .state { WaitScaleUnit }
+                .onErrors(
+                    handle<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleName(); WaitScaleName },
+                    handle<Throwable> { respondInternalError(it); reset(); Start }
+                )
 
-    }),
-    entry(WaitScaleUnit, TextCommand::class, requireArgument { arg ->
-        scale.parseScaleUnit(arg)
-            .then { scale.setUnit(it) }
-            .then { scale.respondPromptScaleDivisions() }
-            .state { WaitScaleDivision }
-            .onErrors(
-                handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); scale.respondPromptScaleUnit(); WaitScaleUnit },
-                handle<Throwable> { scale.respondInternalError(it); scale.reset(); Start }
-            )
+        }),
+        entry(WaitScaleUnit, TextCommand::class, requireArgument { arg ->
+            parseScaleUnit(arg)
+                .then { setUnit(it) }
+                .then { respondPromptScaleDivisions() }
+                .state { WaitScaleDivision }
+                .onErrors(
+                    handle<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleUnit(); WaitScaleUnit },
+                    handle<Throwable> { respondInternalError(it); reset(); Start }
+                )
 
-    }),
-    entry(WaitScaleDivision, TextCommand::class, requireArgument { arg ->
-        scale.parseScaleDivisions(arg)
-            .then { scale.setDivisions(it) }
-            .map { scale.build() }
-            .flatMap { scale.createScale(it) }
-            .then { scale.respondCreateScale(it) }
-            .state { Start }
-            .onErrors(
-                handle<InvalidScalePropertyFormatException> { scale.respondInvalidScalePropertyFormat(it); scale.respondPromptScaleDivisions(); WaitScaleDivision },
-                handle<Throwable> { scale.respondInternalError(it); scale.reset(); Start }
-            )
-    }),
-)
+        }),
+        entry(WaitScaleDivision, TextCommand::class, requireArgument { arg ->
+            parseScaleDivisions(arg)
+                .then { setDivisions(it) }
+                .map { build() }
+                .flatMap { createScale(it) }
+                .then { respondCreateScale(it) }
+                .then { reset() }
+                .state { Start }
+                .onErrors(
+                    handle<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleDivisions(); WaitScaleDivision },
+                    handle<Throwable> { respondInternalError(it); reset(); Start }
+                )
+        }),
+    )
+}

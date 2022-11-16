@@ -4,6 +4,7 @@ import coden.alec.app.actuators.scale.CreateScaleRequestBuilder
 import coden.alec.app.actuators.scale.ScaleParser
 import coden.alec.app.actuators.scale.ScaleResponder
 import coden.alec.app.actuators.scale.ScaleUseCaseInvoker
+import coden.fsm.FSMTable
 
 
 interface HelpActuator {
@@ -23,5 +24,11 @@ class BaseScaleActuator(
     ScaleParser by parser,
     CreateScaleRequestBuilder by builder
 
+
+
+interface FSMTableBuilder<T>{
+    fun buildTableFrom(builder: T) = builder.buildTable()
+    fun T.buildTable(): FSMTable
+}
 
 open class UserException(msg: String? = null): RuntimeException(msg)

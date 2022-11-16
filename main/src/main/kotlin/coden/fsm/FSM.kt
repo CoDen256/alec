@@ -32,6 +32,7 @@ open class FSMTable(private val entries: List<Entry>) : ArrayList<Entry>(entries
     }
 }
 
+
 data class Entry(
     val input: State,
     val command: KClass<out Command>,

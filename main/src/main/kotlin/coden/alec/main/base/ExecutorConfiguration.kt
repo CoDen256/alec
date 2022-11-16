@@ -4,7 +4,7 @@ import coden.alec.app.actuators.HelpActuator
 import coden.alec.app.actuators.ScaleActuator
 import coden.alec.app.fsm.Start
 import coden.alec.main.table.HelpTable
-import coden.alec.main.table.ScaleTable
+import coden.alec.main.table.ScaleTableBuilder
 import coden.fsm.CommandExecutor
 import coden.fsm.FSM
 import coden.fsm.FSMTable
@@ -22,7 +22,7 @@ class ExecutorConfiguration {
 
     @Bean
     fun scaleTable(scaleActuator: ScaleActuator): FSMTable {
-        return ScaleTable(scaleActuator)
+        return ScaleTableBuilder().buildTableFrom(scaleActuator)
     }
 
     @Bean
