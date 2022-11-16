@@ -169,62 +169,51 @@ class ScaleTableTest{
     @Test
     fun createScaleWithoutArgsWithErrors(){
         val request = genRequest()
-        val response = genResponse()
         val error = IllegalStateException()
-        val userError = InvalidScalePropertyFormatException("", "")
 
         whenever(actuator.parseScaleName("name"))
+            .thenReturn(Result.success("name")) // 0
+            .thenReturn(Result.success("name")) // 1
         whenever(actuator.parseScaleUnit("unit"))
+            .thenReturn(Result.failure(error)) // 0
+            .thenReturn(Result.success("unit")) // 1
         whenever(actuator.parseScaleDivisions("1-div"))
-
+            .thenReturn(Result.success(mapOf(1L to "div"))) // 1
 
         whenever(actuator.build())
-            .thenReturn(request) // 5
+            .thenReturn(request) // 1
         whenever(actuator.createScale(request))
-            .thenReturn(Result.success(response)) // 5
+            .thenReturn(Result.failure(error)) // 1
 
         verifier
+                // 0
             .submit(CreateScaleCommandNoArgs)
-            .verify(actuator) {respondPromptScaleName()}
             .verifyState(WaitScaleName)
 
-            // valid name
             .submit(TextCommand("name"))
-            .verify(actuator) {parseScaleName("name")}
-            .verify(actuator) {setName("name")}
-            .verify(actuator) {respondPromptScaleUnit()}
             .verifyState(WaitScaleUnit)
 
-            // invalid unit
             .submit(TextCommand("unit"))
-            .verify(actuator) {parseScaleUnit("unit")}
-            .verify(actuator) {respondInvalidScalePropertyFormat(userError)}
-            .verify(actuator) {respondPromptScaleUnit()}
+            .verify(actuator) {respondInternalError(error)}
+            .verify(actuator) {actuator.reset()}
+            .verifyState(Start)
+                // 1
+            .submit(CreateScaleCommandNoArgs)
+            .verifyState(WaitScaleName)
+
+            .submit(TextCommand("name"))
             .verifyState(WaitScaleUnit)
 
-            // valid unit
             .submit(TextCommand("unit"))
-            .verify(actuator) {parseScaleUnit("unit")}
-            .verify(actuator) {setUnit("unit")}
-            .verify(actuator) {respondPromptScaleDivisions()}
             .verifyState(WaitScaleDivision)
 
-            // invalid divisions
             .submit(TextCommand("1-div"))
-            .verify(actuator) {parseScaleDivisions("1-div")}
-            .verify(actuator) {respondInvalidScalePropertyFormat(userError)}
-            .verify(actuator) {respondPromptScaleDivisions()}
-            .verifyState(WaitScaleDivision)
-
-            // valid divisions
-            .submit(TextCommand("1-div"))
-            .verify(actuator) {parseScaleDivisions("1-div")}
-            .verify(actuator) {setDivisions(mapOf(1L to "div"))}
-
             .verify(actuator) {build()}
             .verify(actuator) {createScale(request)}
-            .verify(actuator) {respondCreateScale(response)}
+            .verify(actuator) {respondInternalError(error)}
+            .verify(actuator) {reset()}
             .verifyState(Start)
+
     }
 
     private fun genResponse() = CreateScaleResponse("scale-0")
