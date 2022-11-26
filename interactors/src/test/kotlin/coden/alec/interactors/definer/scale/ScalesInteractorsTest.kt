@@ -66,7 +66,7 @@ class ScalesInteractorsTest {
         }
 
         verify(gateway).getScalesCount()
-        verify(gateway).addScale(Scale("scale-3", "scale", "unit", false, listOf(
+        verify(gateway).addScaleOrUpdate(Scale("scale-3", "scale", "unit", false, listOf(
             ScaleDivision(1, "first"),
              ScaleDivision(2, "second")
         )))
@@ -148,5 +148,88 @@ class ScalesInteractorsTest {
         }
 
         verify(gateway).getScaleById("scale-0")
+    }
+
+    @Test
+    fun updateScaleNothing() {
+        val interactor = BaseUpdateScaleInteractor(gateway)
+
+        val scale = Scale("scale-0", "name", "unit", false, emptyList())
+        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.success(scale))
+        val response = interactor.execute(UpdateScaleRequest("scale-0")) as Result<UpdateScaleResponse>
+
+
+        response.onFailure { fail() }
+
+        verify(gateway).getScaleById("scale-0")
+        verify(gateway).addScaleOrUpdate(scale)
+    }
+
+    @Test
+    fun updateScaleName() {
+        val interactor = BaseUpdateScaleInteractor(gateway)
+
+        val scale = Scale("scale-0", "name", "unit", false, emptyList())
+        val updatedScale = Scale("scale-0", "name2", "unit", false, emptyList())
+        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.success(scale))
+        val response = interactor.execute(UpdateScaleRequest("scale-0", name = "name2")) as Result<UpdateScaleResponse>
+
+
+        response.onFailure { fail() }
+
+        verify(gateway).getScaleById("scale-0")
+        verify(gateway).addScaleOrUpdate(updatedScale)
+    }
+
+    @Test
+    fun updateScaleUnit() {
+        val interactor = BaseUpdateScaleInteractor(gateway)
+
+        val scale = Scale("scale-0", "name", "unit", false, emptyList())
+        val updatedScale = Scale("scale-0", "name", "unit2", false, emptyList())
+        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.success(scale))
+        val response = interactor.execute(UpdateScaleRequest("scale-0", unit = "unit2")) as Result<UpdateScaleResponse>
+
+
+        response.onFailure { fail() }
+
+        verify(gateway).getScaleById("scale-0")
+        verify(gateway).addScaleOrUpdate(updatedScale)
+    }
+
+    @Test
+    fun updateScaleDivisions() {
+        val interactor = BaseUpdateScaleInteractor(gateway)
+
+        val scale = Scale("scale-0", "name", "unit", false, emptyList())
+        val updatedScale = Scale("scale-0", "name", "unit", false, listOf(ScaleDivision(1L, "div")))
+        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.success(scale))
+        val divisions = mapOf(1L to "div")
+        val response = interactor.execute(UpdateScaleRequest("scale-0", divisions = divisions)) as Result<UpdateScaleResponse>
+
+
+        response.onFailure { fail() }
+
+        verify(gateway).getScaleById("scale-0")
+        verify(gateway).addScaleOrUpdate(updatedScale)
+    }
+
+    @Test
+    fun updateScaleFull() {
+        val interactor = BaseUpdateScaleInteractor(gateway)
+
+        val scale = Scale("scale-0", "name", "unit", false, emptyList())
+        val updatedScale = Scale("scale-0", "name2", "unit2", false, listOf(ScaleDivision(1L, "div")))
+        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.success(scale))
+        val divisions = mapOf(1L to "div")
+        val response = interactor.execute(UpdateScaleRequest("scale-0",
+            name = "name2", unit = "unit2",
+            divisions = divisions)) as Result<UpdateScaleResponse>
+
+
+        response.onFailure { fail() }
+
+        verify(gateway).getScaleById("scale-0")
+        verify(gateway).addScaleOrUpdate(updatedScale)
     }
 }

@@ -23,7 +23,7 @@ class ScaleInMemoryGateway : ScaleGateway {
         return scales.size
     }
 
-    override fun addScale(scale: Scale) {
+    override fun addScaleOrUpdate(scale: Scale) {
         scales.add(scale)
     }
 

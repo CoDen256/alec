@@ -25,7 +25,7 @@ class ScaleInMemoryGatewayTest {
     fun addScale() {
         gen.generateScalesSequentially()
             .limit(10)
-            .forEach { sut.addScale(it) }
+            .forEach { sut.addScaleOrUpdate(it) }
         assertEquals(10, sut.getScalesCount())
         var current = 0
         sut.getScales().sortedBy { it.id }.forEach {
@@ -37,7 +37,7 @@ class ScaleInMemoryGatewayTest {
     fun updateScaleSetDeleted() {
         gen.generateScalesSequentially()
             .limit(10)
-            .forEach { sut.addScale(it) }
+            .forEach { sut.addScaleOrUpdate(it) }
 
         sut.updateScaleSetDeleted("scale-0", true)
 
@@ -48,7 +48,7 @@ class ScaleInMemoryGatewayTest {
     fun deleteScale() {
         gen.generateScalesSequentially()
             .limit(10)
-            .forEach { sut.addScale(it) }
+            .forEach { sut.addScaleOrUpdate(it) }
 
         sut.deleteScale("scale-0")
 

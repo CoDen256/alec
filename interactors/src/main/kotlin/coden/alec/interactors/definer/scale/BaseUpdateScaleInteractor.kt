@@ -3,7 +3,6 @@ package coden.alec.interactors.definer.scale
 import coden.alec.core.UpdateScaleInteractor
 import coden.alec.core.Request
 import coden.alec.core.Response
-import coden.alec.data.Scale
 import coden.alec.data.ScaleDivision
 import coden.alec.data.ScaleGateway
 
@@ -13,26 +12,30 @@ class BaseUpdateScaleInteractor(
 
     override fun execute(request: Request): Result<Response> {
         request as UpdateScaleRequest
-        val updatedScale = Scale(
-            name = request.name,
-            unit = request.unit,
-            deleted = false,
-            id = request.id,
-            divisions = createDivisions(request.divisions)
-        )
-        gateway.addScale(updatedScale)
-        return Result.success(UpdateScaleResponse())
+        return gateway.getScaleById(request.id)
+            .map { scale ->
+                scale.copy(
+                    name = request.name ?: scale.name,
+                    unit = request.unit ?: scale.unit,
+                    divisions = request.divisions?.let { createDivisions(it) } ?: scale.divisions
+                )
+            }.map { scale ->
+                gateway.addScaleOrUpdate(scale)
+            }.map {
+                UpdateScaleResponse()
+            }
     }
 
-    private fun createDivisions(divisions: Map<Long, String>): List<ScaleDivision>{
+    private fun createDivisions(divisions: Map<Long, String>): List<ScaleDivision> {
         return divisions.entries.map { ScaleDivision(it.key, it.value) }
     }
 }
 
 data class UpdateScaleRequest(
-    val id: String, val name: String,
-    val unit: String,
-    val divisions: Map<Long, String>
+    val id: String,
+    val name: String? = null,
+    val unit: String? = null,
+    val divisions: Map<Long, String>? = null
 ) : Request
 
 class UpdateScaleResponse : Response

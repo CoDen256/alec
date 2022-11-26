@@ -20,7 +20,7 @@ class BaseCreateScaleInteractor(
             id = "scale-${gateway.getScalesCount()}",
             divisions = createDivisions(request.divisions)
         )
-        gateway.addScale(newScale)
+        gateway.addScaleOrUpdate(newScale)
         return Result.success(CreateScaleResponse(newScale.id))
     }
 
