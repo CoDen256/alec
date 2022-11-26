@@ -3,9 +3,8 @@ package gateway.memory
 import coden.alec.data.Scale
 import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.data.ScaleGateway
-import java.lang.IllegalArgumentException
 
-class ScaleInMemoryGateway: ScaleGateway {
+class ScaleInMemoryGateway : ScaleGateway {
 
     private val scales = ArrayList<Scale>()
 
@@ -16,7 +15,7 @@ class ScaleInMemoryGateway: ScaleGateway {
     override fun getScaleById(scaleId: String): Result<Scale> {
         return scales.firstOrNull { it.id == scaleId }?.let {
             Result.success(it)
-        }   ?: Result.failure(ScaleDoesNotExistException(scaleId))
+        } ?: Result.failure(ScaleDoesNotExistException(scaleId))
     }
 
 
@@ -29,7 +28,10 @@ class ScaleInMemoryGateway: ScaleGateway {
     }
 
     override fun updateScaleSetDeleted(scaleId: String, deleted: Boolean) {
-        scales.filter { it.id == scaleId }.map { it.copy(deleted = deleted) }
+        scales.replaceAll {
+            if (it.id == scaleId) it.copy(deleted = deleted)
+            else it
+        }
     }
 
     override fun deleteScale(scaleId: String) {
