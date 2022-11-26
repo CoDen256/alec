@@ -75,7 +75,7 @@
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
+      <artifactId>junit-jupiter</artifactId>
       <version>5.8.2</version>
       <scope>test</scope>
     </dependency>
@@ -87,6 +87,11 @@
     <dependency>
       <groupId>coden</groupId>
       <artifactId>alec-data</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>coden.alec</groupId>
+      <artifactId>alec-data-generator</artifactId>
       <version>1.0</version>
     </dependency>
   </dependencies>
