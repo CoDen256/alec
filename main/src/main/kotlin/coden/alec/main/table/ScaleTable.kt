@@ -11,7 +11,7 @@ import coden.alec.data.ScaleDoesNotExistException
 import coden.fsm.*
 import coden.fsm.Entry.Companion.entry
 
-class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> {
+class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repetetive code
     override fun ScaleActuator.buildTable() = FSMTable(
         entry(Start, ListScalesCommand) {
             listScales()

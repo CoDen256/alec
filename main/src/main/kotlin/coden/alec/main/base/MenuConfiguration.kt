@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration
 class MenuConfiguration {
 
     @Bean
-    fun menu(messages: Messages): MenuLayout{ // deserialize from configuration properties
+    fun menu(messages: Messages): MenuLayout{ // TODO: deserialize from configuration properties
         return menuLayout(
             "Choose anything from  the main menu", itemLayout(messages.menuBack),
             itemLayout("Start",  action = HelpCommand),
