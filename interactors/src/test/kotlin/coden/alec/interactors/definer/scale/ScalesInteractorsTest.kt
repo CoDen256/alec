@@ -1,5 +1,6 @@
 package coden.alec.interactors.definer.scale
 
+import coden.alec.core.ScaleIsNotDeletedException
 import coden.alec.data.Scale
 import coden.alec.data.ScaleDivision
 import coden.alec.data.ScaleDoesNotExistException
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -103,6 +103,9 @@ class ScalesInteractorsTest {
     @Test
     fun purgeScale() {
         val interactor = BasePurgeScaleInteractor(gateway)
+        whenever(gateway.getScaleById("scale-0")).thenReturn(
+            Result.success(Scale("scale-0", "name", "unit", true, emptyList()))
+        )
 
         val response = interactor.execute(PurgeScaleRequest("scale-0")) as Result<PurgeScaleResponse>
 
@@ -111,6 +114,24 @@ class ScalesInteractorsTest {
 
         verify(gateway).getScaleById("scale-0")
         verify(gateway).deleteScale("scale-0")
+    }
+
+    @Test
+    fun purgeScaleNotDeleted() {
+        val interactor = BasePurgeScaleInteractor(gateway)
+        whenever(gateway.getScaleById("scale-0")).thenReturn(
+            Result.success(Scale("scale-0", "name", "unit", false, emptyList()))
+        )
+
+        val response = interactor.execute(PurgeScaleRequest("scale-0")) as Result<PurgeScaleResponse>
+
+
+        response.onFailure { assertTrue(it is ScaleIsNotDeletedException) }
+        response.onSuccess {
+            fail()
+        }
+
+        verify(gateway).getScaleById("scale-0")
     }
 
     @Test

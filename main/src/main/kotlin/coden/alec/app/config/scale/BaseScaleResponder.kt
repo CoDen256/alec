@@ -6,6 +6,7 @@ import coden.alec.app.actuators.scale.ScaleFormatter
 import coden.alec.app.actuators.scale.ScaleResponder
 import coden.alec.app.resources.MessageResource
 import coden.alec.app.util.inline
+import coden.alec.core.ScaleIsNotDeletedException
 import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.DeleteScaleResponse
@@ -36,6 +37,10 @@ class BaseScaleResponder(
         ))
     }
 
+    override fun respondScaleIsNotDeleted(throwable: ScaleIsNotDeletedException) {
+        display.displayError(messages.scaleIsNotMarkedAsDeleted.inline("id" to throwable.scaleId))
+    }
+
     override fun respondInternalError(throwable: Throwable) {
         display.displayError(messages.error.inline(
             "name" to throwable.javaClass.simpleName,
@@ -61,6 +66,10 @@ class BaseScaleResponder(
 
     override fun respondPurgeScale(response: PurgeScaleResponse) {
         display.displayMessage(messages.purgedScale)
+    }
+
+    override fun respondWarnAboutPurging() {
+        display.displayMessage(messages.warnAboutPurging)
     }
 
     override fun respondPromptScaleName() {

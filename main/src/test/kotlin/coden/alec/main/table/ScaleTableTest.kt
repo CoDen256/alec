@@ -4,6 +4,7 @@ import coden.alec.app.actuators.ScaleActuator
 import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.fsm.*
+import coden.alec.core.ScaleIsNotDeletedException
 import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.interactors.definer.scale.*
 import coden.fsm.FSMVerifier
@@ -301,14 +302,17 @@ class ScaleTableTest{
         val request = genPurgeRequest()
         val response = genPurgeResponse()
         val userError = ScaleDoesNotExistException("scale-0")
+        val userError2 = ScaleIsNotDeletedException("scale-0")
 
         whenever(actuator.parsePurgeScaleRequest("scale-0"))
+            .thenReturn(Result.success(request))
             .thenReturn(Result.success(request))
             .thenReturn(Result.success(request))
 
         whenever(actuator.purgeScale(request))
             .thenReturn(Result.success(response))
             .thenReturn(Result.failure(userError))
+            .thenReturn(Result.failure(userError2))
 
 
         verifier
@@ -324,6 +328,12 @@ class ScaleTableTest{
             .verify(actuator) {purgeScale(request)}
             .verify(actuator) {respondScaleDoesNotExist(userError)}
             .verifyState(Start)
+
+            .submit(PurgeScaleCommand("scale-0"))
+            .verify(actuator) {parsePurgeScaleRequest("scale-0")}
+            .verify(actuator) {purgeScale(request)}
+            .verify(actuator) {respondScaleIsNotDeleted(userError2)}
+            .verifyState(Start)
     }
 
     @Test
@@ -331,8 +341,10 @@ class ScaleTableTest{
         val request = genPurgeRequest()
         val response = genPurgeResponse()
         val userError = ScaleDoesNotExistException("scale-0")
+        val userError2 = ScaleIsNotDeletedException("scale-0")
 
         whenever(actuator.parsePurgeScaleRequest("scale-0"))
+            .thenReturn(Result.success(request))
             .thenReturn(Result.success(request))
             .thenReturn(Result.success(request))
             .thenReturn(Result.success(request))
@@ -341,12 +353,14 @@ class ScaleTableTest{
             .thenReturn(Result.success(response))
             .thenReturn(Result.failure(userError))
             .thenReturn(Result.success(response))
+            .thenReturn(Result.failure(userError2))
 
 
 
         verifier
             //  scale id exists
             .submit(PurgeScaleCommandNoArgs)
+            .verify(actuator) {respondWarnAboutPurging()}
             .verify(actuator) {respondPromptScaleId()}
             .verifyState(WaitScaleIdForPurge)
 
@@ -358,6 +372,7 @@ class ScaleTableTest{
 
             // Second round
             .submit(PurgeScaleCommandNoArgs)
+            .verify(actuator) {respondWarnAboutPurging()}
             .verify(actuator) {respondPromptScaleId()}
             .verifyState(WaitScaleIdForPurge)
 
@@ -374,6 +389,19 @@ class ScaleTableTest{
             .verify(actuator) {parsePurgeScaleRequest("scale-0")}
             .verify(actuator) {purgeScale(request)}
             .verify(actuator) {respondPurgeScale(response)}
+            .verifyState(Start)
+
+            // Third round
+            .submit(PurgeScaleCommandNoArgs)
+            .verify(actuator) {respondWarnAboutPurging()}
+            .verify(actuator) {respondPromptScaleId()}
+            .verifyState(WaitScaleIdForPurge)
+
+            // scale is not deleted
+            .submit(TextCommand("scale-0"))
+            .verify(actuator) {parsePurgeScaleRequest("scale-0")}
+            .verify(actuator) {purgeScale(request)}
+            .verify(actuator) {respondScaleIsNotDeleted(userError2)}
             .verifyState(Start)
     }
 

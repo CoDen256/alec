@@ -12,10 +12,12 @@ messages:
 
   scaleIdPrompt: "Input the scale id you want to delete."
   deletedScale: "The scale was marked as deleted."
-  purgedScale: "The scale was permanently deleted!"
-
-
   scaleDoesNotExist: "Scale does not exist for id {id}"
+
+  warnAboutPurging: "WARNING: If you purge the scale, it will be no longer possible to recover it."
+  purgedScale: "The scale was permanently deleted!"
+  scaleIsNotMarkedAsDeleted: "Scale {id} must first be marked as DELETED before complete removal!"
+
 
   error: "Unexpected error occurred:\n{name}:{message}"
   menuBack: "Back"

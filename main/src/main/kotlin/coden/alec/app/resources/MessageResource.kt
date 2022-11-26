@@ -15,9 +15,11 @@ open class MessageResource {
 
     lateinit var scaleIdPrompt: String
     lateinit var deletedScale: String
-    lateinit var purgedScale: String
-
     lateinit var scaleDoesNotExist: String
+
+    lateinit var warnAboutPurging: String
+    lateinit var purgedScale: String
+    lateinit var scaleIsNotMarkedAsDeleted: String
 
     lateinit var menuBack: String
     lateinit var error: String

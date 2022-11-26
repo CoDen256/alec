@@ -7,6 +7,7 @@ import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.fsm.*
 import coden.alec.app.util.flatMap
 import coden.alec.app.util.then
+import coden.alec.core.ScaleIsNotDeletedException
 import coden.alec.data.ScaleDoesNotExistException
 import coden.fsm.*
 import coden.fsm.Entry.Companion.entry
@@ -103,17 +104,19 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .then { respondPurgeScale(it) }
                 .state { Start }
                 .onErrors(
+                    handle<ScaleIsNotDeletedException> {respondScaleIsNotDeleted(it); Start},
                     handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); Start},
                     handle<Throwable> { respondInternalError(it); Start }
                 )
         }),
-        entry(Start, PurgeScaleCommandNoArgs) {respondPromptScaleId(); WaitScaleIdForPurge},
+        entry(Start, PurgeScaleCommandNoArgs) {respondWarnAboutPurging(); respondPromptScaleId(); WaitScaleIdForPurge},
         entry(WaitScaleIdForPurge, TextCommand::class, requireArgument { arg ->
             parsePurgeScaleRequest(arg)
                 .flatMap { purgeScale(it) }
                 .then { respondPurgeScale(it) }
                 .state { Start }
                 .onErrors(
+                    handle<ScaleIsNotDeletedException> {respondScaleIsNotDeleted(it); Start},
                     handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); respondPromptScaleId(); WaitScaleIdForPurge},
                     handle<Throwable> { respondInternalError(it); Start }
                 )

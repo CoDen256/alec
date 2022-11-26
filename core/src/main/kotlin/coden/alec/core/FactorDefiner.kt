@@ -13,3 +13,5 @@ interface DeleteScaleInteractor: Interactor
 interface PurgeScaleInteractor: Interactor
 interface UpdateScaleInteractor: Interactor
 interface ListScalesInteractor: Interactor
+
+class ScaleIsNotDeletedException(val scaleId: String): RuntimeException()
