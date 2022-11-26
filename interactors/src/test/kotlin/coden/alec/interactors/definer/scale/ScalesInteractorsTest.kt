@@ -65,7 +65,7 @@ class ScalesInteractorsTest {
             assertEquals("scale-3", it.scaleId)
         }
 
-        verify(gateway, times(1)).getScalesCount()
+        verify(gateway).getScalesCount()
         verify(gateway).addScale(Scale("scale-3", "scale", "unit", false, listOf(
             ScaleDivision(1, "first"),
              ScaleDivision(2, "second")
@@ -80,11 +80,8 @@ class ScalesInteractorsTest {
 
 
         response.onFailure { fail() }
-        response.onSuccess {
-            assertTrue(true)
-        }
 
-        verify(gateway, times(1)).updateScaleSetDeleted("scale-0", true)
+        verify(gateway).updateScaleSetDeleted("scale-0", true)
     }
 
     @Test
@@ -93,6 +90,35 @@ class ScalesInteractorsTest {
 
         whenever(gateway.getScaleById("scale-0")).thenReturn(Result.failure(ScaleDoesNotExistException("scale-0")))
         val response = interactor.execute(DeleteScaleRequest("scale-0")) as Result<DeleteScaleResponse>
+
+
+        response.onFailure { assertTrue(it is ScaleDoesNotExistException) }
+        response.onSuccess {
+            fail()
+        }
+
+        verify(gateway).getScaleById("scale-0")
+    }
+
+    @Test
+    fun purgeScale() {
+        val interactor = BasePurgeScaleInteractor(gateway)
+
+        val response = interactor.execute(PurgeScaleRequest("scale-0")) as Result<PurgeScaleResponse>
+
+
+        response.onFailure { fail() }
+
+        verify(gateway).getScaleById("scale-0")
+        verify(gateway).deleteScale("scale-0")
+    }
+
+    @Test
+    fun purgeScaleDoesNotExist() {
+        val interactor = BasePurgeScaleInteractor(gateway)
+
+        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.failure(ScaleDoesNotExistException("scale-0")))
+        val response = interactor.execute(PurgeScaleRequest("scale-0")) as Result<PurgeScaleResponse>
 
 
         response.onFailure { assertTrue(it is ScaleDoesNotExistException) }

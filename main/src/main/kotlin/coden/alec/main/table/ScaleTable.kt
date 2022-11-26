@@ -21,6 +21,7 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> {
                     handle<Throwable> { respondInternalError(it); Start }
                 )
         },
+        // CREATE //
 
         entry(Start, CreateScaleCommand::class, requireArgument { arg ->
             parseCreateScaleRequest(arg)
@@ -70,7 +71,7 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> {
                     handle<Throwable> { respondInternalError(it); reset(); Start }
                 )
         }),
-
+        // DELETE //
         entry(Start, DeleteScaleCommand::class, requireArgument {  arg ->
             parseDeleteScaleRequest(arg)
                 .flatMap{ deleteScale(it) }
@@ -93,6 +94,30 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> {
                     handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); respondPromptScaleId(); WaitScaleIdForDelete},
                     handle<Throwable> { respondInternalError(it); Start }
                 )
-        })
+        }),
+
+        // PURGE //
+        entry(Start, PurgeScaleCommand::class, requireArgument { arg ->
+            parsePurgeScaleRequest(arg)
+                .flatMap{ purgeScale(it) }
+                .then { respondPurgeScale(it) }
+                .state { Start }
+                .onErrors(
+                    handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); Start},
+                    handle<Throwable> { respondInternalError(it); Start }
+                )
+        }),
+        entry(Start, PurgeScaleCommandNoArgs) {respondPromptScaleId(); WaitScaleIdForPurge},
+        entry(WaitScaleIdForPurge, TextCommand::class, requireArgument { arg ->
+            parsePurgeScaleRequest(arg)
+                .flatMap { purgeScale(it) }
+                .then { respondPurgeScale(it) }
+                .state { Start }
+                .onErrors(
+                    handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); respondPromptScaleId(); WaitScaleIdForPurge},
+                    handle<Throwable> { respondInternalError(it); Start }
+                )
+        }),
+
     )
 }

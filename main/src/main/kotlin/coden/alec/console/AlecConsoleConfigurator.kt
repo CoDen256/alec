@@ -2,10 +2,12 @@ package coden.alec.console
 
 import coden.alec.app.fsm.*
 import coden.alec.app.resources.CommandNamesResource
+import coden.bot.util.arguments
 import coden.console.dispatcher.ConsoleDispatcherConfigurator
 import coden.console.dispatcher.ConsoleDispatcherBuilder
 import coden.display.menu.MenuPresenter
 import coden.fsm.CommandExecutor
+import com.github.kotlintelegrambot.dispatcher.command
 
 class AlecConsoleConfigurator(
     private val commandExecutor: CommandExecutor,
@@ -44,6 +46,13 @@ class AlecConsoleConfigurator(
                 commandExecutor.submit(DeleteScaleCommandNoArgs)
             }else {
                 commandExecutor.submit(DeleteScaleCommand(args))
+            }
+        }
+        command(commandNames.purgeScaleCommand){
+            if (args.isEmpty()){
+                commandExecutor.submit(PurgeScaleCommandNoArgs)
+            }else{
+                commandExecutor.submit(PurgeScaleCommand(args))
             }
         }
 

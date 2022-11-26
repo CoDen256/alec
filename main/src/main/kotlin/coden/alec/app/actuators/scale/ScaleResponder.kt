@@ -4,6 +4,7 @@ import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.DeleteScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesResponse
+import coden.alec.interactors.definer.scale.PurgeScaleResponse
 
 interface ScaleResponder {
     fun respondInternalError(throwable: Throwable)
@@ -15,6 +16,7 @@ interface ScaleResponder {
     fun respondListScales(response: ListScalesResponse)
     fun respondCreateScale(response: CreateScaleResponse)
     fun respondDeleteScale(response: DeleteScaleResponse)
+    fun respondPurgeScale(response: PurgeScaleResponse)
 
     fun respondPromptScaleName()
     fun respondPromptScaleUnit()

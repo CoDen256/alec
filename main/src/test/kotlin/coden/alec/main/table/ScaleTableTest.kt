@@ -296,12 +296,95 @@ class ScaleTableTest{
             .verifyState(Start)
     }
 
+    @Test
+    fun purgeScaleByIdWithArgs() {
+        val request = genPurgeRequest()
+        val response = genPurgeResponse()
+        val userError = ScaleDoesNotExistException("scale-0")
+
+        whenever(actuator.parsePurgeScaleRequest("scale-0"))
+            .thenReturn(Result.success(request))
+            .thenReturn(Result.success(request))
+
+        whenever(actuator.purgeScale(request))
+            .thenReturn(Result.success(response))
+            .thenReturn(Result.failure(userError))
+
+
+        verifier
+            .submit(PurgeScaleCommand("scale-0"))
+            .verify(actuator) {parsePurgeScaleRequest("scale-0")}
+            .verify(actuator) {purgeScale(request)}
+            .verify(actuator) {respondPurgeScale(response)}
+            .verifyState(Start)
+
+
+            .submit(PurgeScaleCommand("scale-0"))
+            .verify(actuator) {parsePurgeScaleRequest("scale-0")}
+            .verify(actuator) {purgeScale(request)}
+            .verify(actuator) {respondScaleDoesNotExist(userError)}
+            .verifyState(Start)
+    }
+
+    @Test
+    fun purgeScaleByIdWithoutArgs() {
+        val request = genPurgeRequest()
+        val response = genPurgeResponse()
+        val userError = ScaleDoesNotExistException("scale-0")
+
+        whenever(actuator.parsePurgeScaleRequest("scale-0"))
+            .thenReturn(Result.success(request))
+            .thenReturn(Result.success(request))
+            .thenReturn(Result.success(request))
+
+        whenever(actuator.purgeScale(request))
+            .thenReturn(Result.success(response))
+            .thenReturn(Result.failure(userError))
+            .thenReturn(Result.success(response))
+
+
+
+        verifier
+            //  scale id exists
+            .submit(PurgeScaleCommandNoArgs)
+            .verify(actuator) {respondPromptScaleId()}
+            .verifyState(WaitScaleIdForPurge)
+
+            .submit(TextCommand("scale-0"))
+            .verify(actuator) {parsePurgeScaleRequest("scale-0")}
+            .verify(actuator) {purgeScale(request)}
+            .verify(actuator) {respondPurgeScale(response)}
+            .verifyState(Start)
+
+            // Second round
+            .submit(PurgeScaleCommandNoArgs)
+            .verify(actuator) {respondPromptScaleId()}
+            .verifyState(WaitScaleIdForPurge)
+
+            // scale id does not exist
+            .submit(TextCommand("scale-0"))
+            .verify(actuator) {parsePurgeScaleRequest("scale-0")}
+            .verify(actuator) {purgeScale(request)}
+            .verify(actuator) {respondScaleDoesNotExist(userError)}
+            .verify(actuator) {respondPromptScaleId()}
+            .verifyState(WaitScaleIdForPurge)
+
+            // scale id exists trying again
+            .submit(TextCommand("scale-0"))
+            .verify(actuator) {parsePurgeScaleRequest("scale-0")}
+            .verify(actuator) {purgeScale(request)}
+            .verify(actuator) {respondPurgeScale(response)}
+            .verifyState(Start)
+    }
+
     private fun genCreateResponse() = CreateScaleResponse("scale-0")
     private fun genDeleteResponse() = DeleteScaleResponse()
+    private fun genPurgeResponse() = PurgeScaleResponse()
 
     private fun genCreateRequest() = CreateScaleRequest(
         "scale", "unit", mapOf(1L to "some")
     )
 
     private fun genDeleteRequest() = DeleteScaleRequest("scale-0")
+    private fun genPurgeRequest() = PurgeScaleRequest("scale-0")
 }

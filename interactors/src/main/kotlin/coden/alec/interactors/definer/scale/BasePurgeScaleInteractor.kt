@@ -11,8 +11,12 @@ class BasePurgeScaleInteractor(
 
     override fun execute(request: Request) : Result<Response> {
         request as PurgeScaleRequest
-        gateway.deleteScale(request.id)
-        return Result.success(PurgeScaleResponse())
+        return gateway.getScaleById(request.id)
+            .map {
+                gateway.deleteScale(request.id)
+            }.map {
+                PurgeScaleResponse()
+            }
     }
 }
 

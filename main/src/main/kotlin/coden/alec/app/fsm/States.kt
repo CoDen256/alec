@@ -7,3 +7,4 @@ object WaitScaleName: State
 object WaitScaleUnit: State
 object WaitScaleDivision: State
 object WaitScaleIdForDelete: State
+object WaitScaleIdForPurge: State

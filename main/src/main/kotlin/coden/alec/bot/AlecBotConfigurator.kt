@@ -55,6 +55,14 @@ class AlecBotConfigurator(
             }
         }
 
+        command(commandNamesResource.purgeScaleCommand){
+            if (args.isEmpty()){
+                commandExecutor.submit(PurgeScaleCommandNoArgs)
+            }else{
+                commandExecutor.submit(PurgeScaleCommand(arguments()))
+            }
+        }
+
         text {
             if (text.startsWith("/")) return@text
             commandExecutor.submit(TextCommand(text))

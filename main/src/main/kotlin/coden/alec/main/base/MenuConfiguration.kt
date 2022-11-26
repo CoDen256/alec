@@ -1,9 +1,6 @@
 package coden.alec.main.base
 
-import coden.alec.app.fsm.CreateScaleCommandNoArgs
-import coden.alec.app.fsm.DeleteScaleCommandNoArgs
-import coden.alec.app.fsm.HelpCommand
-import coden.alec.app.fsm.ListScalesCommand
+import coden.alec.app.fsm.*
 import coden.alec.main.resources.Messages
 import coden.display.displays.MenuDisplay
 import coden.display.displays.MessageDisplay
@@ -31,7 +28,8 @@ class MenuConfiguration {
                 "Scale Management", "Scales are needed define factors",
                 itemLayout("List all Scales", action = ListScalesCommand),
                 itemLayout("Create Scale", action = CreateScaleCommandNoArgs),
-                itemLayout("Delete Scale", action = DeleteScaleCommandNoArgs)
+                itemLayout("Delete Scale", action = DeleteScaleCommandNoArgs),
+                itemLayout("Purge Scale", action = PurgeScaleCommandNoArgs)
             ),
             itemLayout(
                 "Factors", "Factor management",

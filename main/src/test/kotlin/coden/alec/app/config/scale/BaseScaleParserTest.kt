@@ -4,6 +4,7 @@ import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.DeleteScaleRequest
+import coden.alec.interactors.definer.scale.PurgeScaleRequest
 import org.junit.jupiter.api.Assertions.*
 
 import org.junit.jupiter.params.ParameterizedTest
@@ -22,6 +23,7 @@ class BaseScaleParserTest {
     @ParameterizedTest
     fun parseScaleId(input: String, expected: String) {
         verifyPropertyParsedCorrectly(parser.parseDeleteScaleRequest(input), DeleteScaleRequest(expected))
+        verifyPropertyParsedCorrectly(parser.parsePurgeScaleRequest(input), PurgeScaleRequest(expected))
     }
 
     @CsvSource(

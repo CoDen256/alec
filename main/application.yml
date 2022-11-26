@@ -10,8 +10,11 @@ messages:
   scaleUnitPrompt: "Input a unit of the new scale..."
   scaleDivisionsPrompt: "Input list of divisions for the new scale..."
 
-  scaleIdPrompt: "Input the scale id you want to delete"
-  deletedScale: "The scale was marked as deleted"
+  scaleIdPrompt: "Input the scale id you want to delete."
+  deletedScale: "The scale was marked as deleted."
+  purgedScale: "The scale was permanently deleted!"
+
+
   scaleDoesNotExist: "Scale does not exist for id {id}"
 
   error: "Unexpected error occurred:\n{name}:{message}"

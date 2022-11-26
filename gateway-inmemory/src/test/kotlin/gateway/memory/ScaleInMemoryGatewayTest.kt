@@ -50,5 +50,8 @@ class ScaleInMemoryGatewayTest {
             .limit(10)
             .forEach { sut.addScale(it) }
 
+        sut.deleteScale("scale-0")
+
+        assertEquals(9, sut.getScales().count())
     }
 }

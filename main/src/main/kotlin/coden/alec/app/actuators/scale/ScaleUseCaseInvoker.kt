@@ -6,4 +6,5 @@ interface ScaleUseCaseInvoker {
     fun listScales(): Result<ListScalesResponse>
     fun createScale(request: CreateScaleRequest): Result<CreateScaleResponse>
     fun deleteScale(request: DeleteScaleRequest): Result<DeleteScaleResponse>
+    fun purgeScale(request: PurgeScaleRequest): Result<PurgeScaleResponse>
 }

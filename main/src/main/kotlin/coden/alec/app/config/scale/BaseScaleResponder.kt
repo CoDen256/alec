@@ -10,6 +10,7 @@ import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.DeleteScaleResponse
 import coden.alec.interactors.definer.scale.ListScalesResponse
+import coden.alec.interactors.definer.scale.PurgeScaleResponse
 import coden.display.displays.MessageDisplay
 
 class BaseScaleResponder(
@@ -56,6 +57,10 @@ class BaseScaleResponder(
 
     override fun respondDeleteScale(response: DeleteScaleResponse) {
         display.displayMessage(messages.deletedScale)
+    }
+
+    override fun respondPurgeScale(response: PurgeScaleResponse) {
+        display.displayMessage(messages.purgedScale)
     }
 
     override fun respondPromptScaleName() {

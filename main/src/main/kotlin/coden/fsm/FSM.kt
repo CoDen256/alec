@@ -82,8 +82,8 @@ fun <T> Result<T>.state(state: State): Result<State>{
     return map { state }
 }
 
-fun <T> Result<T>.state(state: () -> State): Result<State>{
-    return map { state() }
+fun <T> Result<T>.state(state: (T) -> State): Result<State>{
+    return map { state(it) }
 }
 
  fun Result<State>.onErrors(

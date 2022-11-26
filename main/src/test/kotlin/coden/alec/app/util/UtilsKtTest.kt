@@ -8,7 +8,7 @@ class UtilsKtTest {
 
     @Test
      fun format() {
-        assertEquals("Scales: \n\n1", "Scales: \n\n{scales}".format("scales" to  "1"))
+        assertEquals("Scales: \n\n1", "Scales: \n\n{scales}".inline("scales" to  "1"))
     }
 
     @Test
