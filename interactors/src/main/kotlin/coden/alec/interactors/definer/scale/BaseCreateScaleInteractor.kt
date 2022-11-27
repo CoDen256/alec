@@ -15,13 +15,11 @@ class BaseCreateScaleInteractor(
     override fun execute(request: Request): Result<Response> {
         request as CreateScaleRequest
         return verifyRequest(request)
-            .flatMap { gateway.getTotalScaleCount() }
-            .map { count ->
+            .map {
                 Scale(
                     name = request.name,
                     unit = request.unit,
                     deleted = false,
-                    id = "scale-$count",
                     divisions = request.divisions.entries.map { ScaleDivision(it.key, it.value) }
                 )
             }.flatMap { scale ->

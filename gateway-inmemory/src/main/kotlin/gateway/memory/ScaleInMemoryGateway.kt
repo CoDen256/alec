@@ -25,11 +25,6 @@ class ScaleInMemoryGateway() : ScaleGateway {
         } ?: Result.failure(ScaleDoesNotExistException(scaleId))
     }
 
-
-    override fun getTotalScaleCount(): Result<Int> {
-        return Result.success(scales.keys.max())
-    }
-
     override fun addScaleOrUpdate(scale: Scale): Result<Unit> {
         scales[scale.id] = scale
         return Result.success(Unit)

@@ -26,7 +26,7 @@ class ScaleInMemoryGatewayTest {
         gen.generateScalesSequentially()
             .limit(10)
             .forEach { sut.addScaleOrUpdate(it) }
-        assertEquals(10, sut.getTotalScaleCount().getOrThrow())
+        assertEquals(10, sut.getScales().getOrThrow().size)
         var current = 0
         sut.getScales().getOrThrow().sortedBy { it.id }.forEach {
             assertEquals(current++, it.id.split("-")[1].toInt())

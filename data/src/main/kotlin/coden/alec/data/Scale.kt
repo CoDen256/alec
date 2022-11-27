@@ -1,9 +1,10 @@
 package coden.alec.data
 
 import java.lang.RuntimeException
+import java.util.UUID
 
 data class Scale (
-    val id: String,
+    val id: String = UUID.randomUUID().toString(),
     val name: String,
     val unit: String,
     val deleted: Boolean,
@@ -19,7 +20,6 @@ data class ScaleDivision (
 interface ScaleGateway{
     fun getScales(): Result<List<Scale>>
     fun getScaleById(scaleId: String): Result<Scale>
-    fun getTotalScaleCount(): Result<Int>
 
     fun addScaleOrUpdate(scale: Scale): Result<Unit>
     fun updateScaleSetDeleted(scaleId: String, deleted: Boolean): Result<Unit>
