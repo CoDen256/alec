@@ -3,7 +3,7 @@ package coden.alec.app.util
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class UtilsKtTest {
+class UtilsTest {
 
     @Test
      fun format() {

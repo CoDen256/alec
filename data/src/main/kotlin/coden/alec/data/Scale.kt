@@ -19,10 +19,12 @@ data class ScaleDivision (
 interface ScaleGateway{
     fun getScales(): Result<List<Scale>>
     fun getScaleById(scaleId: String): Result<Scale>
-    fun getScalesCount(): Result<Int>
+    fun getTotalScaleCount(): Result<Int>
+
     fun addScaleOrUpdate(scale: Scale): Result<Unit>
     fun updateScaleSetDeleted(scaleId: String, deleted: Boolean): Result<Unit>
     fun deleteScale(scaleId: String): Result<Unit>
+    fun deleteAll(): Result<Unit>
 }
 
 class ScaleDoesNotExistException(val scaleId: String): RuntimeException()

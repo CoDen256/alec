@@ -4,12 +4,19 @@ import coden.alec.data.Scale
 import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.data.ScaleGateway
 
-class ScaleInMemoryGateway : ScaleGateway {
+class ScaleInMemoryGateway() : ScaleGateway {
 
     private val scales = HashMap<String, Scale>()
 
+    constructor(scales: Collection<Scale>) : this() {
+        scales.forEach {
+            this.scales[it.id] = it
+        }
+    }
+
+
     override fun getScales(): Result<List<Scale>> {
-        return Result.success(scales.values.toList())
+        return Result.success(scales.values.sortedBy { it.id }.toList())
     }
 
     override fun getScaleById(scaleId: String): Result<Scale> {
@@ -19,8 +26,8 @@ class ScaleInMemoryGateway : ScaleGateway {
     }
 
 
-    override fun getScalesCount(): Result<Int> {
-        return Result.success(scales.size)
+    override fun getTotalScaleCount(): Result<Int> {
+        return Result.success(scales.keys.max())
     }
 
     override fun addScaleOrUpdate(scale: Scale): Result<Unit> {
@@ -29,7 +36,7 @@ class ScaleInMemoryGateway : ScaleGateway {
     }
 
     override fun updateScaleSetDeleted(scaleId: String, deleted: Boolean): Result<Unit> {
-        scales.compute(scaleId){ _, scale ->
+        scales.compute(scaleId) { _, scale ->
             scale?.copy(deleted = deleted)
         }
         return Result.success(Unit)
@@ -37,6 +44,11 @@ class ScaleInMemoryGateway : ScaleGateway {
 
     override fun deleteScale(scaleId: String): Result<Unit> {
         scales.remove(scaleId)
+        return Result.success(Unit)
+    }
+
+    override fun deleteAll(): Result<Unit> {
+        scales.clear()
         return Result.success(Unit)
     }
 }

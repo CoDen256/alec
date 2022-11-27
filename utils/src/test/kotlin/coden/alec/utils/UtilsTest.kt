@@ -3,7 +3,7 @@ package coden.alec.utils
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class UtilsKtTest{
+class UtilsTest{
     @Test
     fun flatMapSuccessSuccess() {
         val result = Result.success(1).flatMap {

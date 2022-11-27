@@ -78,6 +78,11 @@
             <artifactId>alec-gateway-inmemory</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>coden.alec</groupId>
+            <artifactId>alec-utils</artifactId>
+            <version>1.0</version>
+        </dependency>
 
         <dependency>
             <groupId>io.github.kotlin-telegram-bot.kotlin-telegram-bot</groupId>

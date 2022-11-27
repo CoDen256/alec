@@ -5,10 +5,10 @@ import coden.alec.app.actuators.ScaleActuator
 import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.fsm.*
-import coden.alec.app.util.flatMap
-import coden.alec.app.util.then
 import coden.alec.core.ScaleIsNotDeletedException
 import coden.alec.data.ScaleDoesNotExistException
+import coden.alec.utils.then
+import coden.alec.utils.flatMap
 import coden.fsm.*
 import coden.fsm.Entry.Companion.entry
 
