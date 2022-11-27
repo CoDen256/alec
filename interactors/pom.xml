@@ -94,6 +94,11 @@
       <artifactId>alec-data</artifactId>
       <version>1.0</version>
     </dependency>
+    <dependency>
+      <groupId>coden.alec</groupId>
+      <artifactId>alec-utils</artifactId>
+      <version>1.0</version>
+    </dependency>
 
     <dependency>
       <groupId>org.mockito</groupId>

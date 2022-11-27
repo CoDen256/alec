@@ -12,8 +12,8 @@ class BaseListScalesInteractor(
 
     override fun execute(request: Request): Result<Response> {
         request as ListScalesRequest
-        val scales = gateway.getScales()
-        return Result.success(ListScalesResponse(scales))
+        return gateway.getScales()
+            .map { ListScalesResponse(it) }
     }
 }
 

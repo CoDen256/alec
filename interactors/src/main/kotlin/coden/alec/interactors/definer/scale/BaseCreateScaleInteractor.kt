@@ -18,14 +18,11 @@ class BaseCreateScaleInteractor(
             unit = request.unit,
             deleted = false,
             id = "scale-${gateway.getScalesCount()}",
-            divisions = createDivisions(request.divisions)
+            divisions = request.divisions.entries.map { ScaleDivision(it.key, it.value) }
         )
-        gateway.addScaleOrUpdate(newScale)
-        return Result.success(CreateScaleResponse(newScale.id))
-    }
-
-    private fun createDivisions(divisions: Map<Long, String>): List<ScaleDivision>{
-        return divisions.entries.map { ScaleDivision(it.key, it.value) }
+        return gateway.addScaleOrUpdate(newScale).map {
+                CreateScaleResponse(newScale.id)
+            }
     }
 
 }
@@ -34,9 +31,9 @@ data class CreateScaleRequest(
     val name: String,
     val unit: String,
     val divisions: Map<Long, String>
-): Request
+) : Request
 
-data class CreateScaleResponse(val scaleId: String): Response
+data class CreateScaleResponse(val scaleId: String) : Response
 
 
 

@@ -5,6 +5,7 @@ import coden.alec.core.Request
 import coden.alec.core.Response
 import coden.alec.data.ScaleDivision
 import coden.alec.data.ScaleGateway
+import coden.alec.utils.flatMap
 
 class BaseUpdateScaleInteractor(
     private val gateway: ScaleGateway,
@@ -19,7 +20,7 @@ class BaseUpdateScaleInteractor(
                     unit = request.unit ?: scale.unit,
                     divisions = request.divisions?.let { createDivisions(it) } ?: scale.divisions
                 )
-            }.map { scale ->
+            }.flatMap { scale ->
                 gateway.addScaleOrUpdate(scale)
             }.map {
                 UpdateScaleResponse()

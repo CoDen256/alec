@@ -5,6 +5,7 @@ import coden.alec.core.Request
 import coden.alec.core.Response
 import coden.alec.core.ScaleIsNotDeletedException
 import coden.alec.data.ScaleGateway
+import coden.alec.utils.flatMap
 
 class BasePurgeScaleInteractor(
     private val gateway: ScaleGateway,
@@ -13,10 +14,10 @@ class BasePurgeScaleInteractor(
     override fun execute(request: Request) : Result<Response> {
         request as PurgeScaleRequest
         return gateway.getScaleById(request.id)
-            .mapCatching {
-                if (!it.deleted) throw ScaleIsNotDeletedException(it.id)
-                it
-            }.map {
+            .flatMap {
+                if (!it.deleted) return@flatMap Result.failure(ScaleIsNotDeletedException(it.id))
+                Result.success(it)
+            }.flatMap {
                 gateway.deleteScale(it.id)
             }.map {
                 PurgeScaleResponse()

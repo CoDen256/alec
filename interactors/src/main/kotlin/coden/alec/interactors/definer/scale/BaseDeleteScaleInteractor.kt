@@ -4,6 +4,7 @@ import coden.alec.core.DeleteScaleInteractor
 import coden.alec.core.Request
 import coden.alec.core.Response
 import coden.alec.data.ScaleGateway
+import coden.alec.utils.flatMap
 
 class BaseDeleteScaleInteractor(
     private val gateway: ScaleGateway,
@@ -12,7 +13,7 @@ class BaseDeleteScaleInteractor(
     override fun execute(request: Request): Result<Response> {
         request as DeleteScaleRequest
         return gateway.getScaleById(request.id)
-            .map {
+            .flatMap {
                 gateway.updateScaleSetDeleted(request.id, true)
             }.map {
                 DeleteScaleResponse()

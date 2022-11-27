@@ -28,7 +28,7 @@ class ScaleInMemoryGatewayTest {
             .forEach { sut.addScaleOrUpdate(it) }
         assertEquals(10, sut.getScalesCount())
         var current = 0
-        sut.getScales().sortedBy { it.id }.forEach {
+        sut.getScales().getOrThrow().sortedBy { it.id }.forEach {
             assertEquals(current++, it.id.split("-")[1].toInt())
         }
     }
@@ -41,7 +41,7 @@ class ScaleInMemoryGatewayTest {
 
         sut.updateScaleSetDeleted("scale-0", true)
 
-        assertEquals(9, sut.getScales().count { !it.deleted })
+        assertEquals(9, sut.getScales().getOrThrow().count { !it.deleted })
     }
 
     @Test
@@ -52,6 +52,6 @@ class ScaleInMemoryGatewayTest {
 
         sut.deleteScale("scale-0")
 
-        assertEquals(9, sut.getScales().count())
+        assertEquals(9, sut.getScales().getOrThrow().count())
     }
 }
