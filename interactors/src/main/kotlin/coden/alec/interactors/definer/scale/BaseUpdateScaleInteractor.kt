@@ -16,13 +16,17 @@ class BaseUpdateScaleInteractor(
         return gateway.getScaleById(request.id)
             .map { scale ->
                 scale.copy(
+                    id = request.name ?: scale.name,
                     name = request.name ?: scale.name,
                     unit = request.unit ?: scale.unit,
                     divisions = request.divisions?.let { createDivisions(it) } ?: scale.divisions
                 )
             }.flatMap { scale ->
-                gateway.addScaleOrUpdate(scale)
-            }.map {
+                gateway.deleteScale(request.id).map { scale }
+            }.flatMap {
+                gateway.addScale(it)
+            }
+            .map {
                 UpdateScaleResponse()
             }
     }

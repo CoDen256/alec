@@ -6,6 +6,7 @@ import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.fsm.*
 import coden.alec.core.ScaleIsNotDeletedException
+import coden.alec.data.ScaleAlreadyExistsException
 import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.utils.then
 import coden.alec.utils.flatMap
@@ -29,6 +30,7 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .then { respondCreateScale(it) }
                 .state { Start }
                 .onError<InvalidScaleFormatException> { respondInvalidScaleFormat(it); Start }
+                .onError<ScaleAlreadyExistsException> { respondScaleAlreadyExists(it);  Start }
                 .onError<Throwable> { respondInternalError(it); Start }
                 .get()
         }),
@@ -63,6 +65,7 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .then { reset() }
                 .state { Start }
                 .onError<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleDivisions(); WaitScaleDivision }
+                .onError<ScaleAlreadyExistsException> { respondScaleAlreadyExists(it); reset(); Start }
                 .onError<Throwable> { respondInternalError(it); reset(); Start }
                 .get()
         }),

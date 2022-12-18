@@ -1,6 +1,7 @@
 package coden.alec.gateway.memory
 
 import coden.alec.data.Scale
+import coden.alec.data.ScaleAlreadyExistsException
 import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.data.ScaleGateway
 
@@ -25,7 +26,8 @@ class ScaleInMemoryGateway() : ScaleGateway {
         } ?: Result.failure(ScaleDoesNotExistException(scaleId))
     }
 
-    override fun addScaleOrUpdate(scale: Scale): Result<Unit> {
+    override fun addScale(scale: Scale): Result<Unit> {
+        if (scale.id in scales) return Result.failure(ScaleAlreadyExistsException(scale.id))
         scales[scale.id] = scale
         return Result.success(Unit)
     }

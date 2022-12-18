@@ -7,6 +7,7 @@ import coden.alec.app.actuators.scale.ScaleResponder
 import coden.alec.app.resources.MessageResource
 import coden.alec.app.util.inline
 import coden.alec.core.ScaleIsNotDeletedException
+import coden.alec.data.ScaleAlreadyExistsException
 import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.interactors.definer.scale.CreateScaleResponse
 import coden.alec.interactors.definer.scale.DeleteScaleResponse
@@ -28,6 +29,12 @@ class BaseScaleResponder(
         display.displayError(messages.rejectScaleProperty.inline(
             "prop" to throwable.property,
             "value" to throwable.value
+        ))
+    }
+
+    override fun respondScaleAlreadyExists(throwable: ScaleAlreadyExistsException) {
+        display.displayError(messages.scaleAlreadyExists.inline(
+            "id" to throwable.scaleId
         ))
     }
 

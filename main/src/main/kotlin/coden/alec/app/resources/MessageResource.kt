@@ -16,6 +16,7 @@ open class MessageResource {
     lateinit var scaleIdPrompt: String
     lateinit var deletedScale: String
     lateinit var scaleDoesNotExist: String
+    lateinit var scaleAlreadyExists: String
 
     lateinit var warnAboutPurging: String
     lateinit var purgedScale: String

@@ -17,13 +17,14 @@ class BaseCreateScaleInteractor(
         return verifyRequest(request)
             .map {
                 Scale(
+                    id = request.name,
                     name = request.name,
                     unit = request.unit,
                     deleted = false,
                     divisions = request.divisions.entries.map { ScaleDivision(it.key, it.value) }
                 )
             }.flatMap { scale ->
-                gateway.addScaleOrUpdate(scale).map { scale.id }
+                gateway.addScale(scale).map { scale.id } // IF ALREADY EXISTS, CHANGE ID (like windows with folders)
             }.map {
                 CreateScaleResponse(it)
             }

@@ -21,10 +21,11 @@ interface ScaleGateway{
     fun getScales(): Result<List<Scale>>
     fun getScaleById(scaleId: String): Result<Scale>
 
-    fun addScaleOrUpdate(scale: Scale): Result<Unit>
+    fun addScale(scale: Scale): Result<Unit>
     fun updateScaleSetDeleted(scaleId: String, deleted: Boolean): Result<Unit>
     fun deleteScale(scaleId: String): Result<Unit>
     fun deleteAll(): Result<Unit>
 }
 
 class ScaleDoesNotExistException(val scaleId: String): RuntimeException()
+class ScaleAlreadyExistsException(val scaleId: String): RuntimeException()

@@ -5,6 +5,7 @@ import coden.alec.app.actuators.scale.InvalidScaleFormatException
 import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.app.fsm.*
 import coden.alec.core.ScaleIsNotDeletedException
+import coden.alec.data.ScaleAlreadyExistsException
 import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.interactors.definer.scale.*
 import coden.fsm.FSMVerifier
@@ -55,15 +56,18 @@ class ScaleTableTest{
         val response = genCreateResponse()
         val error = IllegalStateException()
         val userError = InvalidScaleFormatException("")
+        val alreadyExistsError = ScaleAlreadyExistsException("")
         whenever(actuator.parseCreateScaleRequest("scale"))
             .thenReturn(Result.success(request)) // 0
             .thenReturn(Result.failure(userError)) // 1
             .thenReturn(Result.failure(error))  // 2
             .thenReturn(Result.success(request)) // 3
+            .thenReturn(Result.success(request)) // 4
 
         whenever(actuator.createScale(request))
             .thenReturn(Result.success(response)) // 0
             .thenReturn(Result.failure(error))   // 3
+            .thenReturn(Result.failure(alreadyExistsError))   // 4
 
         verifier
             .submit(CreateScaleCommand("scale"))
@@ -86,6 +90,12 @@ class ScaleTableTest{
             .verify(actuator) {parseCreateScaleRequest("scale")}
             .verify(actuator) {createScale(request)}
             .verify(actuator) {respondInternalError(error)}
+            .verifyState(Start)
+
+            .submit(CreateScaleCommand("scale"))
+            .verify(actuator) {parseCreateScaleRequest("scale")}
+            .verify(actuator) {createScale(request)}
+            .verify(actuator) {respondScaleAlreadyExists(alreadyExistsError)}
             .verifyState(Start)
 
     }
@@ -170,20 +180,26 @@ class ScaleTableTest{
     fun createScaleWithoutArgsWithErrors(){
         val request = genCreateRequest()
         val error = IllegalStateException()
+        val alreadyExists = ScaleAlreadyExistsException("scale")
 
         whenever(actuator.parseScaleName("name"))
             .thenReturn(Result.success("name")) // 0
             .thenReturn(Result.success("name")) // 1
+            .thenReturn(Result.success("name")) // 2
         whenever(actuator.parseScaleUnit("unit"))
             .thenReturn(Result.failure(error)) // 0
             .thenReturn(Result.success("unit")) // 1
+            .thenReturn(Result.success("unit")) // 2
         whenever(actuator.parseScaleDivisions("1-div"))
             .thenReturn(Result.success(mapOf(1L to "div"))) // 1
+            .thenReturn(Result.success(mapOf(1L to "div"))) // 2
 
         whenever(actuator.build())
             .thenReturn(request) // 1
+            .thenReturn(request) // 2
         whenever(actuator.createScale(request))
             .thenReturn(Result.failure(error)) // 1
+            .thenReturn(Result.failure(alreadyExists)) // 2
 
         verifier
                 // 0
@@ -214,6 +230,18 @@ class ScaleTableTest{
             .verify(actuator) {reset()}
             .verifyState(Start)
 
+            // 2
+            .submit(CreateScaleCommandNoArgs)
+            .submit(TextCommand("name"))
+            .submit(TextCommand("unit"))
+            .verifyState(WaitScaleDivision)
+
+            .submit(TextCommand("1-div"))
+            .verify(actuator) {build()}
+            .verify(actuator) {createScale(request)}
+            .verify(actuator) {respondScaleAlreadyExists(alreadyExists)}
+            .verify(actuator) {reset()}
+            .verifyState(Start)
     }
 
     @Test

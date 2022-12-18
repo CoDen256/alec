@@ -13,6 +13,7 @@ messages:
   scaleIdPrompt: "Input the scale id you want to delete."
   deletedScale: "The scale was marked as deleted."
   scaleDoesNotExist: "Scale does not exist for id {id}"
+  scaleAlreadyExists: "Scale already exists: {id}"
 
   warnAboutPurging: "WARNING: If you purge the scale, it will be no longer possible to recover it."
   purgedScale: "The scale was permanently deleted!"

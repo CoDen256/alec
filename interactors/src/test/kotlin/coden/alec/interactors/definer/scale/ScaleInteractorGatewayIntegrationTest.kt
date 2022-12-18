@@ -1,6 +1,7 @@
 package coden.alec.interactors.definer.scale
 
 import coden.alec.core.*
+import coden.alec.data.ScaleAlreadyExistsException
 import coden.alec.data.ScaleDivision
 import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.gateway.memory.ScaleInMemoryGateway
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.lang.IllegalArgumentException
 import java.util.*
+import kotlin.test.assertIs
 
 class ScaleInteractorGatewayIntegrationTest {
 
@@ -62,10 +64,6 @@ class ScaleInteractorGatewayIntegrationTest {
     }
 
 
-    private fun assertUUID(id: String) {
-        assertDoesNotThrow { UUID.fromString(id) }
-    }
-
     @BeforeEach
     fun setUp() {
         gateway.deleteAll().getOrThrow()
@@ -84,10 +82,20 @@ class ScaleInteractorGatewayIntegrationTest {
         val listAfterAdd = list()
         val scales = listAfterAdd.getOrThrow().scales
         assertEquals(1, scales.size)
-        assertUUID(scales[0].id)
         assertEquals("n", scales[0].name)
+        assertEquals("n", scales[0].id)
         assertEquals("u", scales[0].unit)
         assertEquals(listOf(ScaleDivision(1, "something")), scales[0].divisions)
+    }
+
+    @Test
+    fun createOne_createExistingName_fails() {
+        create(CreateScaleRequest("n", "u", mapOf(1L to "something"))).getOrThrow()
+        create(CreateScaleRequest("n", "u", mapOf(1L to "something"))).onSuccess {
+            fail()
+        }.onFailure {
+            assertIs<ScaleAlreadyExistsException>(it)
+        }
     }
 
     @Test
@@ -100,8 +108,8 @@ class ScaleInteractorGatewayIntegrationTest {
             val scales = r.scales
             assertEquals(2, scales.size)
             val scale = scales.find { it.id == id1 }!!
-            assertUUID(scale.id)
             assertEquals("n2", scale.name)
+            assertEquals("n2", scale.id)
             assertEquals("u2", scale.unit)
             assertFalse(scale.deleted)
             assertEquals(1, scale.divisions.size)
@@ -118,19 +126,19 @@ class ScaleInteractorGatewayIntegrationTest {
         create(CreateScaleRequest("n", "u", mapOf())).onSuccess {
             fail()
         }.onFailure {
-            assertTrue(it is IllegalArgumentException)
+            assertIs<IllegalArgumentException>(it)
         }
 
         create(CreateScaleRequest("", "u", mapOf(1L to "something"))).onSuccess {
             fail()
         }.onFailure {
-            assertTrue(it is IllegalArgumentException)
+            assertIs<IllegalArgumentException>(it)
         }
 
         create(CreateScaleRequest("n", "", mapOf(1L to "something"))).onSuccess {
             fail()
         }.onFailure {
-            assertTrue(it is IllegalArgumentException)
+            assertIs<IllegalArgumentException>(it)
         }
     }
 
@@ -143,6 +151,7 @@ class ScaleInteractorGatewayIntegrationTest {
         val scales = list().getOrThrow().scales
         val deleted = scales.first()
         assertEquals(1, scales.size)
+        assertEquals("n1", deleted.id)
         assertEquals("n1", deleted.name)
         assertEquals("u1", deleted.unit)
         assertTrue(deleted.deleted)
@@ -158,7 +167,7 @@ class ScaleInteractorGatewayIntegrationTest {
         purge(PurgeScaleRequest(id)).onSuccess {
             fail()
         }.onFailure {
-            assertTrue { it is ScaleIsNotDeletedException }
+            assertIs<ScaleIsNotDeletedException>(it)
         }
 
     }
@@ -202,7 +211,7 @@ class ScaleInteractorGatewayIntegrationTest {
         delete(DeleteScaleRequest("invalid")).onSuccess {
             fail()
         }.onFailure {
-            assertTrue { it is ScaleDoesNotExistException }
+            assertIs<ScaleDoesNotExistException>(it)
         }
     }
 
@@ -211,7 +220,7 @@ class ScaleInteractorGatewayIntegrationTest {
         purge(PurgeScaleRequest("invalid")).onSuccess {
             fail()
         }.onFailure {
-            assertTrue { it is ScaleDoesNotExistException }
+            assertIs<ScaleDoesNotExistException>(it)
         }
     }
 
@@ -222,8 +231,8 @@ class ScaleInteractorGatewayIntegrationTest {
 
         val scales = list().getOrThrow().scales
         assertEquals(1, scales.size)
-        assertUUID(scales[0].id)
         assertEquals("n", scales[0].name)
+        assertEquals("n", scales[0].id)
         assertEquals("u", scales[0].unit)
         assertEquals(listOf(ScaleDivision(1, "desc")), scales[0].divisions)
     }
@@ -235,8 +244,8 @@ class ScaleInteractorGatewayIntegrationTest {
 
         val scales = list().getOrThrow().scales
         assertEquals(1, scales.size)
-        assertUUID(scales[0].id)
         assertEquals("n2", scales[0].name)
+        assertEquals("n2", scales[0].id)
         assertEquals("u", scales[0].unit)
         assertEquals(listOf(ScaleDivision(1, "desc")), scales[0].divisions)
     }
@@ -248,7 +257,7 @@ class ScaleInteractorGatewayIntegrationTest {
 
         val scales = list().getOrThrow().scales
         assertEquals(1, scales.size)
-        assertUUID(scales[0].id)
+        assertEquals("n", scales[0].id)
         assertEquals("n", scales[0].name)
         assertEquals("u2", scales[0].unit)
         assertEquals(listOf(ScaleDivision(1, "desc")), scales[0].divisions)
@@ -261,7 +270,7 @@ class ScaleInteractorGatewayIntegrationTest {
 
         val scales = list().getOrThrow().scales
         assertEquals(1, scales.size)
-        assertUUID(scales[0].id)
+        assertEquals("n", scales[0].id)
         assertEquals("n", scales[0].name)
         assertEquals("u", scales[0].unit)
         assertEquals(
@@ -285,8 +294,8 @@ class ScaleInteractorGatewayIntegrationTest {
 
         val scales = list().getOrThrow().scales
         assertEquals(1, scales.size)
-        assertUUID(scales[0].id)
         assertEquals("n2", scales[0].name)
+        assertEquals("n2", scales[0].id)
         assertEquals("u2", scales[0].unit)
         assertEquals(
             listOf(
@@ -294,6 +303,42 @@ class ScaleInteractorGatewayIntegrationTest {
                 ScaleDivision(2, "d3")
             ), scales[0].divisions
         )
+    }
+
+    @Test
+    fun addOne_UpdateSame() {
+        val id = create(CreateScaleRequest("n", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+        update(
+            UpdateScaleRequest(
+                id, name = "n", unit = "u", divisions = mapOf(1L to "desc")
+            )
+        ).getOrThrow()
+
+        val scales = list().getOrThrow().scales
+        assertEquals(1, scales.size)
+        assertEquals("n", scales[0].name)
+        assertEquals("n", scales[0].id)
+        assertEquals("u", scales[0].unit)
+        assertEquals(
+            listOf(
+                ScaleDivision(1, "desc"),
+            ), scales[0].divisions
+        )
+    }
+
+    @Test
+    fun addTwo_UpdateOneExistingName() {
+        val id = create(CreateScaleRequest("n", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+        create(CreateScaleRequest("n2", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+        update(
+            UpdateScaleRequest(
+                id, name = "n2", unit = "u", divisions = mapOf(1L to "desc")
+            )
+        ).onSuccess {
+            fail()
+        }.onFailure {
+            assertIs<ScaleAlreadyExistsException>(it)
+        }
     }
 
     @Test
@@ -307,7 +352,7 @@ class ScaleInteractorGatewayIntegrationTest {
                 )
             )
         ).onFailure {
-            assertTrue { it is ScaleDoesNotExistException }
+            assertIs<ScaleDoesNotExistException>(it)
         }.onSuccess {
             fail()
         }
