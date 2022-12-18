@@ -1,10 +1,9 @@
-package coden.alec.main
+package coden.alec.interactors.definer.scale
 
 import coden.alec.core.*
 import coden.alec.data.ScaleDivision
 import coden.alec.data.ScaleDoesNotExistException
-import coden.alec.interactors.definer.scale.*
-import gateway.memory.ScaleInMemoryGateway
+import coden.alec.gateway.memory.ScaleInMemoryGateway
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -159,7 +158,7 @@ class ScaleInteractorGatewayIntegrationTest {
         purge(PurgeScaleRequest(id)).onSuccess {
             fail()
         }.onFailure {
-            assertInstanceOf(ScaleIsNotDeletedException::class.java, it)
+            assertTrue { it is ScaleIsNotDeletedException }
         }
 
     }
@@ -203,7 +202,7 @@ class ScaleInteractorGatewayIntegrationTest {
         delete(DeleteScaleRequest("invalid")).onSuccess {
             fail()
         }.onFailure {
-            assertInstanceOf(ScaleDoesNotExistException::class.java, it)
+            assertTrue { it is ScaleDoesNotExistException }
         }
     }
 
@@ -212,7 +211,7 @@ class ScaleInteractorGatewayIntegrationTest {
         purge(PurgeScaleRequest("invalid")).onSuccess {
             fail()
         }.onFailure {
-            assertInstanceOf(ScaleDoesNotExistException::class.java, it)
+            assertTrue { it is ScaleDoesNotExistException }
         }
     }
 
@@ -308,7 +307,7 @@ class ScaleInteractorGatewayIntegrationTest {
                 )
             )
         ).onFailure {
-            assertInstanceOf(ScaleDoesNotExistException::class.java, it)
+            assertTrue { it is ScaleDoesNotExistException }
         }.onSuccess {
             fail()
         }

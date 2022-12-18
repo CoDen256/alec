@@ -1,4 +1,4 @@
-package gateway.memory
+package coden.alec.gateway.memory
 
 import coden.alec.data.Scale
 import coden.alec.data.ScaleDoesNotExistException

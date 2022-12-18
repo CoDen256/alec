@@ -99,6 +99,12 @@
       <artifactId>alec-utils</artifactId>
       <version>1.0</version>
     </dependency>
+    <dependency>
+      <groupId>coden</groupId>
+      <artifactId>alec-gateway-inmemory</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.mockito</groupId>

@@ -3,7 +3,7 @@ package coden.alec.main.base
 import coden.alec.core.*
 import coden.alec.data.ScaleGateway
 import coden.alec.interactors.definer.scale.*
-import gateway.memory.ScaleInMemoryGateway
+import coden.alec.gateway.memory.ScaleInMemoryGateway
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
