@@ -12,15 +12,14 @@ import coden.alec.utils.flatMap
 import coden.fsm.*
 import coden.fsm.Entry.Companion.entry
 
-class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repetetive code
+class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repetitive code
     override fun ScaleActuator.buildTable() = FSMTable(
         entry(Start, ListScalesCommand) {
             listScales()
                 .then { respondListScales(it) }
                 .state { Start }
-                .onErrors(
-                    handle<Throwable> { respondInternalError(it); Start }
-                )
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
         },
         // CREATE //
 
@@ -29,10 +28,9 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .flatMap { createScale(it) }
                 .then { respondCreateScale(it) }
                 .state { Start }
-                .onErrors(
-                    handle<InvalidScaleFormatException> { respondInvalidScaleFormat(it); Start },
-                    handle<Throwable> { respondInternalError(it); Start }
-                )
+                .onError<InvalidScaleFormatException> { respondInvalidScaleFormat(it); Start }
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
         }),
 
         entry(Start, CreateScaleCommandNoArgs) { respondPromptScaleName(); WaitScaleName },
@@ -42,21 +40,18 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .then { setName(it) }
                 .then { respondPromptScaleUnit() }
                 .state { WaitScaleUnit }
-                .onErrors(
-                    handle<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleName(); WaitScaleName },
-                    handle<Throwable> { respondInternalError(it); reset(); Start }
-                )
-
+                .onError<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleName(); WaitScaleName }
+                .onError<Throwable> { respondInternalError(it); reset(); Start }
+                .get()
         }),
         entry(WaitScaleUnit, TextCommand::class, requireArgument { arg ->
             parseScaleUnit(arg)
                 .then { setUnit(it) }
                 .then { respondPromptScaleDivisions() }
                 .state { WaitScaleDivision }
-                .onErrors(
-                    handle<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleUnit(); WaitScaleUnit },
-                    handle<Throwable> { respondInternalError(it); reset(); Start }
-                )
+                .onError<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleUnit(); WaitScaleUnit }
+                .onError<Throwable> { respondInternalError(it); reset(); Start }
+                .get()
 
         }),
         entry(WaitScaleDivision, TextCommand::class, requireArgument { arg ->
@@ -67,10 +62,9 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .then { respondCreateScale(it) }
                 .then { reset() }
                 .state { Start }
-                .onErrors(
-                    handle<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleDivisions(); WaitScaleDivision },
-                    handle<Throwable> { respondInternalError(it); reset(); Start }
-                )
+                .onError<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleDivisions(); WaitScaleDivision }
+                .onError<Throwable> { respondInternalError(it); reset(); Start }
+                .get()
         }),
         // DELETE //
         entry(Start, DeleteScaleCommand::class, requireArgument {  arg ->
@@ -78,10 +72,9 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .flatMap{ deleteScale(it) }
                 .then { respondDeleteScale(it) }
                 .state { Start }
-                .onErrors(
-                    handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); Start},
-                    handle<Throwable> { respondInternalError(it); Start }
-                )
+                .onError<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); Start}
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
         }),
 
 
@@ -91,10 +84,9 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .flatMap { deleteScale(it) }
                 .then { respondDeleteScale(it) }
                 .state { Start }
-                .onErrors(
-                    handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); respondPromptScaleId(); WaitScaleIdForDelete},
-                    handle<Throwable> { respondInternalError(it); Start }
-                )
+                .onError<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); respondPromptScaleId(); WaitScaleIdForDelete}
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
         }),
 
         // PURGE //
@@ -103,11 +95,10 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .flatMap{ purgeScale(it) }
                 .then { respondPurgeScale(it) }
                 .state { Start }
-                .onErrors(
-                    handle<ScaleIsNotDeletedException> {respondScaleIsNotDeleted(it); Start},
-                    handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); Start},
-                    handle<Throwable> { respondInternalError(it); Start }
-                )
+                    .onError<ScaleIsNotDeletedException> {respondScaleIsNotDeleted(it); Start}
+                    .onError<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); Start}
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
         }),
         entry(Start, PurgeScaleCommandNoArgs) {respondWarnAboutPurging(); respondPromptScaleId(); WaitScaleIdForPurge},
         entry(WaitScaleIdForPurge, TextCommand::class, requireArgument { arg ->
@@ -115,11 +106,10 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .flatMap { purgeScale(it) }
                 .then { respondPurgeScale(it) }
                 .state { Start }
-                .onErrors(
-                    handle<ScaleIsNotDeletedException> {respondScaleIsNotDeleted(it); Start},
-                    handle<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); respondPromptScaleId(); WaitScaleIdForPurge},
-                    handle<Throwable> { respondInternalError(it); Start }
-                )
+                 .onError<ScaleIsNotDeletedException> {respondScaleIsNotDeleted(it); Start}
+                 .onError<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); respondPromptScaleId(); WaitScaleIdForPurge}
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
         }),
 
     )

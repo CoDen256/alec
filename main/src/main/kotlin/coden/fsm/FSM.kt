@@ -86,22 +86,24 @@ fun <T> Result<T>.state(state: (T) -> State): Result<State>{
     return map { state(it) }
 }
 
- fun Result<State>.onErrors(
+// .on<Throwable> {do something}.on<....>{...}.on<>{}.get()
+inline fun <reified E: Throwable> Result<State>.onError(crossinline handler: (E) -> State): ErrorHandlingResult<State>{
+    return ErrorHandlingResult(this).onError(handler)
+}
+
+fun Result<State>.onErrors(
     vararg handlers: ExceptionHandler<Throwable, State>
 ): State {
     return mapToState({it}, *handlers)
 }
 
-inline fun <T> Result<T>.mapToState(
-    onSuccess: (T) -> State,
+fun <T> Result<T>.mapToState(
+    toState: (T) -> State,
     vararg handlers: ExceptionHandler<Throwable, State>
 ): State {
-    return fold(onSuccess) { t ->
-        handlers
-            .firstOrNull { it.canHandle(t) }
-            ?.handle(t)
-            ?: throw IllegalStateException("No exception handler for ${t.javaClass.simpleName}")
-    }
+    val delegate = ErrorHandlingResult(this.map(toState))
+    delegate.handlers.addAll(handlers)
+    return delegate.get()
 }
 
 interface ExceptionHandler<T: Throwable, R>{
@@ -109,15 +111,38 @@ interface ExceptionHandler<T: Throwable, R>{
     fun handle(throwable: T): R
 }
 
-inline fun <reified T: Throwable> handle(crossinline handler: (T) -> State): ExceptionHandler<Throwable, State>{
-    return object: ExceptionHandler<Throwable, State>{
+
+class ErrorHandlingResult<T>(private val result: Result<T>) {
+    val handlers: MutableList<ExceptionHandler<Throwable, T>> = ArrayList()
+
+    inline fun <reified E: Throwable> onError(crossinline handler: (E) -> T): ErrorHandlingResult<T> {
+        handlers.add(handle(handler))
+        return this
+    }
+
+    fun get(): T {
+        return result.fold({ it }) { throwable ->
+            handlers
+                .firstOrNull { it.canHandle(throwable) }
+                ?.handle(throwable)
+                ?: throw IllegalStateException("No exception handler for ${throwable.javaClass.simpleName}")
+        }
+    }
+}
+
+inline fun <reified T: Throwable, R> handle(crossinline handler: (T) -> R): ExceptionHandler<Throwable, R>{
+    return object: ExceptionHandler<Throwable, R>{
         override fun canHandle(throwable: Throwable): Boolean {
             return throwable is T
         }
 
-        override fun handle(throwable: Throwable): State {
+        override fun handle(throwable: Throwable): R {
             return handler(throwable as T)
         }
 
     }
+}
+
+inline fun <reified T: Throwable> fallbackOn(crossinline handler: (T) -> State): ExceptionHandler<Throwable, State>{
+    return handle(handler)
 }

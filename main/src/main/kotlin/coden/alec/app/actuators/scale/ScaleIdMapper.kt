@@ -1,6 +1,6 @@
 package coden.alec.app.actuators.scale
 
 interface ScaleIdMapper {
-    fun mapIdToRef(scaleId: String): String
-    fun mapRefToId(scaleId: String): String
+    fun mapIdToIndex(scaleId: String): String
+    fun mapIndexToId(index: String): String
 }
