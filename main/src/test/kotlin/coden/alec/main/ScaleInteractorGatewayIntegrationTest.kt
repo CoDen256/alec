@@ -1,20 +1,21 @@
 package coden.alec.main
 
 import coden.alec.core.*
-import coden.alec.data.Scale
 import coden.alec.data.ScaleDivision
+import coden.alec.data.ScaleDoesNotExistException
 import coden.alec.interactors.definer.scale.*
 import gateway.memory.ScaleInMemoryGateway
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.lang.IllegalArgumentException
+import java.util.*
 
-class ScaleInteractorGatewayIntegrationTest{
+class ScaleInteractorGatewayIntegrationTest {
 
     private val gateway = ScaleInMemoryGateway()
 
-    private val scaleUseCaseFactory = object: ScaleUseCaseFactory{
+    private val scaleUseCaseFactory = object : ScaleUseCaseFactory {
         override fun listScales(): ListScalesInteractor {
             return BaseListScalesInteractor(gateway)
         }
@@ -37,28 +38,33 @@ class ScaleInteractorGatewayIntegrationTest{
 
     }
 
-    private fun list(request: ListScalesRequest): Result<ListScalesResponse>{
+    private fun list(request: ListScalesRequest): Result<ListScalesResponse> {
         return scaleUseCaseFactory.listScales().execute(request) as Result<ListScalesResponse>
     }
 
-    private fun list(): Result<ListScalesResponse>{
+    private fun list(): Result<ListScalesResponse> {
         return list(ListScalesRequest())
     }
 
-    private fun create(request: CreateScaleRequest): Result<CreateScaleResponse>{
+    private fun create(request: CreateScaleRequest): Result<CreateScaleResponse> {
         return scaleUseCaseFactory.createScale().execute(request) as Result<CreateScaleResponse>
     }
 
-    private fun delete(request: DeleteScaleRequest): Result<DeleteScaleResponse>{
+    private fun delete(request: DeleteScaleRequest): Result<DeleteScaleResponse> {
         return scaleUseCaseFactory.deleteScale().execute(request) as Result<DeleteScaleResponse>
     }
 
-    private fun purge(request: PurgeScaleRequest): Result<PurgeScaleResponse>{
+    private fun purge(request: PurgeScaleRequest): Result<PurgeScaleResponse> {
         return scaleUseCaseFactory.purgeScale().execute(request) as Result<PurgeScaleResponse>
     }
 
-    private fun update(request: UpdateScaleRequest): Result<UpdateScaleResponse>{
+    private fun update(request: UpdateScaleRequest): Result<UpdateScaleResponse> {
         return scaleUseCaseFactory.updateScale().execute(request) as Result<UpdateScaleResponse>
+    }
+
+
+    private fun assertUUID(id: String) {
+        assertDoesNotThrow { UUID.fromString(id) }
     }
 
     @BeforeEach
@@ -73,38 +79,40 @@ class ScaleInteractorGatewayIntegrationTest{
     }
 
     @Test
-    fun listTwo() {
-        gateway.addScaleOrUpdate(Scale("i1", "n1", "u1", false, listOf()))
-        gateway.addScaleOrUpdate(Scale("i2", "n2", "u2", true, listOf(ScaleDivision(1, "desc"))))
-
-        val response = list()
-
-        response.onSuccess {
-            val scales = it.scales
-            assertEquals(2, scales.size)
-            val scale =  scales.last()
-            assertEquals("i2", scale.id)
-            assertEquals("n2", scale.name)
-            assertEquals("u2", scale.unit)
-            assertTrue(scale.deleted)
-            assertEquals(1, scale.divisions.size)
-            assertEquals(1L, scale.divisions.first().value)
-            assertEquals("desc", scale.divisions.first().description)
-        }
-    }
-
-    @Test
-    fun createOne() {
+    fun createOneListOne() {
         create(CreateScaleRequest("n", "u", mapOf(1L to "something"))).getOrThrow()
 
         val listAfterAdd = list()
         val scales = listAfterAdd.getOrThrow().scales
         assertEquals(1, scales.size)
-        assertEquals("scale-0", scales[0].id)
+        assertUUID(scales[0].id)
         assertEquals("n", scales[0].name)
         assertEquals("u", scales[0].unit)
         assertEquals(listOf(ScaleDivision(1, "something")), scales[0].divisions)
     }
+
+    @Test
+    fun createTwoListTwo() {
+
+        create(CreateScaleRequest("n1", "u1", mapOf(1L to "desc"))).getOrThrow()
+        val id1 = create(CreateScaleRequest("n2", "u2", mapOf(1L to "desc"))).getOrThrow().scaleId
+
+        list().onSuccess { r ->
+            val scales = r.scales
+            assertEquals(2, scales.size)
+            val scale = scales.find { it.id == id1 }!!
+            assertUUID(scale.id)
+            assertEquals("n2", scale.name)
+            assertEquals("u2", scale.unit)
+            assertFalse(scale.deleted)
+            assertEquals(1, scale.divisions.size)
+            assertEquals(1L, scale.divisions.first().value)
+            assertEquals("desc", scale.divisions.first().description)
+        }.onFailure {
+            fail()
+        }
+    }
+
 
     @Test
     fun createInvalid() {
@@ -127,176 +135,183 @@ class ScaleInteractorGatewayIntegrationTest{
         }
     }
 
+    @Test
+    fun addOne_ListOne_DeleteOne_ListOneDeleted() {
+        val id = create(CreateScaleRequest("n1", "u1", mapOf(1L to "desc"))).getOrThrow().scaleId
+
+        delete(DeleteScaleRequest(id)).getOrThrow()
+
+        val scales = list().getOrThrow().scales
+        val deleted = scales.first()
+        assertEquals(1, scales.size)
+        assertEquals("n1", deleted.name)
+        assertEquals("u1", deleted.unit)
+        assertTrue(deleted.deleted)
+        assertEquals(1, deleted.divisions.size)
+        assertEquals(1L, deleted.divisions.first().value)
+        assertEquals("desc", deleted.divisions.first().description)
+    }
 
     @Test
-    fun purgeScales() {
-        gateway.addScaleOrUpdate(Scale("scale-0","n1", "u", true, listOf(ScaleDivision(1, "s"))))
-        gateway.addScaleOrUpdate(Scale("scale-1","n2", "u", true, listOf(ScaleDivision(1,"s"))))
-        val scales0 = list().getOrThrow().scales
-        assertEquals(2, scales0.size)
-        assertEquals("scale-0", scales0[0].id)
-        assertEquals("scale-1", scales0[1].id)
+    fun addOne_PurgeOne_ErrorNotDeleted() {
+        val id = create(CreateScaleRequest("n1", "u1", mapOf(1L to "desc"))).getOrThrow().scaleId
 
-        purge(PurgeScaleRequest("scale-0")).getOrThrow()
-        val scales1 = list().getOrThrow().scales
-        assertEquals(1, scales1.size)
-        assertEquals("scale-1", scales1[0].id)
+        purge(PurgeScaleRequest(id)).onSuccess {
+            fail()
+        }.onFailure {
+            assertInstanceOf(ScaleIsNotDeletedException::class.java, it)
+        }
 
-
-        create(CreateScaleRequest("n3", "u", mapOf(1L to "something"))).getOrThrow()
-        val scales2 = list().getOrThrow().scales
-        assertEquals(2, scales2.size)
-        assertEquals("scale-1", scales2[0].id)
-        assertEquals("scale-2", scales2[1].id)
     }
-//
-//    @Test
-//    fun deleteScalesDoesNotExist() {
-//        val interactor = BaseDeleteScaleInteractor(gateway)
-//
-//        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.failure(ScaleDoesNotExistException("scale-0")))
-//        val response = interactor.execute(DeleteScaleRequest("scale-0")) as Result<DeleteScaleResponse>
-//
-//
-//        response.onFailure { Assertions.assertTrue(it is ScaleDoesNotExistException) }
-//        response.onSuccess {
-//            fail()
-//        }
-//
-//        verify(gateway).getScaleById("scale-0")
-//    }
-//
-//    @Test
-//    fun purgeScale() {
-//        val interactor = BasePurgeScaleInteractor(gateway)
-//        whenever(gateway.getScaleById("scale-0")).thenReturn(
-//            Result.success(Scale("scale-0", "name", "unit", true, emptyList()))
-//        )
-//
-//        val response = interactor.execute(PurgeScaleRequest("scale-0")) as Result<PurgeScaleResponse>
-//
-//
-//        response.onFailure { fail() }
-//
-//        verify(gateway).getScaleById("scale-0")
-//        verify(gateway).deleteScale("scale-0")
-//    }
-//
-//    @Test
-//    fun purgeScaleNotDeleted() {
-//        val interactor = BasePurgeScaleInteractor(gateway)
-//        whenever(gateway.getScaleById("scale-0")).thenReturn(
-//            Result.success(Scale("scale-0", "name", "unit", false, emptyList()))
-//        )
-//
-//        val response = interactor.execute(PurgeScaleRequest("scale-0")) as Result<PurgeScaleResponse>
-//
-//
-//        response.onFailure { Assertions.assertTrue(it is ScaleIsNotDeletedException) }
-//        response.onSuccess {
-//            fail()
-//        }
-//
-//        verify(gateway).getScaleById("scale-0")
-//    }
-//
-//    @Test
-//    fun purgeScaleDoesNotExist() {
-//        val interactor = BasePurgeScaleInteractor(gateway)
-//
-//        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.failure(ScaleDoesNotExistException("scale-0")))
-//        val response = interactor.execute(PurgeScaleRequest("scale-0")) as Result<PurgeScaleResponse>
-//
-//
-//        response.onFailure { Assertions.assertTrue(it is ScaleDoesNotExistException) }
-//        response.onSuccess {
-//            fail()
-//        }
-//
-//        verify(gateway).getScaleById("scale-0")
-//    }
-//
-//    @Test
-//    fun updateScaleNothing() {
-//        val interactor = BaseUpdateScaleInteractor(gateway)
-//
-//        val scale = Scale("scale-0", "name", "unit", false, emptyList())
-//        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.success(scale))
-//        val response = interactor.execute(UpdateScaleRequest("scale-0")) as Result<UpdateScaleResponse>
-//
-//
-//        response.onFailure { fail() }
-//
-//        verify(gateway).getScaleById("scale-0")
-//        verify(gateway).addScaleOrUpdate(scale)
-//    }
-//
-//    @Test
-//    fun updateScaleName() {
-//        val interactor = BaseUpdateScaleInteractor(gateway)
-//
-//        val scale = Scale("scale-0", "name", "unit", false, emptyList())
-//        val updatedScale = Scale("scale-0", "name2", "unit", false, emptyList())
-//        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.success(scale))
-//        val response = interactor.execute(UpdateScaleRequest("scale-0", name = "name2")) as Result<UpdateScaleResponse>
-//
-//
-//        response.onFailure { fail() }
-//
-//        verify(gateway).getScaleById("scale-0")
-//        verify(gateway).addScaleOrUpdate(updatedScale)
-//    }
-//
-//    @Test
-//    fun updateScaleUnit() {
-//        val interactor = BaseUpdateScaleInteractor(gateway)
-//
-//        val scale = Scale("scale-0", "name", "unit", false, emptyList())
-//        val updatedScale = Scale("scale-0", "name", "unit2", false, emptyList())
-//        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.success(scale))
-//        val response = interactor.execute(UpdateScaleRequest("scale-0", unit = "unit2")) as Result<UpdateScaleResponse>
-//
-//
-//        response.onFailure { fail() }
-//
-//        verify(gateway).getScaleById("scale-0")
-//        verify(gateway).addScaleOrUpdate(updatedScale)
-//    }
-//
-//    @Test
-//    fun updateScaleDivisions() {
-//        val interactor = BaseUpdateScaleInteractor(gateway)
-//
-//        val scale = Scale("scale-0", "name", "unit", false, emptyList())
-//        val updatedScale = Scale("scale-0", "name", "unit", false, listOf(ScaleDivision(1L, "div")))
-//        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.success(scale))
-//        val divisions = mapOf(1L to "div")
-//        val response = interactor.execute(UpdateScaleRequest("scale-0", divisions = divisions)) as Result<UpdateScaleResponse>
-//
-//
-//        response.onFailure { fail() }
-//
-//        verify(gateway).getScaleById("scale-0")
-//        verify(gateway).addScaleOrUpdate(updatedScale)
-//    }
-//
-//    @Test
-//    fun updateScaleFull() {
-//        val interactor = BaseUpdateScaleInteractor(gateway)
-//
-//        val scale = Scale("scale-0", "name", "unit", false, emptyList())
-//        val updatedScale = Scale("scale-0", "name2", "unit2", false, listOf(ScaleDivision(1L, "div")))
-//        whenever(gateway.getScaleById("scale-0")).thenReturn(Result.success(scale))
-//        val divisions = mapOf(1L to "div")
-//        val response = interactor.execute(UpdateScaleRequest("scale-0",
-//            name = "name2", unit = "unit2",
-//            divisions = divisions)) as Result<UpdateScaleResponse>
-//
-//
-//        response.onFailure { fail() }
-//
-//        verify(gateway).getScaleById("scale-0")
-//        verify(gateway).addScaleOrUpdate(updatedScale)
-//    }
 
+    @Test
+    fun addOne_DeleteOne_PurgeOne_ListEmpty() {
+        val id = create(CreateScaleRequest("n1", "u1", mapOf(1L to "desc"))).getOrThrow().scaleId
+        delete(DeleteScaleRequest(id)).getOrThrow()
+
+        purge(PurgeScaleRequest(id)).getOrThrow()
+
+        assertEquals(0, list().getOrThrow().scales.size)
+    }
+
+    @Test
+    fun addTwo_DeletePurgeOne_ListOne_CreateOne_ListTwo() {
+        val id1 = create(CreateScaleRequest("n1", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+        val id2 = create(CreateScaleRequest("n2", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+
+        delete(DeleteScaleRequest(id1)).getOrThrow()
+        purge(PurgeScaleRequest(id1)).getOrThrow()
+        val purged = list().getOrThrow().scales
+        assertEquals(1, purged.size)
+        assertEquals(id2, purged[0].id)
+
+
+        val id3 = create(CreateScaleRequest("n3", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+        val created = list().getOrThrow().scales
+        assertEquals(2, created.size)
+        created.distinct().forEach {
+            assertTrue {
+                id2 == it.id || id3 == it.id
+            }
+        }
+    }
+
+    @Test
+    fun addOne_DeleteOneWrong_ErrorDoesNotExist() {
+        create(CreateScaleRequest("n1", "u", mapOf(1L to "desc"))).getOrThrow()
+
+        delete(DeleteScaleRequest("invalid")).onSuccess {
+            fail()
+        }.onFailure {
+            assertInstanceOf(ScaleDoesNotExistException::class.java, it)
+        }
+    }
+
+    @Test
+    fun purgeOneWrong_ErrorDoesNotExist() {
+        purge(PurgeScaleRequest("invalid")).onSuccess {
+            fail()
+        }.onFailure {
+            assertInstanceOf(ScaleDoesNotExistException::class.java, it)
+        }
+    }
+
+    @Test
+    fun addOne_UpdateOneNothing() {
+        val id = create(CreateScaleRequest("n", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+        update(UpdateScaleRequest(id)).getOrThrow()
+
+        val scales = list().getOrThrow().scales
+        assertEquals(1, scales.size)
+        assertUUID(scales[0].id)
+        assertEquals("n", scales[0].name)
+        assertEquals("u", scales[0].unit)
+        assertEquals(listOf(ScaleDivision(1, "desc")), scales[0].divisions)
+    }
+
+    @Test
+    fun addOne_UpdateOneName() {
+        val id = create(CreateScaleRequest("n", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+        update(UpdateScaleRequest(id, name = "n2")).getOrThrow()
+
+        val scales = list().getOrThrow().scales
+        assertEquals(1, scales.size)
+        assertUUID(scales[0].id)
+        assertEquals("n2", scales[0].name)
+        assertEquals("u", scales[0].unit)
+        assertEquals(listOf(ScaleDivision(1, "desc")), scales[0].divisions)
+    }
+
+    @Test
+    fun addOne_UpdateOneUnit() {
+        val id = create(CreateScaleRequest("n", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+        update(UpdateScaleRequest(id, unit = "u2")).getOrThrow()
+
+        val scales = list().getOrThrow().scales
+        assertEquals(1, scales.size)
+        assertUUID(scales[0].id)
+        assertEquals("n", scales[0].name)
+        assertEquals("u2", scales[0].unit)
+        assertEquals(listOf(ScaleDivision(1, "desc")), scales[0].divisions)
+    }
+
+    @Test
+    fun addOne_UpdateOneDivisions() {
+        val id = create(CreateScaleRequest("n", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+        update(UpdateScaleRequest(id, divisions = mapOf(1L to "desc", 2L to "d"))).getOrThrow()
+
+        val scales = list().getOrThrow().scales
+        assertEquals(1, scales.size)
+        assertUUID(scales[0].id)
+        assertEquals("n", scales[0].name)
+        assertEquals("u", scales[0].unit)
+        assertEquals(
+            listOf(
+                ScaleDivision(1, "desc"),
+                ScaleDivision(2, "d")
+            ), scales[0].divisions
+        )
+    }
+
+    @Test
+    fun addOne_UpdateOneAll() {
+        val id = create(CreateScaleRequest("n", "u", mapOf(1L to "desc"))).getOrThrow().scaleId
+        update(
+            UpdateScaleRequest(
+                id, name = "n2", unit = "u2", divisions = mapOf(
+                    1L to "d2", 2L to "d3"
+                )
+            )
+        ).getOrThrow()
+
+        val scales = list().getOrThrow().scales
+        assertEquals(1, scales.size)
+        assertUUID(scales[0].id)
+        assertEquals("n2", scales[0].name)
+        assertEquals("u2", scales[0].unit)
+        assertEquals(
+            listOf(
+                ScaleDivision(1, "d2"),
+                ScaleDivision(2, "d3")
+            ), scales[0].divisions
+        )
+    }
+
+    @Test
+    fun addOne_UpdateOneWrong() {
+        create(CreateScaleRequest("n", "u", mapOf(1L to "desc"))).getOrThrow()
+
+        update(
+            UpdateScaleRequest(
+                "invalid", name = "n2", unit = "u2", divisions = mapOf(
+                    1L to "d2", 2L to "d3"
+                )
+            )
+        ).onFailure {
+            assertInstanceOf(ScaleDoesNotExistException::class.java, it)
+        }.onSuccess {
+            fail()
+        }
+
+    }
 }
