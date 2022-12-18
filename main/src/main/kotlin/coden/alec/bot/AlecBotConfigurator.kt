@@ -63,6 +63,30 @@ class AlecBotConfigurator(
             }
         }
 
+        command(commandNamesResource.updateNameScaleCommand){
+            if (args.isEmpty()){
+                commandExecutor.submit(UpdateScaleNameCommandNoArgs)
+            }else{
+                commandExecutor.submit(UpdateScaleNameCommand(arguments()))
+            }
+        }
+
+        command(commandNamesResource.updateUnitScaleCommand){
+            if (args.isEmpty()){
+                commandExecutor.submit(UpdateScaleUnitCommandNoArgs)
+            }else{
+                commandExecutor.submit(UpdateScaleUnitCommand(arguments()))
+            }
+        }
+
+        command(commandNamesResource.updateDivisionsScaleCommand){
+            if (args.isEmpty()){
+                commandExecutor.submit(UpdateScaleDivisionsCommandNoArgs)
+            }else{
+                commandExecutor.submit(UpdateScaleDivisionsCommand(arguments()))
+            }
+        }
+
         text {
             if (text.startsWith("/")) return@text
             commandExecutor.submit(TextCommand(text))

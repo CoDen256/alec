@@ -20,4 +20,8 @@ class BaseScaleUseCaseInvoker(private val useCaseFactory: ScaleUseCaseFactory) :
     override fun purgeScale(request: PurgeScaleRequest): Result<PurgeScaleResponse> {
         return useCaseFactory.purgeScale().execute(request) as Result<PurgeScaleResponse>
     }
+
+    override fun updateScale(request: UpdateScaleRequest): Result<UpdateScaleResponse> {
+        return useCaseFactory.updateScale().execute(request) as Result<UpdateScaleResponse>
+    }
 }

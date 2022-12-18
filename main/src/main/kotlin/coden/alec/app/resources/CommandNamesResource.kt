@@ -8,5 +8,7 @@ open class CommandNamesResource {
     lateinit var createScaleCommand: String
     lateinit var deleteScaleCommand: String
     lateinit var purgeScaleCommand: String
-    lateinit var updateScaleCommand: String
+    lateinit var updateNameScaleCommand: String
+    lateinit var updateUnitScaleCommand: String
+    lateinit var updateDivisionsScaleCommand: String
 }

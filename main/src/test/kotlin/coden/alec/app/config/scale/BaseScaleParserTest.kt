@@ -5,6 +5,7 @@ import coden.alec.app.actuators.scale.InvalidScalePropertyFormatException
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.DeleteScaleRequest
 import coden.alec.interactors.definer.scale.PurgeScaleRequest
+import coden.alec.interactors.definer.scale.UpdateScaleRequest
 import org.junit.jupiter.api.Assertions.*
 
 import org.junit.jupiter.params.ParameterizedTest
@@ -13,6 +14,35 @@ import org.junit.jupiter.params.provider.CsvSource
 class BaseScaleParserTest {
 
     private val parser = BaseScaleParser()
+
+
+    @CsvSource(
+        "'name2\n1-hello',name2,{1:hello}",
+        "'name3\n2-world',name3,{2:world}",
+        "'name4\n3 - hello',name4,{3:hello}",
+        "'name5 \n 4 -  hello',name5,{4:hello}",
+        delimiter = ',',
+        ignoreLeadingAndTrailingWhitespace = false
+    )
+    @ParameterizedTest
+    fun parseUpdateScaleDivisions(input: String, id: String, expected: String) {
+        val divisions = invalidToNullOr(expected) { parseDivisions() }
+        verifyPropertyParsedCorrectly(parser.parseUpdateDivisionRequest(input), UpdateScaleRequest(id=id, divisions=divisions))
+    }
+
+    @CsvSource(
+        "name1  name,name1,name",
+        "name2  name,name2,name",
+        "name3  name ,name3,name",
+        "name4  name a second name,name4,name a second name",
+        delimiter = ',',
+        ignoreLeadingAndTrailingWhitespace = false
+    )
+    @ParameterizedTest
+    fun parseUpdateNameAndUnit(input: String, id: String, expected: String) {
+        verifyPropertyParsedCorrectly(parser.parseUpdateNameRequest(input), UpdateScaleRequest(id, name=expected))
+        verifyPropertyParsedCorrectly(parser.parseUpdateUnitRequest(input), UpdateScaleRequest(id, unit=expected))
+    }
 
     @CsvSource(
         "' scale  - 123',scale-123",

@@ -29,7 +29,12 @@ class MenuConfiguration {
                 itemLayout("List all Scales", action = ListScalesCommand),
                 itemLayout("Create Scale", action = CreateScaleCommandNoArgs),
                 itemLayout("Delete Scale", action = DeleteScaleCommandNoArgs),
-                itemLayout("Purge Scale", action = PurgeScaleCommandNoArgs)
+                itemLayout("Purge Scale", action = PurgeScaleCommandNoArgs),
+                itemLayout("Update Scale", "Select what you want to update",
+                    itemLayout("Name", action = UpdateScaleNameCommandNoArgs),
+                    itemLayout("Unit", action = UpdateScaleUnitCommandNoArgs),
+                    itemLayout("Divisions", action = UpdateScaleDivisionsCommandNoArgs),
+                    )
             ),
             itemLayout(
                 "Factors", "Factor management",

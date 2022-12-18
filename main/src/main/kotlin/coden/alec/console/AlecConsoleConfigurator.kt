@@ -56,6 +56,32 @@ class AlecConsoleConfigurator(
             }
         }
 
+
+        command(commandNames.updateNameScaleCommand){
+            if (args.isEmpty()){
+                commandExecutor.submit(UpdateScaleNameCommandNoArgs)
+            }else{
+                commandExecutor.submit(UpdateScaleNameCommand(args))
+            }
+        }
+
+        command(commandNames.updateUnitScaleCommand){
+            if (args.isEmpty()){
+                commandExecutor.submit(UpdateScaleUnitCommandNoArgs)
+            }else{
+                commandExecutor.submit(UpdateScaleUnitCommand(args))
+            }
+        }
+
+        command(commandNames.updateDivisionsScaleCommand){
+            if (args.isEmpty()){
+                commandExecutor.submit(UpdateScaleDivisionsCommandNoArgs)
+            }else{
+                commandExecutor.submit(UpdateScaleDivisionsCommand(args))
+            }
+        }
+
+
         command(commandNames.textCommand){
             commandExecutor.submit(TextCommand(args))
         }

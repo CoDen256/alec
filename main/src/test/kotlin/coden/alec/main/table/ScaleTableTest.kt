@@ -119,7 +119,7 @@ class ScaleTableTest{
             .thenReturn(Result.success(mapOf(1L to "div"))) // 5
 
 
-        whenever(actuator.build())
+        whenever(actuator.buildCreateRequest())
             .thenReturn(request) // 5
         whenever(actuator.createScale(request))
             .thenReturn(Result.success(response)) // 5
@@ -169,7 +169,7 @@ class ScaleTableTest{
             .verify(actuator) {parseScaleDivisions("1-div")}
             .verify(actuator) {setDivisions(mapOf(1L to "div"))}
 
-            .verify(actuator) {build()}
+            .verify(actuator) {buildCreateRequest()}
             .verify(actuator) {createScale(request)}
             .verify(actuator) {respondCreateScale(response)}
             .verify(actuator) {reset()}
@@ -194,7 +194,7 @@ class ScaleTableTest{
             .thenReturn(Result.success(mapOf(1L to "div"))) // 1
             .thenReturn(Result.success(mapOf(1L to "div"))) // 2
 
-        whenever(actuator.build())
+        whenever(actuator.buildCreateRequest())
             .thenReturn(request) // 1
             .thenReturn(request) // 2
         whenever(actuator.createScale(request))
@@ -224,7 +224,7 @@ class ScaleTableTest{
             .verifyState(WaitScaleDivision)
 
             .submit(TextCommand("1-div"))
-            .verify(actuator) {build()}
+            .verify(actuator) {buildCreateRequest()}
             .verify(actuator) {createScale(request)}
             .verify(actuator) {respondInternalError(error)}
             .verify(actuator) {reset()}
@@ -237,7 +237,7 @@ class ScaleTableTest{
             .verifyState(WaitScaleDivision)
 
             .submit(TextCommand("1-div"))
-            .verify(actuator) {build()}
+            .verify(actuator) {buildCreateRequest()}
             .verify(actuator) {createScale(request)}
             .verify(actuator) {respondScaleAlreadyExists(alreadyExists)}
             .verify(actuator) {reset()}

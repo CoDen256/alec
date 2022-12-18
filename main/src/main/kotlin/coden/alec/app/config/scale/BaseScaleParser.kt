@@ -6,6 +6,8 @@ import coden.alec.app.actuators.scale.ScaleParser
 import coden.alec.interactors.definer.scale.CreateScaleRequest
 import coden.alec.interactors.definer.scale.DeleteScaleRequest
 import coden.alec.interactors.definer.scale.PurgeScaleRequest
+import coden.alec.interactors.definer.scale.UpdateScaleRequest
+import coden.alec.utils.combine
 import java.util.regex.Pattern
 
 class BaseScaleParser : ScaleParser {
@@ -35,7 +37,7 @@ class BaseScaleParser : ScaleParser {
     override fun parseScaleName(input: String): Result<String> {
         return input.verify("scale name", this::isValidScaleName).map {
             parseName(it)
-            }
+        }
     }
 
     override fun parseScaleUnit(input: String): Result<String> {
@@ -52,25 +54,66 @@ class BaseScaleParser : ScaleParser {
             .recoverCatching { throw InvalidScalePropertyFormatException("scale divisions", input) }
     }
 
-    override fun parseDeleteScaleRequest(input: String): Result<DeleteScaleRequest> {
-        return Result.success(DeleteScaleRequest(parseId(input)))
+    override fun parseScaleId(input: String): Result<String> {
+        return Result.success(parseId(input))
     }
 
     private fun parseId(input: String) = input.replace(whitespaceReplacement, "")
 
+    override fun parseDeleteScaleRequest(input: String): Result<DeleteScaleRequest> {
+        return parseScaleId(input).map { DeleteScaleRequest(it) }
+    }
+
     override fun parsePurgeScaleRequest(input: String): Result<PurgeScaleRequest> {
-        return Result.success(PurgeScaleRequest(parseId(input)))
+        return parseScaleId(input).map { PurgeScaleRequest(it) }
+    }
+
+    override fun parseUpdateNameRequest(input: String): Result<UpdateScaleRequest> {
+        val idWithName = input.split(" ", limit = 2)
+        return parseScaleId(idWithName[0])
+            .combine { parseScaleName(idWithName[1]) }
+            .map { (id, name) ->
+                UpdateScaleRequest(
+                    id = id,
+                    name = name
+                )
+            }
+    }
+
+    override fun parseUpdateUnitRequest(input: String): Result<UpdateScaleRequest> {
+        val idWithUnit = input.split(" ", limit = 2)
+        return parseScaleId(idWithUnit[0])
+            .combine { parseScaleName(idWithUnit[1]) }
+            .map { (id, unit) ->
+                UpdateScaleRequest(
+                    id = id,
+                    unit = unit
+                )
+            }
+    }
+
+    override fun parseUpdateDivisionRequest(input: String): Result<UpdateScaleRequest> {
+        val idWithDiv = input.split("\n", limit = 2)
+        return parseScaleId(idWithDiv[0])
+            .combine { parseScaleDivisions(idWithDiv[1]) }
+            .map { (id, divs) ->
+                UpdateScaleRequest(
+                    id = id,
+                    divisions = divs
+                )
+            }
     }
 
     private fun parseDivisions(it: String): Map<Long, String> =
         it.split("\n")
             .map { verifyDivision(it); it }
             .map { l -> l.split("-", limit = 2) }
-            .associate { parseName(it[0]).toLong() to parseName(it[1].trim())
-        }
+            .associate {
+                parseName(it[0]).toLong() to parseName(it[1].trim())
+            }
 
-    private fun verifyDivision(input: String){
-        if (input.count {  it == '-' } != 1) throw IllegalArgumentException()
+    private fun verifyDivision(input: String) {
+        if (input.count { it == '-' } != 1) throw IllegalArgumentException()
     }
 
     private fun isValidScaleName(input: String): Boolean {

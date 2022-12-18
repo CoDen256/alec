@@ -3,10 +3,7 @@ package coden.alec.app.actuators.scale
 import coden.alec.core.ScaleIsNotDeletedException
 import coden.alec.data.ScaleAlreadyExistsException
 import coden.alec.data.ScaleDoesNotExistException
-import coden.alec.interactors.definer.scale.CreateScaleResponse
-import coden.alec.interactors.definer.scale.DeleteScaleResponse
-import coden.alec.interactors.definer.scale.ListScalesResponse
-import coden.alec.interactors.definer.scale.PurgeScaleResponse
+import coden.alec.interactors.definer.scale.*
 
 interface ScaleResponder {
     fun respondInternalError(throwable: Throwable)
@@ -21,6 +18,9 @@ interface ScaleResponder {
     fun respondCreateScale(response: CreateScaleResponse)
     fun respondDeleteScale(response: DeleteScaleResponse)
     fun respondPurgeScale(response: PurgeScaleResponse)
+    fun respondUpdateName(response: UpdateScaleResponse)
+    fun respondUpdateUnit(response: UpdateScaleResponse)
+    fun respondUpdateDivisions(response: UpdateScaleResponse)
 
     fun respondWarnAboutPurging()
 

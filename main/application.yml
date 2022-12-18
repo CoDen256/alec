@@ -19,6 +19,9 @@ messages:
   purgedScale: "The scale was permanently deleted!"
   scaleIsNotMarkedAsDeleted: "Scale {id} must first be marked as DELETED before complete removal!"
 
+  updatedNameScale : "Scale name was successfully updated"
+  updatedUnitScale : "Scale unit was successfully updated"
+  updatedDivisionsScale : "Scale divisions were successfully updated"
 
   error: "Unexpected error occurred:\n{name}:{message}"
   menuBack: "Back"
@@ -30,7 +33,9 @@ commands:
   createScaleCommand: "create_scale"
   deleteScaleCommand: "delete_scale"
   purgeScaleCommand: "purge_scale"
-  updateScaleCommand: "update_scale"
+  updateNameScaleCommand : "update_scale_name"
+  updateUnitScaleCommand : "update_scale_unit"
+  updateDivisionsScaleCommand : "update_scale_div"
   textCommand: "text"
   navCommand: "nav"
 

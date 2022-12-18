@@ -9,10 +9,7 @@ import coden.alec.app.util.inline
 import coden.alec.core.ScaleIsNotDeletedException
 import coden.alec.data.ScaleAlreadyExistsException
 import coden.alec.data.ScaleDoesNotExistException
-import coden.alec.interactors.definer.scale.CreateScaleResponse
-import coden.alec.interactors.definer.scale.DeleteScaleResponse
-import coden.alec.interactors.definer.scale.ListScalesResponse
-import coden.alec.interactors.definer.scale.PurgeScaleResponse
+import coden.alec.interactors.definer.scale.*
 import coden.display.displays.MessageDisplay
 
 class BaseScaleResponder(
@@ -73,6 +70,18 @@ class BaseScaleResponder(
 
     override fun respondPurgeScale(response: PurgeScaleResponse) {
         display.displayMessage(messages.purgedScale)
+    }
+
+    override fun respondUpdateName(response: UpdateScaleResponse) {
+        display.displayMessage(messages.updatedNameScale)
+    }
+
+    override fun respondUpdateUnit(response: UpdateScaleResponse) {
+        display.displayMessage(messages.updatedUnitScale)
+    }
+
+    override fun respondUpdateDivisions(response: UpdateScaleResponse) {
+        display.displayMessage(messages.updatedDivisionsScale)
     }
 
     override fun respondWarnAboutPurging() {

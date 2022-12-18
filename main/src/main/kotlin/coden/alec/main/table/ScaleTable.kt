@@ -59,7 +59,7 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
         entry(WaitScaleDivision, TextCommand::class, requireArgument { arg ->
             parseScaleDivisions(arg)
                 .then { setDivisions(it) }
-                .map { build() }
+                .map { buildCreateRequest() }
                 .flatMap { createScale(it) }
                 .then { respondCreateScale(it) }
                 .then { reset() }
@@ -109,11 +109,114 @@ class ScaleTableBuilder : FSMTableBuilder<ScaleActuator> { // TODO: improve repe
                 .flatMap { purgeScale(it) }
                 .then { respondPurgeScale(it) }
                 .state { Start }
-                 .onError<ScaleIsNotDeletedException> {respondScaleIsNotDeleted(it); Start}
-                 .onError<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); respondPromptScaleId(); WaitScaleIdForPurge}
+                .onError<ScaleIsNotDeletedException> {respondScaleIsNotDeleted(it); Start}
+                .onError<ScaleDoesNotExistException> {respondScaleDoesNotExist(it); respondPromptScaleId(); WaitScaleIdForPurge}
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
+        }),
+        // UPDATE NAME
+        entry(Start, UpdateScaleNameCommand::class, requireArgument { arg ->
+            parseUpdateNameRequest(arg)
+                .flatMap { updateScale(it) }
+                .then { respondUpdateName(it) }
+                .state { Start }
+                .onError<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); Start }
+                .onError<ScaleAlreadyExistsException> { respondScaleAlreadyExists(it);  Start }
                 .onError<Throwable> { respondInternalError(it); Start }
                 .get()
         }),
 
+        entry(Start, UpdateScaleNameCommandNoArgs){respondPromptScaleId(); WaitScaleIdForUpdateName},
+        entry(WaitScaleIdForUpdateName, TextCommand::class, requireArgument { arg ->
+            parseScaleId(arg)
+                .then {setId(it)}
+                .then { respondPromptScaleName() }
+                .state { WaitScaleUpdateName }
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
+        }),
+        entry(WaitScaleUpdateName, TextCommand::class, requireArgument { arg ->
+            parseScaleName(arg)
+                .then {setName(it)}
+                .map { buildUpdateRequest() }
+                .flatMap { updateScale(it) }
+                .then { respondUpdateName(it) }
+                .then { reset() }
+                .state { Start }
+                .onError<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleName(); WaitScaleUpdateName }
+                .onError<ScaleAlreadyExistsException> { respondScaleAlreadyExists(it); reset(); Start }
+                .onError<Throwable> { respondInternalError(it); reset(); Start }
+                .get()
+        }),
+
+                // UPDATE UNIT
+        entry(Start, UpdateScaleDivisionsCommand::class, requireArgument { arg ->
+            parseUpdateDivisionRequest(arg)
+                .flatMap { updateScale(it) }
+                .then { respondUpdateDivisions(it) }
+                .state { Start }
+                .onError<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); Start }
+                .onError<ScaleAlreadyExistsException> { respondScaleAlreadyExists(it);  Start }
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
+        }),
+
+        entry(Start, UpdateScaleUnitCommandNoArgs){respondPromptScaleId(); WaitScaleIdForUpdateUnit},
+        entry(WaitScaleIdForUpdateUnit, TextCommand::class, requireArgument { arg ->
+            parseScaleId(arg)
+                .then {setId(it)}
+                .then { respondPromptScaleUnit() }
+                .state { WaitScaleUpdateUnit }
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
+        }),
+        entry(WaitScaleUpdateUnit, TextCommand::class, requireArgument { arg ->
+            parseScaleUnit(arg)
+                .then {setUnit(it)}
+                .map { buildUpdateRequest() }
+                .flatMap { updateScale(it) }
+                .then { respondUpdateName(it) }
+                .then { reset() }
+                .state { Start }
+                .onError<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleUnit(); WaitScaleUpdateUnit }
+                .onError<ScaleAlreadyExistsException> { respondScaleAlreadyExists(it); reset(); Start }
+                .onError<Throwable> { respondInternalError(it); reset(); Start }
+                .get()
+        }),
+
+        // UPDATE DIVISION
+        entry(Start, UpdateScaleDivisionsCommand::class, requireArgument { arg ->
+            parseUpdateDivisionRequest(arg)
+                .flatMap { updateScale(it) }
+                .then { respondUpdateDivisions(it) }
+                .state { Start }
+                .onError<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); Start }
+                .onError<ScaleAlreadyExistsException> { respondScaleAlreadyExists(it);  Start }
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
+        }),
+
+        entry(Start, UpdateScaleDivisionsCommandNoArgs){respondPromptScaleId(); WaitScaleIdForUpdateDivisions},
+        entry(WaitScaleIdForUpdateDivisions, TextCommand::class, requireArgument { arg ->
+            parseScaleId(arg)
+                .then {setId(it)}
+                .then { respondPromptScaleDivisions() }
+                .state { WaitScaleUpdateDivisions }
+                .onError<Throwable> { respondInternalError(it); Start }
+                .get()
+        }),
+        entry(WaitScaleUpdateDivisions, TextCommand::class, requireArgument { arg ->
+            parseScaleDivisions(arg)
+                .then {setDivisions(it)}
+                .map { buildUpdateRequest() }
+                .flatMap { updateScale(it) }
+                .then { respondUpdateDivisions(it) }
+                .then { reset() }
+                .state { Start }
+                .onError<InvalidScalePropertyFormatException> { respondInvalidScalePropertyFormat(it); respondPromptScaleDivisions(); WaitScaleUpdateDivisions }
+                .onError<ScaleAlreadyExistsException> { respondScaleAlreadyExists(it); reset(); Start }
+                .onError<Throwable> { respondInternalError(it); reset(); Start }
+                .get()
+        }),
     )
 }

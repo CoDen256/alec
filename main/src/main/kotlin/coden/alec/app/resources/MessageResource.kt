@@ -22,6 +22,10 @@ open class MessageResource {
     lateinit var purgedScale: String
     lateinit var scaleIsNotMarkedAsDeleted: String
 
+    lateinit var updatedNameScale: String
+    lateinit var updatedUnitScale: String
+    lateinit var updatedDivisionsScale: String
+
     lateinit var menuBack: String
     lateinit var error: String
 
